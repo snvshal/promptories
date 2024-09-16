@@ -10,7 +10,7 @@ export function SidebarComponent() {
             <aside className="hidden md:flex flex-col w-64 h-full border-r">
                 <div className="p-4">
                     <h1 className="text-2xl font-bold text-blue-600">
-                        Prompto
+                        Promptories
                     </h1>
                 </div>
                 <SidebarContent />
@@ -25,7 +25,7 @@ export function ToggleSidebar() {
     return (
         <header className="shadow-sm sticky top-0 z-10 md:hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-blue-600">Prompto</h1>
+                <h1 className="text-2xl font-bold text-blue-600">Promptories</h1>
                 <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
                     <SheetTrigger asChild>
                         <Button variant="ghost" size="icon">
