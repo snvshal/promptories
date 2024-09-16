@@ -1,14 +1,4 @@
-import {
-    Bookmark,
-    Compass,
-    Home,
-    Menu,
-    PlusCircle,
-    Sidebar,
-    User,
-    Users,
-    X,
-} from "lucide-react";
+import { Bookmark, Compass, Home, Menu, Users } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
@@ -73,7 +63,6 @@ export const SidebarContent = () => (
             Communities
         </Button>
         <Button variant="default" className="justify-center h-10 rounded-full">
-            {/* <PlusCircle className="mr-2 h-4 w-4" /> */}
             New Post
         </Button>
         <Button
