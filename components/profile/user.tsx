@@ -1,42 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Bell,
-  MessageSquare,
-  Search,
-  Home,
-  BookOpen,
-  Compass,
-  Users,
-  Heart,
-  MessageCircle,
-  Bookmark,
-  Share2,
-  Menu,
-  X,
-  PlusCircle,
-  User,
-  Settings,
-  LogOut,
-} from "lucide-react";
-import { posts } from "@/lib/seed";
+
 import { PostsComponent } from "../home";
 
 export default function UserProfileComponent() {
-  //   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   // Mock user data
   const user = {
     name: "Alice Johnson",

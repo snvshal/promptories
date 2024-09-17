@@ -1,9 +1,5 @@
 import UserProfileComponent from "@/components/profile/user";
 
-export default function UserProfilePage({
-  params,
-}: {
-  params: { username: string };
-}) {
+export default function UserProfilePage() {
   return <UserProfileComponent />;
 }

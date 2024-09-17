@@ -1,9 +1,3 @@
-import PostForm from "@/components/form";
-
-export default function PromptoriesPage({
-  params,
-}: {
-  params: { username: string; promptory_id: string };
-}) {
+export default function PromptoriesPage() {
   return <div>Promptpries</div>;
 }
