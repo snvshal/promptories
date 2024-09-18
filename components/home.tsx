@@ -22,8 +22,9 @@ import {
 import { posts } from "@/lib/seed";
 import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
+import { TUser } from "@/types/schema.type";
 
-export function HomePageComponent() {
+export function HomePageComponent({ user }: { user: TUser }) {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -48,7 +49,7 @@ export function HomePageComponent() {
               <Bell className="h-5 w-5" />
             </Button>
             <ModeToggle />
-            <Link href={"/username"}>
+            <Link href={user?.username}>
               <Avatar>
                 <AvatarImage
                   src="/placeholder.svg?height=40&width=40"

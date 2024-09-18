@@ -8,6 +8,10 @@ const UserSchema = new Schema<TUser>(
       required: true,
       unique: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -33,4 +37,4 @@ const UserSchema = new Schema<TUser>(
   },
 );
 
-export const User = models.User || model<TUser>("Post", UserSchema);
+export const User = models.User || model<TUser>("User", UserSchema);
