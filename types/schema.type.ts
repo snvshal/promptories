@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export type TPost = {
+  promptory_id: number;
   user: Types.ObjectId;
   caption: string;
   model: string;

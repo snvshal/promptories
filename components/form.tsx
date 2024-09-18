@@ -15,14 +15,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { promptory_type } from "@/lib/constants";
+import { promptory_types } from "@/lib/constants";
+import { savePostForm } from "@/actions/postFormAction";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
   model: z.string().min(1, "Model is required"),
   prompt: z.string().min(1, "Prompt is required"),
   response: z.string().min(1, "Response is required"),
-  promptory_type: z.enum(promptory_type as [string, ...string[]], {
+  promptory_type: z.enum(promptory_types as [string, ...string[]], {
     required_error: "Please select a promptory type",
   }),
   tags: z.string().optional(),
@@ -45,20 +46,23 @@ export default function PostForm() {
       model: "",
       prompt: "",
       response: "",
-      promptory_type: promptory_type[0],
+      promptory_type: promptory_types[0],
       tags: "",
     },
   });
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
-    // Here you would typically send the data to your API
-    console.log(data);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitting(false);
-    // Reset form after successful submission
-    reset();
+    try {
+      await savePostForm(data); // Call the server action
+      // Simulate API call
+      console.log("Form saved:", data);
+      reset();
+    } catch (error) {
+      console.error("Submission failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -109,7 +113,7 @@ export default function PostForm() {
                   <SelectValue placeholder="Select a promptory type" />
                 </SelectTrigger>
                 <SelectContent className="max-h-48">
-                  {promptory_type.map((type) => (
+                  {promptory_types.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
                     </SelectItem>
