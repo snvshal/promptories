@@ -1,0 +1,18 @@
+export const promptory_type = [
+  "text-to-text",
+  "text-to-image",
+  "text-to-video",
+  "text-to-audio",
+  "image-to-text",
+  "image-to-image",
+  "image-to-video",
+  "image-to-audio",
+  "video-to-text",
+  "video-to-image",
+  "video-to-video",
+  "video-to-audio",
+  "audio-to-text",
+  "audio-to-image",
+  "audio-to-video",
+  "audio-to-audio",
+];
