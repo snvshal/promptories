@@ -24,10 +24,10 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
   session,
-}: Readonly<{
+}: {
   children: React.ReactNode;
   session: Session;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
