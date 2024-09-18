@@ -1,4 +1,4 @@
-export const promptory_type = [
+export const promptory_types = [
   "text-to-text",
   "text-to-image",
   "text-to-video",
