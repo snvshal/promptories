@@ -21,6 +21,7 @@ export type TPost = {
 
 export type TUser = Document & {
   username: string;
+  name: string;
   email: string;
   password: string;
   bio?: string;
