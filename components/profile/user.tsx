@@ -1,13 +1,20 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { PostsComponent } from "../home";
 import { signOut } from "next-auth/react";
 import { TPost, TUser } from "@/types/schema.type";
+import { useParams } from "next/navigation";
+import { User2 } from "lucide-react";
 
 export default function UserProfileComponent({
   user,
@@ -16,16 +23,7 @@ export default function UserProfileComponent({
   user: TUser;
   posts: TPost[];
 }) {
-  // Mock user data
-  // const user = {
-  //   name: "Alice Johnson",
-  //   username: "@alicewrites",
-  //   avatar: "/placeholder.svg?height=128&width=128",
-  //   bio: "AI enthusiast | Creative writer | Coffee lover",
-  //   followers: 1234,
-  //   following: 567,
-  //   posts: 89,
-  // };
+  if (!user) return <UserNotFound />;
 
   return (
     <div className="flex min-h-screen">
@@ -51,7 +49,7 @@ export default function UserProfileComponent({
                     <p className="text-muted-foreground">Following</p>
                   </div>
                   <div>
-                    {/* <p className="font-semibold">{user?.posts.length}</p> */}
+                    <p className="font-semibold">{posts.length}</p>
                     <p className="text-muted-foreground">Posts</p>
                   </div>
                 </div>
@@ -87,6 +85,40 @@ export default function UserProfileComponent({
           </Tabs>
         </div>
       </main>
+    </div>
+  );
+}
+
+export function UserNotFound() {
+  const { username } = useParams();
+  console.log(username);
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <Card className="mb-8">
+        <CardContent className="pt-6">
+          <div className="flex flex-col items-center text-center">
+            <Avatar className="mb-4 h-24 w-24">
+              <AvatarImage src={""} alt={"user not found!"} />
+              <AvatarFallback>
+                <User2 size={48} />
+              </AvatarFallback>
+            </Avatar>
+            <CardHeader className="text-2xl font-bold">
+              User Not Found!
+            </CardHeader>
+            <div className="pb-3">
+              <p>
+                We couldn&#39;t find a user with the username &#34;{username}
+                &#34;.
+              </p>
+            </div>
+            <CardFooter>
+              The user may have changed their username or the account may no
+              longer exist.
+            </CardFooter>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

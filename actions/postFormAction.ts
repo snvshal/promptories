@@ -1,11 +1,7 @@
-// app/actions/postFormAction.ts
-
 "use server";
 
 import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model";
-import { TPost } from "@/types/schema.type";
-import { Types } from "mongoose";
 import { currentUser } from "@/utils/get-user";
 
 export type FPost = {
@@ -19,7 +15,7 @@ export type FPost = {
 
 export async function savePostForm(data: FPost) {
   try {
-    await connectToDatabase(); // Ensure the database is connected
+    await connectToDatabase();
     const user = await currentUser();
 
     await Post.create({
@@ -30,10 +26,17 @@ export async function savePostForm(data: FPost) {
       prompt: data.prompt,
       response: data.response,
       promptory_type: data.promptory_type,
-      tags: data.tags,
+      tags: await parseTags(data.tags as string),
     });
   } catch (error) {
     console.error("Error saving post:", error);
     throw new Error("Failed to save post.");
   }
 }
+
+export const parseTags = async (tags: string): Promise<string[]> => {
+  return tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length);
+};
