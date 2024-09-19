@@ -2,8 +2,7 @@ import { Schema, model, models } from "mongoose";
 import { promptory_types } from "@/lib/constants";
 import { TPost } from "@/types/schema.type";
 
-// Create the Mongoose schema based on the TPost type
-const PostSchema: Schema = new Schema<TPost>(
+const PostSchema: Schema = new Schema(
   {
     promptory_id: {
       type: Number,

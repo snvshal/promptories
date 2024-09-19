@@ -42,7 +42,7 @@ export default function SignUpPage() {
             <Button
               variant="outline"
               onClick={handleSignIn}
-              className="flex-center gap-2 rounded-full px-4"
+              className="flex-center h-10 gap-2 rounded-full px-4"
             >
               <svg
                 viewBox="0 0 24 24"

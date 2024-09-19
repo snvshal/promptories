@@ -18,13 +18,20 @@ import {
   MessageCircle,
   Bookmark,
   Share2,
+  Pen,
 } from "lucide-react";
-import { posts } from "@/lib/seed";
 import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
-import { TUser } from "@/types/schema.type";
+import { TPost, TUser } from "@/types/schema.type";
+import { timeAgo } from "@/utils/time-ago";
 
-export function HomePageComponent({ user }: { user: TUser }) {
+export function HomePageComponent({
+  user,
+  posts,
+}: {
+  user: TUser;
+  posts: TPost[];
+}) {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -49,6 +56,9 @@ export function HomePageComponent({ user }: { user: TUser }) {
               <Bell className="h-5 w-5" />
             </Button>
             <ModeToggle />
+            <Link href={"/compose/promptory"}>
+              <Pen size={15} />
+            </Link>
             <Link href={user?.username}>
               <Avatar>
                 <AvatarImage
@@ -62,68 +72,64 @@ export function HomePageComponent({ user }: { user: TUser }) {
         </div>
       </header>
 
-      <PostsComponent />
+      <PostsComponent posts={posts} />
     </div>
   );
 }
 
-export function PostsComponent() {
+export function PostsComponent({ posts }: { posts: TPost[] }) {
+  const pu = (post: TPost) => post.user as TUser;
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 sm:px-12 lg:px-16">
       <div className="space-y-6">
         {posts.map((post) => (
           <Card
-            key={post.id}
+            key={post._id as string}
             className="bordery-y-0 w-full rounded-none border-0 border-b"
           >
             <CardHeader className="p-2">
               <div className="flex-start space-x-4">
                 <Link
-                  href={`${post.user.username}`}
+                  href={`/${pu(post).username}`}
                   className="flex-start space-x-4"
                 >
                   <Avatar>
-                    <AvatarImage src={post.user.avatar} alt={post.user.name} />
-                    <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
+                    <AvatarFallback>{pu(post).name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-start gap-1">
-                    <p className="font-semibold">{post.user.name}</p>
+                    <p className="font-semibold">{pu(post).name}</p>
                     <p className="text-muted-foreground">
-                      {post.user.username}
+                      @{pu(post).username}
                     </p>
                   </div>
                 </Link>
-                <p className="text-sm text-muted-foreground">{post.postedAt}</p>
+                <p className="text-sm text-muted-foreground">
+                  • {timeAgo(post.createdAt as Date)}
+                </p>
               </div>
-              {/* <CardTitle className="text-xl font-semibold">
-                {post.title}
-              </CardTitle> */}
             </CardHeader>
             <CardContent className="ml-10 border-0">
               <div className="mb-4">
                 <div className="relative overflow-hidden">
-                  {/* <h3 className="mb-2 font-semibold">Prompt:</h3> */}
                   <p className="whitespace-pre-wrap">
-                    {post.explanation.split(" ").slice(0, 24).join(" ")}
-                    {post.explanation.split(" ").length > 24 && (
-                      <span> ...</span>
-                    )}
+                    {post.caption.split(" ").slice(0, 24).join(" ")}
+                    {post.caption.split(" ").length > 24 && <span> ...</span>}
                   </p>
-                  {post.explanation.split(" ").length > 24 && (
+                  {post.caption.split(" ").length > 24 && (
                     <button className="mb-2 text-blue-500 hover:underline">
                       Show more
                     </button>
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
+                  {post.tags.map((tag: string) => (
                     <Badge key={tag} variant="secondary">
                       #{tag}
                     </Badge>
                   ))}
                 </div>
               </div>
-              {/* <ScrollArea className="h-60 rounded-md border p-4"> */}
               <div className="bbn space-y-4 rounded-lg p-4">
                 <div className="relative overflow-hidden">
                   <h3 className="mb-2 font-semibold">Prompt:</h3>
@@ -144,30 +150,26 @@ export function PostsComponent() {
                     {post.response.split(" ").length > 24 && <span> ...</span>}
                   </p>
                   {post.response.split(" ").length > 24 && (
-                    <button
-                      // onClick={() => setShowFullResponse(!showFullResponse)}
-                      className="mt-2 text-blue-500 hover:underline"
-                    >
+                    <button className="mt-2 text-blue-500 hover:underline">
                       Show more
                     </button>
                   )}
                 </div>
               </div>
-              {/* </ScrollArea> */}
             </CardContent>
             <CardFooter className="ml-10 flex justify-between">
               <div className="flex space-x-4">
                 <Button variant="ghost" size="sm">
                   <Heart className="mr-2 h-4 w-4" />
-                  {post.likes}
+                  {post.likes_count}
                 </Button>
                 <Button variant="ghost" size="sm">
                   <MessageCircle className="mr-2 h-4 w-4" />
-                  {post.comments}
+                  {post.replies.length}
                 </Button>
                 <Button variant="ghost" size="sm">
                   <Bookmark className="mr-2 h-4 w-4" />
-                  {post.saves}
+                  {post.bookmarks.length}
                 </Button>
               </div>
               <Button variant="ghost" size="sm">

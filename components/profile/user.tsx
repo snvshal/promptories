@@ -7,9 +7,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { PostsComponent } from "../home";
 import { signOut } from "next-auth/react";
-import { TUser } from "@/types/schema.type";
+import { TPost, TUser } from "@/types/schema.type";
 
-export default function UserProfileComponent({ user }: { user: TUser }) {
+export default function UserProfileComponent({
+  user,
+  posts,
+}: {
+  user: TUser;
+  posts: TPost[];
+}) {
   // Mock user data
   // const user = {
   //   name: "Alice Johnson",
@@ -66,7 +72,7 @@ export default function UserProfileComponent({ user }: { user: TUser }) {
               <TabsTrigger value="saved">Saved</TabsTrigger>
             </TabsList>
             <TabsContent value="posts">
-              <PostsComponent />
+              <PostsComponent posts={posts} />
             </TabsContent>
             <TabsContent value="likes">
               <div className="py-8 text-center">
