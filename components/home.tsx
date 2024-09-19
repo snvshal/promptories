@@ -23,7 +23,7 @@ import {
 import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
 import { TPost, TUser } from "@/types/schema.type";
-import { timeAgo } from "@/utils/time-ago";
+import { TimeAgo } from "./time-ago";
 
 export function HomePageComponent({
   user,
@@ -84,7 +84,7 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
       <div className="space-y-6">
         {posts.map((post) => (
           <Card
-            key={post._id as string}
+            key={post._id?.toString()}
             className="bordery-y-0 w-full rounded-none border-0 border-b"
           >
             <CardHeader className="p-2">
@@ -105,7 +105,8 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
                   </div>
                 </Link>
                 <p className="text-sm text-muted-foreground">
-                  • {timeAgo(post.createdAt as Date)}
+                  {/* • {timeAgo(post.createdAt as Date)} */}
+                  • <TimeAgo timestamp={post.createdAt as Date} />
                 </p>
               </div>
             </CardHeader>
@@ -123,8 +124,8 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag: string) => (
-                    <Badge key={tag} variant="secondary">
+                  {post.tags.map((tag: string, index) => (
+                    <Badge key={index} variant="secondary">
                       #{tag}
                     </Badge>
                   ))}
