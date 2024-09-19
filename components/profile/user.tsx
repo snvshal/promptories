@@ -18,12 +18,14 @@ import { User2 } from "lucide-react";
 
 export default function UserProfileComponent({
   user,
+  profileUser,
   posts,
 }: {
   user: TUser;
+  profileUser: TUser;
   posts: TPost[];
 }) {
-  if (!user) return <UserNotFound />;
+  if (!profileUser) return <UserNotFound />;
 
   return (
     <div className="flex min-h-screen">
@@ -33,19 +35,28 @@ export default function UserProfileComponent({
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
                 <Avatar className="mb-4 h-24 w-24">
-                  <AvatarImage src={user?.avatar} alt={user?.name} />
-                  <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                  <AvatarImage
+                    src={profileUser?.avatar}
+                    alt={profileUser?.name}
+                  />
+                  <AvatarFallback>
+                    {profileUser?.name?.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
-                <h2 className="text-2xl font-bold">{user?.name}</h2>
-                <p className="text-muted-foreground">{user?.username}</p>
-                <p className="mt-2 text-gray-700">{user?.bio}</p>
+                <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
+                <p className="text-muted-foreground">{profileUser?.username}</p>
+                <p className="mt-2 text-gray-700">{profileUser?.bio}</p>
                 <div className="mt-4 flex justify-center space-x-4">
                   <div>
-                    <p className="font-semibold">{user?.followers.length}</p>
+                    <p className="font-semibold">
+                      {profileUser?.followers.length}
+                    </p>
                     <p className="text-muted-foreground">Followers</p>
                   </div>
                   <div>
-                    <p className="font-semibold">{user?.following.length}</p>
+                    <p className="font-semibold">
+                      {profileUser?.following.length}
+                    </p>
                     <p className="text-muted-foreground">Following</p>
                   </div>
                   <div>
@@ -70,7 +81,7 @@ export default function UserProfileComponent({
               <TabsTrigger value="saved">Saved</TabsTrigger>
             </TabsList>
             <TabsContent value="posts">
-              <PostsComponent posts={posts} />
+              <PostsComponent user={user} posts={posts} />
             </TabsContent>
             <TabsContent value="likes">
               <div className="py-8 text-center">

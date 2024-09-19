@@ -174,7 +174,7 @@ export function PostsComponent({
                   </div>
                 </Link>
                 <p className="text-sm text-muted-foreground">
-                  • <TimeAgo timestamp={post.createdAt as Date} />
+                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
                 </p>
               </div>
             </CardHeader>
