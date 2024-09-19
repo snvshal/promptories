@@ -24,6 +24,9 @@ import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
 import { TPost, TUser } from "@/types/schema.type";
 import { TimeAgo } from "./time-ago";
+import { handleLikePost } from "@/actions/handleLikePost";
+import { Types } from "mongoose";
+import { handleBookmarkPost } from "@/actions/handleBookmarkPost";
 
 export function HomePageComponent({
   user,
@@ -61,23 +64,89 @@ export function HomePageComponent({
             </Link>
             <Link href={user?.username}>
               <Avatar>
-                <AvatarImage
-                  src="/placeholder.svg?height=40&width=40"
-                  alt="@username"
-                />
-                <AvatarFallback>UN</AvatarFallback>
+                <AvatarImage src={user?.avatar} alt={user?.username} />
+                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
               </Avatar>
             </Link>
           </div>
         </div>
       </header>
 
-      <PostsComponent posts={posts} />
+      <PostsComponent user={user} posts={posts} />
     </div>
   );
 }
 
-export function PostsComponent({ posts }: { posts: TPost[] }) {
+export function PostsComponent({
+  user,
+  posts,
+}: {
+  user: TUser;
+  posts: TPost[];
+}) {
+  const [likeStates, setLikeStates] = useState(
+    posts.reduce(
+      (acc, post) => {
+        acc[post._id as string] = {
+          likes: post.likes.length,
+          hasLiked: post.likes.includes(user._id as Types.ObjectId),
+          bookmarks: post.bookmarks.length,
+          hasBookmarked: post.bookmarks.includes(user._id as Types.ObjectId),
+        };
+        return acc;
+      },
+      {} as Record<
+        string,
+        {
+          likes: number;
+          hasLiked: boolean;
+          bookmarks: number;
+          hasBookmarked: boolean;
+        }
+      >,
+    ),
+  );
+
+  // Handle like/unlike
+  const handleLikeClick = async (postId: string) => {
+    setLikeStates((prevState) => {
+      const hasLiked = !prevState[postId].hasLiked;
+      const likes = hasLiked
+        ? prevState[postId].likes + 1
+        : prevState[postId].likes - 1;
+
+      return {
+        ...prevState,
+        [postId]: { ...prevState[postId], likes, hasLiked },
+      };
+    });
+
+    await handleLikePost(postId, user._id as string);
+  };
+
+  // Handle bookmark/unbookmark
+  const handleBookmarkClick = async (postId: string) => {
+    setLikeStates((prevState) => {
+      const hasBookmarked = !prevState[postId].hasBookmarked;
+      const bookmarks = hasBookmarked
+        ? prevState[postId].bookmarks + 1
+        : prevState[postId].bookmarks - 1;
+
+      return {
+        ...prevState,
+        [postId]: { ...prevState[postId], bookmarks, hasBookmarked },
+      };
+    });
+
+    await handleBookmarkPost(postId, user._id as string); // Call server action for bookmark/unbookmark
+  };
+
+  const ib = (postId: string) =>
+    likeStates[postId].hasBookmarked ? "#3b82f6" : "none";
+
+  const il = (postId: string) =>
+    likeStates[postId].hasLiked ? "#b91c1c" : "none";
+
   const pu = (post: TPost) => post.user as TUser;
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 sm:px-12 lg:px-16">
@@ -105,7 +174,6 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
                   </div>
                 </Link>
                 <p className="text-sm text-muted-foreground">
-                  {/* • {timeAgo(post.createdAt as Date)} */}
                   • <TimeAgo timestamp={post.createdAt as Date} />
                 </p>
               </div>
@@ -160,18 +228,41 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
             </CardContent>
             <CardFooter className="ml-10 flex justify-between">
               <div className="flex space-x-4">
-                <Button variant="ghost" size="sm">
-                  <Heart className="mr-2 h-4 w-4" />
-                  {post.likes.length}
-                </Button>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleLikeClick(post._id as string);
+                  }}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Heart
+                      style={{ color: il(post._id as string) }}
+                      fill={il(post._id as string)}
+                      className={`mr-2 h-4 w-4`}
+                    />
+                    {likeStates[post._id as string].likes}
+                  </Button>
+                </form>
                 <Button variant="ghost" size="sm">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   {post.replies.length}
                 </Button>
-                <Button variant="ghost" size="sm">
-                  <Bookmark className="mr-2 h-4 w-4" />
-                  {post.bookmarks.length}
-                </Button>
+                {/* Bookmark Button */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleBookmarkClick(post._id as string);
+                  }}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Bookmark
+                      style={{ color: ib(post._id as string) }}
+                      className={`mr-2 h-4 w-4`}
+                      fill={ib(post._id as string)}
+                    />
+                    {likeStates[post._id as string].bookmarks}
+                  </Button>
+                </form>
               </div>
               <Button variant="ghost" size="sm">
                 <Share2 className="mr-2 h-4 w-4" />
