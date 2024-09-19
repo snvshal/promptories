@@ -107,7 +107,10 @@ export function UserNotFound() {
               User Not Found!
             </CardHeader>
             <div className="pb-3">
-              <p>We couldn't find a user with the username "{username}".</p>
+              <p>
+                We couldn&#39;t find a user with the username &#34;{username}
+                &#34;.
+              </p>
             </div>
             <CardFooter>
               The user may have changed their username or the account may no
