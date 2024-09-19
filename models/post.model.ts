@@ -41,16 +41,10 @@ const PostSchema: Schema = new Schema(
         timestamp: { type: Date, default: Date.now },
       },
     ],
-    likes_count: {
-      type: Number,
-      default: 0,
-    },
+    likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
     bookmarks: [{ type: Schema.Types.ObjectId, ref: "User" }],
     tags: [{ type: String }],
-    views_count: {
-      type: Number,
-      default: 0,
-    },
+    views: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true },
 );
