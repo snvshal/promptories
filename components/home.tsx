@@ -162,7 +162,7 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
               <div className="flex space-x-4">
                 <Button variant="ghost" size="sm">
                   <Heart className="mr-2 h-4 w-4" />
-                  {post.likes_count}
+                  {post.likes.length}
                 </Button>
                 <Button variant="ghost" size="sm">
                   <MessageCircle className="mr-2 h-4 w-4" />

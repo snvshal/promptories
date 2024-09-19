@@ -13,10 +13,10 @@ export type TPost = Document & {
     reply: string;
     timestamp: Date;
   }[];
-  likes_count: number;
+  likes: Types.ObjectId[];
   bookmarks: Types.ObjectId[];
   tags: string[];
-  views_count: number;
+  views: Types.ObjectId[];
   createdAt?: Date;
   updatedAt?: Date;
 };
