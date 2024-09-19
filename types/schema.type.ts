@@ -1,8 +1,8 @@
-import { Types } from "mongoose";
+import { Types, Document } from "mongoose";
 
-export type TPost = {
+export type TPost = Document & {
   promptory_id: number;
-  user: Types.ObjectId;
+  user: Types.ObjectId | TUser;
   caption: string;
   model: string;
   prompt: string;
@@ -17,6 +17,8 @@ export type TPost = {
   bookmarks: Types.ObjectId[];
   tags: string[];
   views_count: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type TUser = Document & {
@@ -28,7 +30,6 @@ export type TUser = Document & {
   avatar?: string;
   socialLinks?: {
     twitter?: string;
-    linkedin?: string;
     github?: string;
   };
   followers: Types.ObjectId[];

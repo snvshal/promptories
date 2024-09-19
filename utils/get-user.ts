@@ -1,13 +1,14 @@
 import { getServerSession } from "next-auth";
 import { connectToDatabase } from "./db";
 import { User } from "@/models/user.model";
+import { TPost, TUser } from "@/types/schema.type";
 
 export const currentUser = async () => {
   try {
     await connectToDatabase();
     const session = await getServerSession();
 
-    const user = User.findOne({ email: session?.user?.email });
+    const user = await User.findOne({ email: session?.user?.email });
 
     return user;
   } catch (error) {
@@ -19,10 +20,15 @@ export const getUserByUsername = async (username: string) => {
   try {
     await connectToDatabase();
 
-    const user = User.findOne({ username });
+    const user = await User.findOne({ username });
 
     return user;
   } catch (error) {
     console.log(error);
   }
+};
+
+export const getUser = async (post: TPost) => {
+  const user = await User.findOne({ user: post.user });
+  return user;
 };

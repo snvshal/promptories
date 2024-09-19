@@ -6,6 +6,7 @@ import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model";
 import { TPost } from "@/types/schema.type";
 import { Types } from "mongoose";
+import { currentUser } from "@/utils/get-user";
 
 export type FPost = {
   caption: string;
@@ -19,10 +20,11 @@ export type FPost = {
 export async function savePostForm(data: FPost) {
   try {
     await connectToDatabase(); // Ensure the database is connected
+    const user = await currentUser();
 
     await Post.create({
+      user: user,
       promptory_id: Date.now(),
-      user: new Types.ObjectId(),
       caption: data.caption,
       model: data.model,
       prompt: data.prompt,
