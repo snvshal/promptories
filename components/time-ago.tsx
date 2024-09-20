@@ -33,7 +33,7 @@ export function TimeAgo({ timestamp }: { timestamp: Date }) {
     // Update the time every second
     const interval = setInterval(() => {
       setTimeAgo(calculateTimeAgo());
-    }, 1000);
+    }, 10000);
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [timestamp]);

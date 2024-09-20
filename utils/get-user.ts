@@ -10,7 +10,7 @@ export const currentUser = async () => {
 
     const user = await User.findOne({ email: session?.user?.email });
 
-    return user;
+    return user as TUser;
   } catch (error) {
     console.log(error);
   }
@@ -20,15 +20,15 @@ export const getUserByUsername = async (username: string) => {
   try {
     await connectToDatabase();
 
-    const user = await User.findOne({ username });
+    const user: TUser | null = await User.findOne({ username });
 
-    return user;
+    return user as TUser;
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getUser = async (post: TPost) => {
-  const user = await User.findOne({ user: post.user });
-  return user;
-};
+// export const getUserByPost = async (post: TPost) => {
+//   const user = await User.findOne({ user: post.user });
+//   return user as TUser;
+// };

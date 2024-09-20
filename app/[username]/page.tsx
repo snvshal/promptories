@@ -10,14 +10,14 @@ export default async function UserProfilePage({
   params: { username: string };
 }) {
   const { username } = params;
-  const user: TUser = await currentUser();
-  const profileUser: TUser = await getUserByUsername(username);
-  const posts: TPost[] | undefined = await getPostsByUsername(username);
+  const user = await currentUser();
+  const profileUser = await getUserByUsername(username);
+  const posts = await getPostsByUsername(username);
 
   return (
     <UserProfileComponent
-      user={ps(user)}
-      profileUser={ps(profileUser)}
+      user={ps(user as TUser)}
+      profileUser={ps(profileUser as TUser)}
       posts={ps(posts as TPost[])}
     />
   );
