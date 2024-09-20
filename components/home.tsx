@@ -22,11 +22,14 @@ import {
 } from "lucide-react";
 import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
-import { TPost, TUser } from "@/types/schema.type";
+import { TPost, TReplies, TUser } from "@/types/schema.type";
 import { TimeAgo } from "./time-ago";
 import { handleLikePost } from "@/actions/handleLikePost";
 import { Types } from "mongoose";
 import { handleBookmarkPost } from "@/actions/handleBookmarkPost";
+import { useRouter } from "next/navigation";
+
+export const pu = (post: TPost | TReplies) => post.user as TUser;
 
 export function HomePageComponent({
   user,
@@ -84,79 +87,21 @@ export function PostsComponent({
   user: TUser;
   posts: TPost[];
 }) {
-  const [likeStates, setLikeStates] = useState(
-    posts.reduce(
-      (acc, post) => {
-        acc[post._id as string] = {
-          likes: post.likes.length,
-          hasLiked: post.likes.includes(user._id as Types.ObjectId),
-          bookmarks: post.bookmarks.length,
-          hasBookmarked: post.bookmarks.includes(user._id as Types.ObjectId),
-        };
-        return acc;
-      },
-      {} as Record<
-        string,
-        {
-          likes: number;
-          hasLiked: boolean;
-          bookmarks: number;
-          hasBookmarked: boolean;
-        }
-      >,
-    ),
-  );
+  const router = useRouter();
 
-  // Handle like/unlike
-  const handleLikeClick = async (postId: string) => {
-    setLikeStates((prevState) => {
-      const hasLiked = !prevState[postId].hasLiked;
-      const likes = hasLiked
-        ? prevState[postId].likes + 1
-        : prevState[postId].likes - 1;
-
-      return {
-        ...prevState,
-        [postId]: { ...prevState[postId], likes, hasLiked },
-      };
-    });
-
-    await handleLikePost(postId, user._id as string);
-  };
-
-  // Handle bookmark/unbookmark
-  const handleBookmarkClick = async (postId: string) => {
-    setLikeStates((prevState) => {
-      const hasBookmarked = !prevState[postId].hasBookmarked;
-      const bookmarks = hasBookmarked
-        ? prevState[postId].bookmarks + 1
-        : prevState[postId].bookmarks - 1;
-
-      return {
-        ...prevState,
-        [postId]: { ...prevState[postId], bookmarks, hasBookmarked },
-      };
-    });
-
-    await handleBookmarkPost(postId, user._id as string); // Call server action for bookmark/unbookmark
-  };
-
-  const ib = (postId: string) =>
-    likeStates[postId].hasBookmarked ? "#3b82f6" : "none";
-
-  const il = (postId: string) =>
-    likeStates[postId].hasLiked ? "#b91c1c" : "none";
-
-  const pu = (post: TPost) => post.user as TUser;
+  const postClick = (post: TPost) =>
+    router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 sm:px-12 lg:px-16">
       <div className="space-y-6">
         {posts.map((post) => (
           <Card
             key={post._id?.toString()}
-            className="bordery-y-0 w-full rounded-none border-0 border-b"
+            onClick={() => postClick(post)}
+            className="bordery-y-0 w-full cursor-pointer"
+            role="button"
           >
-            <CardHeader className="p-2">
+            <CardHeader className="pb-0">
               <div className="flex-start space-x-4">
                 <Link
                   href={`/${pu(post).username}`}
@@ -164,12 +109,12 @@ export function PostsComponent({
                 >
                   <Avatar>
                     <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                    <AvatarFallback>{pu(post).name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-start gap-1">
                     <p className="font-semibold">{pu(post).name}</p>
                     <p className="text-muted-foreground">
-                      @{pu(post).username}
+                      &#64;{pu(post).username}
                     </p>
                   </div>
                 </Link>
@@ -178,7 +123,7 @@ export function PostsComponent({
                 </p>
               </div>
             </CardHeader>
-            <CardContent className="ml-10 border-0">
+            <CardContent className="ml-14 border-0">
               <div className="mb-4">
                 <div className="relative overflow-hidden">
                   <p className="whitespace-pre-wrap">
@@ -226,43 +171,30 @@ export function PostsComponent({
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="ml-10 flex justify-between">
+            <CardFooter className="ml-12 flex justify-between">
               <div className="flex space-x-4">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleLikeClick(post._id as string);
-                  }}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Heart
-                      style={{ color: il(post._id as string) }}
-                      fill={il(post._id as string)}
-                      className={`mr-2 h-4 w-4`}
-                    />
-                    {likeStates[post._id as string].likes}
-                  </Button>
-                </form>
+                {/* Like Button */}
+                <LikeButton
+                  postId={post._id as string}
+                  initialLikes={post.likes.length}
+                  userId={user._id as string}
+                  hasLikedInitial={post.likes.includes(
+                    user._id as Types.ObjectId,
+                  )}
+                />
                 <Button variant="ghost" size="sm">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   {post.replies.length}
                 </Button>
                 {/* Bookmark Button */}
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleBookmarkClick(post._id as string);
-                  }}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Bookmark
-                      style={{ color: ib(post._id as string) }}
-                      className={`mr-2 h-4 w-4`}
-                      fill={ib(post._id as string)}
-                    />
-                    {likeStates[post._id as string].bookmarks}
-                  </Button>
-                </form>
+                <BookmarkButton
+                  postId={post._id as string}
+                  initialBookmarks={post.bookmarks.length}
+                  userId={user._id as string}
+                  hasBookmarkedInitial={post.bookmarks.includes(
+                    user._id as Types.ObjectId,
+                  )}
+                />
               </div>
               <Button variant="ghost" size="sm">
                 <Share2 className="mr-2 h-4 w-4" />
@@ -275,3 +207,87 @@ export function PostsComponent({
     </main>
   );
 }
+
+export type LikeButtonProps = {
+  postId: string;
+  initialLikes: number;
+  userId: string;
+  hasLikedInitial: boolean;
+};
+
+export const LikeButton = ({
+  postId,
+  initialLikes,
+  userId,
+  hasLikedInitial,
+}: LikeButtonProps) => {
+  const [likes, setLikes] = useState(initialLikes);
+  const [hasLiked, setHasLiked] = useState(hasLikedInitial);
+
+  const handleLikeClick = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Optimistically update state
+    setHasLiked(!hasLiked);
+    setLikes(hasLiked ? likes - 1 : likes + 1);
+
+    // Server action to handle like/unlike
+    await handleLikePost(postId, userId);
+  };
+
+  const il = () => (hasLiked ? "#b91c1c" : "none");
+  return (
+    <form onSubmit={handleLikeClick}>
+      <Button variant="ghost" size="sm">
+        <Heart style={{ color: il() }} fill={il()} className={`mr-2 h-4 w-4`} />
+        {likes}
+      </Button>
+    </form>
+  );
+};
+
+// export default LikeButton;
+
+export type BookmarkButtonProps = {
+  postId: string;
+  initialBookmarks: number;
+  userId: string;
+  hasBookmarkedInitial: boolean;
+};
+
+export const BookmarkButton = ({
+  postId,
+  initialBookmarks,
+  userId,
+  hasBookmarkedInitial,
+}: BookmarkButtonProps) => {
+  const [bookmarks, setBookmarks] = useState(initialBookmarks);
+  const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial);
+
+  const handleBookmarkClick = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Optimistically update state
+    setHasBookmarked(!hasBookmarked);
+    setBookmarks(hasBookmarked ? bookmarks - 1 : bookmarks + 1);
+
+    // Server action to handle bookmark/unbookmark
+    await handleBookmarkPost(postId, userId);
+  };
+
+  const ib = () => (hasBookmarked ? "#3b82f6" : "none");
+  return (
+    <form onSubmit={handleBookmarkClick}>
+      <Button variant="ghost" size="sm">
+        <Bookmark
+          style={{ color: ib() }}
+          className={`mr-2 h-4 w-4`}
+          fill={ib()}
+        />
+        {bookmarks}
+      </Button>
+    </form>
+  );
+};
+
+// export default BookmarkButton;

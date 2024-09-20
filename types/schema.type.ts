@@ -8,11 +8,7 @@ export type TPost = Document & {
   prompt: string;
   response: string;
   promptory_type: PromptoryType;
-  replies: {
-    user: Types.ObjectId;
-    reply: string;
-    timestamp: Date;
-  }[];
+  replies: TReplies[];
   likes: Types.ObjectId[];
   bookmarks: Types.ObjectId[];
   tags: string[];
@@ -41,3 +37,10 @@ export type MediaType = "text" | "image" | "video" | "audio";
 
 // Combine all conversion types into a single type
 export type PromptoryType = `${MediaType}-to-${MediaType}`;
+
+// Post Replies Type
+export type TReplies = {
+  user: Types.ObjectId | TUser;
+  reply: string;
+  timestamp: Date;
+};
