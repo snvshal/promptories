@@ -13,7 +13,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Share2, Send, ArrowLeft, Heart } from "lucide-react";
+import {
+  MessageCircle,
+  Share2,
+  Send,
+  ArrowLeft,
+  Heart,
+  Trash,
+  Ellipsis,
+} from "lucide-react";
 import Link from "next/link";
 import { BookmarkButton, il, LikeButton, pu } from "./home";
 import { TimeAgo } from "./time-ago";
@@ -21,7 +29,13 @@ import { TPost, TReplies, TUser } from "@/types/schema.type";
 import { Types } from "mongoose";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { Separator } from "./ui/separator";
-import { handleLikeReply } from "@/actions/handleLikeReply";
+import { deleteReply, handleLikeReply } from "@/actions/handleReplyActions";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function SinglePostPage({
   user,
@@ -36,25 +50,28 @@ export default function SinglePostPage({
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <Card key={post._id?.toString()} className="bordery-y-0 mb-8 w-full">
           <CardHeader className="pb-0">
-            <div className="flex-start space-x-4">
-              <Link
-                href={`/${pu(post).username}`}
-                className="flex-start space-x-4"
-              >
-                <Avatar>
-                  <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                  <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-start gap-1">
-                  <p className="font-semibold">{pu(post).name}</p>
-                  <p className="text-muted-foreground">
-                    &#64;{pu(post).username}
-                  </p>
-                </div>
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                &#8226; <TimeAgo timestamp={post.createdAt as Date} />
-              </p>
+            <div className="flex-between">
+              <div className="flex-start space-x-4">
+                <Link
+                  href={`/${pu(post).username}`}
+                  className="flex-start space-x-4"
+                >
+                  <Avatar>
+                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
+                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-start gap-1">
+                    <p className="font-semibold">{pu(post).name}</p>
+                    <p className="text-muted-foreground">
+                      &#64;{pu(post).username}
+                    </p>
+                  </div>
+                </Link>
+                <p className="text-sm text-muted-foreground">
+                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+                </p>
+              </div>
+              {/* <PostOptions /> */}
             </div>
           </CardHeader>
           <CardContent className="ml-14 border-0">
@@ -232,15 +249,23 @@ export function PostRepliesContent({
             <AvatarFallback>{pu(reply).name?.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <div className="flex-start space-x-2">
-              <p className="font-semibold">{pu(reply).name}</p>
-              <p className="text-sm text-muted-foreground">
-                &#64;{pu(reply).username}
-              </p>
-              <p className="space-x-4 text-sm text-muted-foreground">
-                &#8226; <TimeAgo timestamp={reply.timestamp} />
-              </p>
+            <div className="flex-between">
+              <div className="flex-start space-x-2">
+                <p className="font-semibold">{pu(reply).name}</p>
+                <p className="text-sm text-muted-foreground">
+                  &#64;{pu(reply).username}
+                </p>
+                <p className="space-x-4 text-sm text-muted-foreground">
+                  &#8226; <TimeAgo timestamp={reply.timestamp} />
+                </p>
+              </div>
+              <PostReplyOptions
+                postId={postId}
+                replyId={reply._id as string}
+                setPostReplies={setPostReplies}
+              />
             </div>
+
             <p className="mt-1">{reply.reply}</p>
             <Button
               variant="ghost"
@@ -278,6 +303,42 @@ export function Header() {
         <h1 className="text-2xl font-bold text-blue-600">Prompto</h1>
       </div>
     </header>
+  );
+}
+
+export function PostReplyOptions({
+  postId,
+  replyId,
+  setPostReplies,
+}: {
+  postId: string;
+  replyId: string;
+  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+}) {
+  const handleDeleteReplyClick = async () => {
+    try {
+      const newReplies = await deleteReply(postId, replyId);
+      setPostReplies(newReplies as TReplies[]);
+    } catch (error) {
+      console.error("Failed to delete reply:", error);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size={"icon"} variant={"ghost"} className="rounded-full">
+          <Ellipsis className="h-4 w-4 text-muted-foreground" />
+          <span className="sr-only">Post reply options</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuItem onClick={handleDeleteReplyClick}>
+          <Trash className="mr-2 h-4 w-4" />
+          <span>Delete</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
