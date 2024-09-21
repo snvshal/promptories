@@ -19,6 +19,7 @@ import {
   Bookmark,
   Share2,
   Pen,
+  Ellipsis,
 } from "lucide-react";
 import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
@@ -28,6 +29,14 @@ import { handleLikePost } from "@/actions/handleLikePost";
 import { Types } from "mongoose";
 import { handleBookmarkPost } from "@/actions/handleBookmarkPost";
 import { useRouter } from "next/navigation";
+import { Keyboard, User } from "lucide-react";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -101,25 +110,28 @@ export function PostsComponent({
           className="bordery-y-0 w-full cursor-pointer"
         >
           <CardHeader className="pb-0">
-            <div className="flex-start space-x-4">
-              <Link
-                href={`/${pu(post).username}`}
-                className="flex-start space-x-4"
-              >
-                <Avatar>
-                  <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                  <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-start gap-1">
-                  <p className="font-semibold">{pu(post).name}</p>
-                  <p className="text-muted-foreground">
-                    &#64;{pu(post).username}
-                  </p>
-                </div>
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                &#8226; <TimeAgo timestamp={post.createdAt as Date} />
-              </p>
+            <div className="flex-between">
+              <div className="flex-start space-x-4">
+                <Link
+                  href={`/${pu(post).username}`}
+                  className="flex-start space-x-4"
+                >
+                  <Avatar>
+                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
+                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-start gap-1">
+                    <p className="font-semibold">{pu(post).name}</p>
+                    <p className="text-muted-foreground">
+                      &#64;{pu(post).username}
+                    </p>
+                  </div>
+                </Link>
+                <p className="text-sm text-muted-foreground">
+                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+                </p>
+              </div>
+              <PostOptions />
             </div>
           </CardHeader>
           <CardContent
@@ -299,3 +311,35 @@ export const BookmarkButton = ({
 };
 
 // export default BookmarkButton;
+
+// export function PostOptionsButton() {
+//   return (
+//     <Button size={"icon"} variant={"ghost"} className="rounded-full">
+//       <Ellipsis className="h-4 w-4 text-muted-foreground" />
+//       <span className="sr-only">Post options</span>
+//     </Button>
+//   );
+// }
+
+export function PostOptions() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size={"icon"} variant={"ghost"} className="rounded-full">
+          <Ellipsis className="h-4 w-4 text-muted-foreground" />
+          <span className="sr-only">Post options</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuItem>
+          <User className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Keyboard className="mr-2 h-4 w-4" />
+          <span>Keyboard shortcuts</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
