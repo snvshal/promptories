@@ -59,7 +59,7 @@ export const getLikedPosts = async (profileUser: TUser) => {
       "user",
     );
 
-    console.log("likedPosts: ", likedPosts);
+    // console.log("likedPosts: ", likedPosts);
 
     return likedPosts as TPost[];
   } catch (error) {
@@ -75,7 +75,7 @@ export const getBookmarkedPosts = async (profileUser: TUser) => {
       bookmarks: profileUser._id,
     }).populate("user");
 
-    console.log("likedPosts: ", bookmarkedPosts);
+    // console.log("likedPosts: ", bookmarkedPosts);
 
     return bookmarkedPosts as TPost[];
   } catch (error) {
