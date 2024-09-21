@@ -51,14 +51,34 @@ export const getPostsByPromptoryId = async (
   }
 };
 
-// export const cleanPosts = async () => {
-//   try {
-//     await connectToDatabase();
+export const getLikedPosts = async (profileUser: TUser) => {
+  try {
+    await connectToDatabase();
 
-//     await Post.deleteMany({});
+    const likedPosts = await Post.find({ likes: profileUser._id }).populate(
+      "user",
+    );
 
-//     // return posts;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+    console.log("likedPosts: ", likedPosts);
+
+    return likedPosts as TPost[];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getBookmarkedPosts = async (profileUser: TUser) => {
+  try {
+    await connectToDatabase();
+
+    const bookmarkedPosts = await Post.find({
+      bookmarks: profileUser._id,
+    }).populate("user");
+
+    console.log("likedPosts: ", bookmarkedPosts);
+
+    return bookmarkedPosts as TPost[];
+  } catch (error) {
+    console.log(error);
+  }
+};

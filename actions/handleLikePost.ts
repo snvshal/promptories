@@ -1,42 +1,43 @@
 "use server";
 
+import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model";
 import { Types } from "mongoose";
 
-// Function to handle like/unlike for a post
+// Server action to like or unlike a post
 export async function handleLikePost(postId: string, userId: string) {
-  console.log(`User ${userId} liked post ${postId}`);
+  try {
+    await connectToDatabase();
 
-  // Check if postId and userId are valid ObjectIds
-  if (!Types.ObjectId.isValid(postId) || !Types.ObjectId.isValid(userId)) {
-    throw new Error("Invalid post or user ID");
+    // Check if postId and userId are valid ObjectIds
+    if (!Types.ObjectId.isValid(postId) || !Types.ObjectId.isValid(userId)) {
+      throw new Error("Invalid post or user ID!");
+    }
+
+    const userObjectId = new Types.ObjectId(userId);
+
+    // Find the post
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      throw new Error("Post not found!");
+    }
+
+    const isLiked = post.likes.includes(userObjectId);
+
+    // If already liked, remove the like; otherwise, add it
+    if (isLiked) {
+      post.likes.pull(userObjectId);
+    } else {
+      post.likes.push(userObjectId);
+    }
+
+    // Save the post without validating the replies array
+    await post.save({ validateModifiedOnly: true });
+
+    // return post;
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    throw new Error("Failed to like/unlike the post.");
   }
-
-  // Fetch the post from the database
-  const post = await Post.findById(postId);
-
-  if (!post) {
-    throw new Error("Post not found");
-  }
-
-  // Check if the user has already liked the post
-  const hasLiked = post.likes.includes(userId);
-
-  if (hasLiked) {
-    // If liked, remove the user from likes (unlike)
-    post.likes = post.likes.filter(
-      (id: Types.ObjectId) => id.toString() !== userId,
-    );
-    console.log(`User ${userId} unliked post ${postId}`);
-  } else {
-    // If not liked, add the user to likes (like)
-    post.likes.push(userId);
-    console.log(`User ${userId} liked post ${postId}`);
-  }
-
-  // Save the updated post back to the database
-  await post.save();
-
-  // Return the updated likes count or array if needed for UI updates
-  return post.likes.length;
 }

@@ -4,12 +4,18 @@ import { connectToDatabase } from "@/utils/db"; // Make sure you have a DB conne
 import { Post } from "@/models/post.model";
 import { currentUser } from "@/utils/get-user";
 import { ps } from "@/utils/ps";
+import { Types } from "mongoose";
 
 // Server action to add a reply to a post
 export async function addReplyToPost(postId: string, replyText: string) {
   try {
     // Connect to the database
     await connectToDatabase();
+
+    if (!Types.ObjectId.isValid(postId)) {
+      throw new Error("Invalid post ID!");
+    }
+
     const user = await currentUser();
 
     // Find the post by ID and push the reply to the replies array
