@@ -16,6 +16,10 @@ export async function addReplyToPost(postId: string, replyText: string) {
       throw new Error("Invalid post ID!");
     }
 
+    if (!replyText) {
+      throw new Error("Reply is required!");
+    }
+
     const user = await currentUser();
 
     // Find the post by ID and push the reply to the replies array

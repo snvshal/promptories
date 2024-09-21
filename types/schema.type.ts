@@ -39,8 +39,9 @@ export type MediaType = "text" | "image" | "video" | "audio";
 export type PromptoryType = `${MediaType}-to-${MediaType}`;
 
 // Post Replies Type
-export type TReplies = {
+export type TReplies = Document & {
   user: Types.ObjectId | TUser;
   reply: string;
+  likes: (Types.ObjectId | TUser)[];
   timestamp: Date;
 };
