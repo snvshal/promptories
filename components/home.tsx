@@ -92,119 +92,119 @@ export function PostsComponent({
   const postClick = (post: TPost) =>
     router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-12 lg:px-16">
-      <div className="space-y-6">
-        {posts.map((post) => (
-          <Card
-            key={post._id?.toString()}
-            onClick={() => postClick(post)}
-            className="bordery-y-0 w-full cursor-pointer"
+    <div className="mt-8 space-y-6">
+      {posts.map((post) => (
+        <Card
+          key={post._id?.toString()}
+          className="bordery-y-0 w-full cursor-pointer"
+        >
+          <CardHeader className="pb-0">
+            <div className="flex-start space-x-4">
+              <Link
+                href={`/${pu(post).username}`}
+                className="flex-start space-x-4"
+              >
+                <Avatar>
+                  <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
+                  <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-start gap-1">
+                  <p className="font-semibold">{pu(post).name}</p>
+                  <p className="text-muted-foreground">
+                    &#64;{pu(post).username}
+                  </p>
+                </div>
+              </Link>
+              <p className="text-sm text-muted-foreground">
+                &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent
             role="button"
+            onClick={() => postClick(post)}
+            className="border-0 pl-20"
           >
-            <CardHeader className="pb-0">
-              <div className="flex-start space-x-4">
-                <Link
-                  href={`/${pu(post).username}`}
-                  className="flex-start space-x-4"
-                >
-                  <Avatar>
-                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-start gap-1">
-                    <p className="font-semibold">{pu(post).name}</p>
-                    <p className="text-muted-foreground">
-                      &#64;{pu(post).username}
-                    </p>
-                  </div>
-                </Link>
-                <p className="text-sm text-muted-foreground">
-                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+            <div className="mb-4">
+              <div className="relative overflow-hidden">
+                <p className="whitespace-pre-wrap">
+                  {post.caption.split(" ").slice(0, 24).join(" ")}
+                  {post.caption.split(" ").length > 24 && <span> ...</span>}
                 </p>
+                {post.caption.split(" ").length > 24 && (
+                  <button className="mb-2 text-blue-500 hover:underline">
+                    Show more
+                  </button>
+                )}
               </div>
-            </CardHeader>
-            <CardContent className="ml-14 border-0">
-              <div className="mb-4">
-                <div className="relative overflow-hidden">
-                  <p className="whitespace-pre-wrap">
-                    {post.caption.split(" ").slice(0, 24).join(" ")}
-                    {post.caption.split(" ").length > 24 && <span> ...</span>}
-                  </p>
-                  {post.caption.split(" ").length > 24 && (
-                    <button className="mb-2 text-blue-500 hover:underline">
-                      Show more
-                    </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag: string, index) => (
-                    <Badge key={index} variant="secondary">
-                      #{tag}
-                    </Badge>
-                  ))}
-                </div>
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag: string, index) => (
+                  <Badge key={index} variant="secondary">
+                    #{tag}
+                  </Badge>
+                ))}
               </div>
-              <div className="bbn space-y-4 rounded-lg p-4">
-                <div className="relative overflow-hidden">
-                  <h3 className="mb-2 font-semibold">Prompt:</h3>
-                  <p className="whitespace-pre-wrap">
-                    {post.prompt.split(" ").slice(0, 24).join(" ")}
-                    {post.prompt.split(" ").length > 24 && <span> ...</span>}
-                  </p>
-                  {post.prompt.split(" ").length > 24 && (
-                    <button className="mt-2 text-blue-500 hover:underline">
-                      Show more
-                    </button>
-                  )}
-                </div>
-                <div className="relative overflow-hidden">
-                  <h3 className="mb-2 font-semibold">Response:</h3>
-                  <p className="whitespace-pre-wrap">
-                    {post.response.split(" ").slice(0, 24).join(" ")}
-                    {post.response.split(" ").length > 24 && <span> ...</span>}
-                  </p>
-                  {post.response.split(" ").length > 24 && (
-                    <button className="mt-2 text-blue-500 hover:underline">
-                      Show more
-                    </button>
-                  )}
-                </div>
+            </div>
+            <div className="bbn space-y-4 rounded-lg p-4">
+              <div className="relative overflow-hidden">
+                <h3 className="mb-2 font-semibold">Prompt:</h3>
+                <p className="whitespace-pre-wrap">
+                  {post.prompt.split(" ").slice(0, 24).join(" ")}
+                  {post.prompt.split(" ").length > 24 && <span> ...</span>}
+                </p>
+                {post.prompt.split(" ").length > 24 && (
+                  <button className="mt-2 text-blue-500 hover:underline">
+                    Show more
+                  </button>
+                )}
               </div>
-            </CardContent>
-            <CardFooter className="ml-12 flex justify-between">
-              <div className="flex space-x-4">
-                {/* Like Button */}
-                <LikeButton
-                  postId={post._id as string}
-                  initialLikes={post.likes.length}
-                  userId={user._id as string}
-                  hasLikedInitial={post.likes.includes(
-                    user._id as Types.ObjectId,
-                  )}
-                />
-                <Button variant="ghost" size="sm">
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  {post.replies.length}
-                </Button>
-                {/* Bookmark Button */}
-                <BookmarkButton
-                  postId={post._id as string}
-                  initialBookmarks={post.bookmarks.length}
-                  userId={user._id as string}
-                  hasBookmarkedInitial={post.bookmarks.includes(
-                    user._id as Types.ObjectId,
-                  )}
-                />
+              <div className="relative overflow-hidden">
+                <h3 className="mb-2 font-semibold">Response:</h3>
+                <p className="whitespace-pre-wrap">
+                  {post.response.split(" ").slice(0, 24).join(" ")}
+                  {post.response.split(" ").length > 24 && <span> ...</span>}
+                </p>
+                {post.response.split(" ").length > 24 && (
+                  <button className="mt-2 text-blue-500 hover:underline">
+                    Show more
+                  </button>
+                )}
               </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between pl-20">
+            <div className="flex space-x-4">
+              {/* Like Button */}
+              <LikeButton
+                postId={post._id as string}
+                initialLikes={post.likes.length}
+                userId={user._id as string}
+                hasLikedInitial={post.likes.includes(
+                  user._id as Types.ObjectId,
+                )}
+              />
               <Button variant="ghost" size="sm">
-                <Share2 className="mr-2 h-4 w-4" />
-                Share
+                <MessageCircle className="mr-2 h-4 w-4" />
+                {post.replies.length}
               </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    </main>
+              {/* Bookmark Button */}
+              <BookmarkButton
+                postId={post._id as string}
+                initialBookmarks={post.bookmarks.length}
+                userId={user._id as string}
+                hasBookmarkedInitial={post.bookmarks.includes(
+                  user._id as Types.ObjectId,
+                )}
+              />
+            </div>
+            <Button variant="ghost" size="sm">
+              <Share2 className="mr-2 h-4 w-4" />
+              Share
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
   );
 }
 

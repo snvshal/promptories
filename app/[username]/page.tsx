@@ -1,24 +1,34 @@
 import UserProfileComponent from "@/components/profile/user";
 import { TPost, TUser } from "@/types/schema.type";
-import { getPostsByUsername } from "@/utils/get-posts";
+import {
+  getBookmarkedPosts,
+  getLikedPosts,
+  getPostsByUsername,
+} from "@/utils/get-posts";
+
 import { currentUser, getUserByUsername } from "@/utils/get-user";
 import { ps } from "@/utils/ps";
 
-export default async function UserProfilePage({
+export default async function Layout({
   params,
 }: {
   params: { username: string };
 }) {
   const { username } = params;
+
   const user = await currentUser();
   const profileUser = await getUserByUsername(username);
   const posts = await getPostsByUsername(username);
+  const likedPosts = await getLikedPosts(profileUser as TUser);
+  const bookmarkedPosts = await getBookmarkedPosts(profileUser as TUser);
 
   return (
     <UserProfileComponent
       user={ps(user as TUser)}
       profileUser={ps(profileUser as TUser)}
       posts={ps(posts as TPost[])}
+      likedPosts={ps(likedPosts as TPost[])}
+      bookmarkedPosts={ps(bookmarkedPosts as TPost[])}
     />
   );
 }

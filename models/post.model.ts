@@ -36,8 +36,8 @@ const PostSchema: Schema = new Schema(
     },
     replies: [
       {
-        user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        reply: { type: String, required: true },
+        user: { type: Schema.Types.ObjectId, ref: "User" },
+        reply: { type: String },
         timestamp: { type: Date, default: Date.now },
       },
     ],
