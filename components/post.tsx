@@ -332,58 +332,12 @@ export function PostReplyOptions({
           <span className="sr-only">Post reply options</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-32">
         <DropdownMenuItem onClick={handleDeleteReplyClick}>
-          <Trash className="mr-2 h-4 w-4" />
-          <span>Delete</span>
+          <Trash className="mr-2 h-4 w-4 text-red-500" />
+          <span className="text-red-500">Delete</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
-
-// Mock data for a single post
-export const post = {
-  id: 1,
-  title: "Creative Writing Prompt for GPT-4",
-  prompt:
-    "Write a short story about a world where people communicate only through music.",
-  response:
-    "In this world, conversations were symphonies, emotions were melodies, and conflicts were resolved through harmonies. The air was constantly filled with a rich tapestry of sounds, each person contributing their unique notes to the grand composition of society. \n\nMaria woke to the gentle pizzicato of raindrops on her window, a natural alarm clock in this melodious realm. She stretched and hummed a cheerful good morning, her pitch perfect and bright. As she stepped outside, the bustling street greeted her with a cacophony of morning rush hour—a fast-paced allegro of hurried commuters and the rhythmic percussion of footsteps.\n\nAt work, Maria collaborated with her team through an intricate fugue, each member adding their own musical phrase to the project at hand. Disagreements were expressed through dissonant chords, quickly resolved into harmonious agreements as they found common ground.\n\nLunchtime brought a medley of flavors, quite literally, as the local café served dishes that sang with spices and textures. Maria ordered her usual—a salad that crisp with refreshing high notes and a soup that resonated with warm, comforting bass tones.\n\nAs evening fell, the city's tempo slowed to a peaceful adagio. Maria met her partner for dinner, their conversation a beautiful duet of intertwining melodies, speaking volumes without a single word. They shared their day through leitmotifs, recurring themes in their personal symphonies.\n\nLater, as Maria drifted off to sleep, the world around her settled into a soft nocturne, the gentle harmonies of a city at rest. In her dreams, she composed new melodies, preparing for another day in this world where music wasn't just heard—it was lived.",
-  explanation:
-    'To trigger this response, I focused on a sensory experience (music) and framed it in a unique world-building scenario. Phrases like "communicate only through music" steered the AI to explore music beyond sound, as a means of expression, leading to a creative response that focuses on emotions and human connections through melodies.',
-  tags: ["CreativeWriting", "AI", "MusicWorld", "GPT4", "Storytelling"],
-  likes: 34,
-  comments: 12,
-  saves: 8,
-  user: {
-    name: "Alice Johnson",
-    username: "@alicewrites",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  postedAt: "2023-06-15T14:30:00Z",
-  replies: [
-    {
-      id: 1,
-      user: {
-        name: "Bob Smith",
-        username: "@bobsmith",
-        avatar: "/placeholder.svg?height=32&width=32",
-      },
-      reply:
-        "This is absolutely beautiful! I love how you've woven music into every aspect of daily life.",
-      timestamp: "2023-06-15T15:45:00Z",
-    },
-    {
-      id: 2,
-      user: {
-        name: "Carol White",
-        username: "@carolw",
-        avatar: "/placeholder.svg?height=32&width=32",
-      },
-      reply:
-        "I'm curious how conflict resolution would work in this world. Would discordant notes represent disagreements?",
-      timestamp: "2023-06-15T16:20:00Z",
-    },
-  ],
-};
