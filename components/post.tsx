@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,14 +13,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Share2, Send, ArrowLeft } from "lucide-react";
+import { MessageCircle, Share2, Send, ArrowLeft, Heart } from "lucide-react";
 import Link from "next/link";
-import { BookmarkButton, LikeButton, pu } from "./home";
+import { BookmarkButton, il, LikeButton, pu } from "./home";
 import { TimeAgo } from "./time-ago";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
 import { Types } from "mongoose";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { Separator } from "./ui/separator";
+import { handleLikeReply } from "@/actions/handleLikeReply";
 
 export default function SinglePostPage({
   user,
@@ -61,7 +62,7 @@ export default function SinglePostPage({
               <div className="relative overflow-hidden">
                 <p className="whitespace-pre-wrap">{post.caption}</p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 {post.tags.map((tag: string, index) => (
                   <Badge key={index} variant="secondary">
                     #{tag}
@@ -111,24 +112,36 @@ export default function SinglePostPage({
             </Button>
           </CardFooter>
         </Card>
-        <PostReplies postId={post._id as string} replies={post.replies} />
+        <PostReplies
+          user={user}
+          postId={post._id as string}
+          replies={post.replies}
+        />
       </main>
     </div>
   );
 }
 
 export function PostReplies({
+  user,
   postId,
   replies,
 }: {
+  user: TUser;
   postId: string;
   replies: TReplies[];
 }) {
   const [replyText, setReplyText] = useState("");
   const [postReplies, setPostReplies] = useState(replies);
+  const [emptyReplyError, setEmptyReplyError] = useState("");
 
   const handleReplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!replyText) {
+      setEmptyReplyError("Reply is required!");
+      return;
+    }
     const updatedPost = await addReplyToPost(postId, replyText);
     setPostReplies(updatedPost.replies);
     console.log("Reply submitted:", replyText);
@@ -148,7 +161,10 @@ export function PostReplies({
               name="reply"
               placeholder="Write a reply..."
               value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
+              onChange={(e) => {
+                setReplyText(e.target.value);
+                setEmptyReplyError("");
+              }}
               className="flex-1"
             />
             <Button type="submit">
@@ -157,14 +173,32 @@ export function PostReplies({
             </Button>
           </div>
         </form>
+        {emptyReplyError && (
+          <p className="mt-1 text-sm text-red-500">{emptyReplyError}</p>
+        )}
         <Separator className="my-4" />
-        <PostRepliesContent replies={postReplies} />
+        <PostRepliesContent
+          user={user}
+          postId={postId}
+          replies={postReplies}
+          setPostReplies={setPostReplies}
+        />
       </CardContent>
     </Card>
   );
 }
 
-export function PostRepliesContent({ replies }: { replies: TReplies[] }) {
+export function PostRepliesContent({
+  user,
+  postId,
+  replies,
+  setPostReplies,
+}: {
+  user: TUser;
+  postId: string;
+  replies: TReplies[];
+  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+}) {
   if (!replies.length) {
     return (
       <div className="space-y-4">
@@ -172,6 +206,22 @@ export function PostRepliesContent({ replies }: { replies: TReplies[] }) {
       </div>
     );
   }
+
+  const handleLikeReplyClick = async (replyId: string) => {
+    try {
+      const newLikes = await handleLikeReply(postId, replyId);
+
+      setPostReplies(
+        replies.map((reply) =>
+          reply._id?.toString() === replyId
+            ? { ...reply, likes: newLikes }
+            : reply,
+        ) as TReplies[],
+      );
+    } catch (error) {
+      console.error("Error updating likes on the client:", error);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -191,7 +241,22 @@ export function PostRepliesContent({ replies }: { replies: TReplies[] }) {
                 &#8226; <TimeAgo timestamp={reply.timestamp} />
               </p>
             </div>
-            <p className="mt-1 text-gray-700">{reply.reply}</p>
+            <p className="mt-1">{reply.reply}</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleLikeReplyClick(reply._id as string)}
+              className="mt-2"
+            >
+              <Heart
+                style={{
+                  color: il(reply.likes.includes(user._id as Types.ObjectId)),
+                }}
+                fill={il(reply.likes.includes(user._id as Types.ObjectId))}
+                className="mr-2 h-4 w-4"
+              />
+              {reply.likes.length}
+            </Button>
           </div>
         </div>
       ))}

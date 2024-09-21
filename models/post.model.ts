@@ -38,6 +38,7 @@ const PostSchema: Schema = new Schema(
       {
         user: { type: Schema.Types.ObjectId, ref: "User" },
         reply: { type: String },
+        likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
         timestamp: { type: Date, default: Date.now },
       },
     ],

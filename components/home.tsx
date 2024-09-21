@@ -217,6 +217,8 @@ export type LikeButtonProps = {
   hasLikedInitial: boolean;
 };
 
+export const il = (hasLiked: boolean) => (hasLiked ? "#b91c1c" : "none");
+
 export const LikeButton = ({
   postId,
   initialLikes,
@@ -237,11 +239,14 @@ export const LikeButton = ({
     await handleLikePost(postId, userId);
   };
 
-  const il = () => (hasLiked ? "#b91c1c" : "none");
   return (
     <form onSubmit={handleLikeClick}>
       <Button variant="ghost" size="sm">
-        <Heart style={{ color: il() }} fill={il()} className={`mr-2 h-4 w-4`} />
+        <Heart
+          style={{ color: il(hasLiked) }}
+          fill={il(hasLiked)}
+          className={`mr-2 h-4 w-4`}
+        />
         {likes}
       </Button>
     </form>
@@ -256,6 +261,8 @@ export type BookmarkButtonProps = {
   userId: string;
   hasBookmarkedInitial: boolean;
 };
+
+export const ib = (isSaved: boolean) => (isSaved ? "#3b82f6" : "none");
 
 export const BookmarkButton = ({
   postId,
@@ -277,14 +284,13 @@ export const BookmarkButton = ({
     await handleBookmarkPost(postId, userId);
   };
 
-  const ib = () => (hasBookmarked ? "#3b82f6" : "none");
   return (
     <form onSubmit={handleBookmarkClick}>
       <Button variant="ghost" size="sm">
         <Bookmark
-          style={{ color: ib() }}
+          style={{ color: ib(hasBookmarked) }}
           className={`mr-2 h-4 w-4`}
-          fill={ib()}
+          fill={ib(hasBookmarked)}
         />
         {bookmarks}
       </Button>
