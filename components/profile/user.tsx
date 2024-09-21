@@ -14,8 +14,11 @@ import { PostsComponent } from "../home";
 import { signOut } from "next-auth/react";
 import { TPost, TUser } from "@/types/schema.type";
 import { useParams } from "next/navigation";
-import { ArrowLeft, User2 } from "lucide-react";
-import Link from "next/link";
+import { User2 } from "lucide-react";
+import { Header } from "../post";
+import { addFollower } from "@/actions/addFollower";
+import { Types } from "mongoose";
+import { useState } from "react";
 
 export default function UserProfileComponent({
   user,
@@ -32,24 +35,11 @@ export default function UserProfileComponent({
 }) {
   if (!profileUser) return <UserNotFound />;
 
-  console.log();
-
   const isAdmin = user._id?.toString() === profileUser._id?.toString();
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="flex items-center text-blue-600 hover:text-blue-800"
-          >
-            <ArrowLeft className="mr-2 h-5 w-5" />
-            <span className="font-semibold">Back to Home</span>
-          </Link>
-          <h1 className="text-2xl font-bold text-blue-600">Prompto</h1>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -57,6 +47,7 @@ export default function UserProfileComponent({
             profileUser={profileUser}
             postCount={posts.length}
             isAdmin={isAdmin}
+            user={user}
           />
           <Tabs defaultValue="posts" className="w-full">
             <TabsList
@@ -70,19 +61,22 @@ export default function UserProfileComponent({
                 </>
               )}
             </TabsList>
-            <TabsContent value="posts">
-              <PostsComponent user={user} posts={posts} />
-            </TabsContent>
-            {isAdmin && (
-              <>
-                <TabsContent value="likes">
-                  <PostsComponent user={user} posts={likedPosts} />
-                </TabsContent>
-                <TabsContent value="saved">
-                  <PostsComponent user={user} posts={bookmarkedPosts} />
-                </TabsContent>
-              </>
-            )}
+
+            <div className="mt-8">
+              <TabsContent value="posts">
+                <PostsComponent user={user} posts={posts} />
+              </TabsContent>
+              {isAdmin && (
+                <>
+                  <TabsContent value="likes">
+                    <PostsComponent user={user} posts={likedPosts} />
+                  </TabsContent>
+                  <TabsContent value="saved">
+                    <PostsComponent user={user} posts={bookmarkedPosts} />
+                  </TabsContent>
+                </>
+              )}
+            </div>
           </Tabs>
         </div>
       </main>
@@ -94,11 +88,31 @@ export function ProfileUserContent({
   profileUser,
   postCount,
   isAdmin,
+  user,
 }: {
+  user: TUser;
   profileUser: TUser;
   postCount: number;
   isAdmin: boolean;
 }) {
+  const initialFollowState = profileUser.followers.includes(
+    user._id as Types.ObjectId,
+  )
+    ? "Following"
+    : "Follow";
+
+  const [follow, setFollow] = useState<"Follow" | "Following">(
+    initialFollowState,
+  );
+
+  const handleAddFollower = async () => {
+    try {
+      const updatedState = await addFollower(profileUser._id as string);
+      setFollow(updatedState as "Follow" | "Following");
+    } catch (error) {
+      console.error("Error updating follower state:", error);
+    }
+  };
   return (
     <Card className="mb-8">
       <CardContent className="pt-6">
@@ -112,16 +126,17 @@ export function ProfileUserContent({
           <p className="mt-2 text-gray-700">{profileUser?.bio}</p>
           <div className="mt-4 flex justify-center space-x-4">
             <div>
-              <p className="font-semibold">{profileUser?.followers.length}</p>
-              <p className="text-muted-foreground">Followers</p>
+              <p className="font-semibold">{postCount}</p>
+              <p className="text-muted-foreground">Posts</p>
             </div>
+
             <div>
               <p className="font-semibold">{profileUser?.following.length}</p>
               <p className="text-muted-foreground">Following</p>
             </div>
             <div>
-              <p className="font-semibold">{postCount}</p>
-              <p className="text-muted-foreground">Posts</p>
+              <p className="font-semibold">{profileUser?.followers.length}</p>
+              <p className="text-muted-foreground">Followers</p>
             </div>
           </div>
           <div className="mt-6 flex space-x-4">
@@ -130,7 +145,12 @@ export function ProfileUserContent({
                 Sign Out
               </Button>
             ) : (
-              <Button>Follow</Button>
+              <Button
+                variant={follow === "Follow" ? "default" : "secondary"}
+                onClick={handleAddFollower}
+              >
+                {follow}
+              </Button>
             )}
           </div>
         </div>

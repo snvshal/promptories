@@ -31,19 +31,7 @@ export default function SinglePostPage({
 }) {
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="flex items-center text-blue-600 hover:text-blue-800"
-          >
-            <ArrowLeft className="mr-2 h-5 w-5" />
-            <span className="font-semibold">Back to Home</span>
-          </Link>
-          <h1 className="text-2xl font-bold text-blue-600">Prompto</h1>
-        </div>
-      </header>
-
+      <Header />
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <Card key={post._id?.toString()} className="bordery-y-0 mb-8 w-full">
           <CardHeader className="pb-0">
@@ -210,6 +198,24 @@ export function PostRepliesContent({ replies }: { replies: TReplies[] }) {
     </div>
   );
 }
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
+      <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <Link
+          href="/home"
+          className="flex items-center text-blue-600 hover:text-blue-800"
+        >
+          <ArrowLeft className="mr-2 h-5 w-5" />
+          <span className="font-semibold">Back to Home</span>
+        </Link>
+        <h1 className="text-2xl font-bold text-blue-600">Prompto</h1>
+      </div>
+    </header>
+  );
+}
+
 // Mock data for a single post
 export const post = {
   id: 1,

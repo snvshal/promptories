@@ -75,7 +75,9 @@ export function HomePageComponent({
         </div>
       </header>
 
-      <PostsComponent user={user} posts={posts} />
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <PostsComponent user={user} posts={posts} />
+      </main>
     </div>
   );
 }
@@ -92,7 +94,7 @@ export function PostsComponent({
   const postClick = (post: TPost) =>
     router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
   return (
-    <div className="mt-8 space-y-6">
+    <div className="space-y-6">
       {posts.map((post) => (
         <Card
           key={post._id?.toString()}
