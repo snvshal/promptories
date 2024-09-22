@@ -33,8 +33,6 @@ export default function UserProfileComponent({
   likedPosts: TPost[];
   bookmarkedPosts: TPost[];
 }) {
-  if (!profileUser) return <UserNotFound />;
-
   const isAdmin = user._id?.toString() === profileUser._id?.toString();
 
   return (

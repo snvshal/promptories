@@ -43,6 +43,7 @@ import {
 import { PostOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
+import { handlePostShare } from "@/utils/ps";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -116,6 +117,7 @@ export function PostsComponent({
 
   const postClick = (post: TPost) =>
     router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
+
   return (
     <div className="space-y-6">
       {posts.map((post) => (
@@ -227,7 +229,12 @@ export function PostsComponent({
                 )}
               />
             </div>
-            <Button variant="ghost" size="sm" aria-label="Share Post">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handlePostShare(post)}
+              aria-label="Share Post"
+            >
               <Share2 className="mr-2 h-4 w-4" />
               Share
             </Button>

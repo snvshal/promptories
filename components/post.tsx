@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { handleDeletePost } from "@/actions/handlePostActions";
+import { handlePostShare } from "@/utils/ps";
 
 export default function SinglePostPage({
   user,
@@ -130,7 +131,12 @@ export default function SinglePostPage({
                 )}
               />
             </div>
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handlePostShare(post)}
+              aria-label="Share Post"
+            >
               <Share2 className="mr-2 h-4 w-4" />
               Share
             </Button>
