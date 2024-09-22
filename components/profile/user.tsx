@@ -122,7 +122,7 @@ export function ProfileUserContent({
             <AvatarFallback>{profileUser?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
           <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
-          <p className="text-muted-foreground">{profileUser?.username}</p>
+          <p className="text-muted-foreground">&#64;{profileUser?.username}</p>
           <p className="mt-2 text-gray-700">{profileUser?.bio}</p>
           <div className="mt-4 flex justify-center space-x-4">
             <div>

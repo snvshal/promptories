@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import {
   MessageCircle,
@@ -37,6 +37,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { handleDeletePost } from "@/actions/handlePostActions";
 
 export default function SinglePostPage({
   user,
@@ -56,6 +58,7 @@ export default function SinglePostPage({
                 <Link
                   href={`/${pu(post).username}`}
                   className="flex-start space-x-4"
+                  prefetch={false}
                 >
                   <Avatar>
                     <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
@@ -72,7 +75,7 @@ export default function SinglePostPage({
                   &#8226; <TimeAgo timestamp={post.createdAt as Date} />
                 </p>
               </div>
-              {/* <PostOptions /> */}
+              <PostOptions user={user} post={post} />
             </div>
           </CardHeader>
           <CardContent className="ml-14 border-0">
@@ -95,7 +98,10 @@ export default function SinglePostPage({
               </div>
               <div className="relative overflow-hidden">
                 <h3 className="mb-2 font-semibold">Response:</h3>
-                <p className="whitespace-pre-wrap">{post.response}</p>
+                <ScrollArea className="h-60 rounded-md border p-4">
+                  <p className="whitespace-pre-wrap">{post.response}</p>
+                </ScrollArea>
+                {/* <p className="whitespace-pre-wrap">{post.response}</p> */}
               </div>
             </div>
           </CardContent>
@@ -156,11 +162,16 @@ export function PostReplies({
       setEmptyReplyError("Reply is required!");
       return;
     }
-    const updatedPost = await addReplyToPost(post._id as string, replyText);
-    setPostReplies(updatedPost.replies);
-    console.log("Reply submitted:", replyText);
-    setReplyText("");
-    // Here you would typically send the reply to your backend
+
+    try {
+      const updatedPost = await addReplyToPost(post._id as string, replyText);
+      setPostReplies(updatedPost.replies);
+      console.log("Reply submitted:", replyText);
+      setReplyText("");
+      // Here you would typically send the reply to your backend
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <Card className="w-full">
@@ -241,17 +252,25 @@ export function PostRepliesContent({
     <div className="space-y-4">
       {replies.map((reply, index) => (
         <div key={index} className="flex space-x-4">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
-            <AvatarFallback>{pu(reply).name?.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <Link href={`/${pu(reply).username}`} prefetch={false}>
+            <Avatar className="mt-1 h-8 w-8">
+              <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
+              <AvatarFallback>{pu(reply).name?.charAt(0)}</AvatarFallback>
+            </Avatar>
+          </Link>
           <div className="flex-1">
             <div className="flex-between">
               <div className="flex-start space-x-2">
-                <p className="font-semibold">{pu(reply).name}</p>
-                <p className="text-sm text-muted-foreground">
-                  &#64;{pu(reply).username}
-                </p>
+                <Link
+                  href={`/${pu(reply).username}`}
+                  className="flex-start gap-1"
+                  prefetch={false}
+                >
+                  <p className="font-semibold">{pu(reply).name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    &#64;{pu(reply).username}
+                  </p>
+                </Link>
                 <p className="space-x-4 text-sm text-muted-foreground">
                   &#8226; <TimeAgo timestamp={reply.timestamp} />
                 </p>
@@ -315,6 +334,8 @@ export function PostReplyOptions({
   reply: TReplies;
   setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
 }) {
+  const router = useRouter();
+
   const handleDeleteReplyClick = async () => {
     try {
       const newReplies = await deleteReply(postId, reply._id as string);
@@ -342,7 +363,51 @@ export function PostReplyOptions({
             <span className="text-red-500">Delete</span>
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/${pu(reply).username}`)}
+            className="cursor-pointer"
+          >
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function PostOptions({ user, post }: { user: TUser; post: TPost }) {
+  const router = useRouter();
+
+  const handleDeletePostClick = async () => {
+    try {
+      await handleDeletePost(post._id as string);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const authorized = post.user._id?.toString() === user._id?.toString();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size={"icon"} variant={"ghost"} className="rounded-full">
+          <Ellipsis className="h-4 w-4 text-muted-foreground" />
+          <span className="sr-only">Post options</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-32">
+        {authorized ? (
+          <DropdownMenuItem onClick={handleDeletePostClick}>
+            <Trash className="mr-2 h-4 w-4 text-red-500" />
+            <span className="text-red-500">Delete</span>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem
+            onClick={() => router.push(`/${pu(post).username}`)}
+            className="cursor-pointer"
+          >
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </DropdownMenuItem>

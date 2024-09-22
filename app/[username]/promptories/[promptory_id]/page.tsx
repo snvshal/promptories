@@ -14,5 +14,13 @@ export default async function PromptoriesPage({
   const post = await getPostsByPromptoryId(username, promptory_id);
   // console.log(post);
 
+  if (!post) {
+    return (
+      <div className="flex-center h-dvh w-full">
+        <p>Post not found!</p>
+      </div>
+    );
+  }
+
   return <SinglePostPage user={ps(user as TUser)} post={ps(post as TPost)} />;
 }
