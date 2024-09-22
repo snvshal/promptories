@@ -62,10 +62,7 @@ export async function deleteReply(postId: string, replyId: string) {
     }
 
     // Check if the user is authorized to delete the reply (either the author of the reply or the post owner)
-    if (
-      reply.user.toString() !== user._id?.toString() &&
-      post.user.toString() !== user._id?.toString()
-    ) {
+    if (reply.user._id?.toString() !== user._id?.toString()) {
       throw new Error("Not authorized to delete this reply.");
     }
 
