@@ -9,7 +9,7 @@ import {
 import { currentUser, getUserByUsername } from "@/utils/get-user";
 import { ps } from "@/utils/ps";
 
-export default async function Layout({
+export default async function UserProfilePage({
   params,
 }: {
   params: { username: string };

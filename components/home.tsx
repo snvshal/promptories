@@ -21,7 +21,6 @@ import {
   Pen,
   Send,
 } from "lucide-react";
-import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
 import { TimeAgo } from "./time-ago";
@@ -61,7 +60,9 @@ export function HomePageComponent({
       <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
-            <h1 className="mr-8 text-2xl font-bold text-blue-600">Prompto</h1>
+            <h1 className="mr-8 text-2xl font-bold text-blue-600">
+              Promptories
+            </h1>
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -77,7 +78,6 @@ export function HomePageComponent({
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
-            <ModeToggle />
             <Link href={"/compose/promptory"} prefetch={false}>
               <Pen size={15} />
             </Link>
