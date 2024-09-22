@@ -21,6 +21,7 @@ import {
   Heart,
   Trash,
   Ellipsis,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { BookmarkButton, il, LikeButton, pu } from "./home";
@@ -129,11 +130,7 @@ export default function SinglePostPage({
             </Button>
           </CardFooter>
         </Card>
-        <PostReplies
-          user={user}
-          postId={post._id as string}
-          replies={post.replies}
-        />
+        <PostReplies user={user} post={post as TPost} replies={post.replies} />
       </main>
     </div>
   );
@@ -141,11 +138,11 @@ export default function SinglePostPage({
 
 export function PostReplies({
   user,
-  postId,
+  post,
   replies,
 }: {
   user: TUser;
-  postId: string;
+  post: TPost;
   replies: TReplies[];
 }) {
   const [replyText, setReplyText] = useState("");
@@ -159,7 +156,7 @@ export function PostReplies({
       setEmptyReplyError("Reply is required!");
       return;
     }
-    const updatedPost = await addReplyToPost(postId, replyText);
+    const updatedPost = await addReplyToPost(post._id as string, replyText);
     setPostReplies(updatedPost.replies);
     console.log("Reply submitted:", replyText);
     setReplyText("");
@@ -196,7 +193,7 @@ export function PostReplies({
         <Separator className="my-4" />
         <PostRepliesContent
           user={user}
-          postId={postId}
+          post={post}
           replies={postReplies}
           setPostReplies={setPostReplies}
         />
@@ -207,12 +204,12 @@ export function PostReplies({
 
 export function PostRepliesContent({
   user,
-  postId,
+  post,
   replies,
   setPostReplies,
 }: {
   user: TUser;
-  postId: string;
+  post: TPost;
   replies: TReplies[];
   setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
 }) {
@@ -226,7 +223,7 @@ export function PostRepliesContent({
 
   const handleLikeReplyClick = async (replyId: string) => {
     try {
-      const newLikes = await handleLikeReply(postId, replyId);
+      const newLikes = await handleLikeReply(post._id as string, replyId);
 
       setPostReplies(
         replies.map((reply) =>
@@ -260,8 +257,9 @@ export function PostRepliesContent({
                 </p>
               </div>
               <PostReplyOptions
-                postId={postId}
-                replyId={reply._id as string}
+                user={user}
+                postId={post._id as string}
+                reply={reply}
                 setPostReplies={setPostReplies}
               />
             </div>
@@ -307,22 +305,27 @@ export function Header() {
 }
 
 export function PostReplyOptions({
+  user,
   postId,
-  replyId,
+  reply,
   setPostReplies,
 }: {
+  user: TUser;
   postId: string;
-  replyId: string;
+  reply: TReplies;
   setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
 }) {
   const handleDeleteReplyClick = async () => {
     try {
-      const newReplies = await deleteReply(postId, replyId);
+      const newReplies = await deleteReply(postId, reply._id as string);
       setPostReplies(newReplies as TReplies[]);
     } catch (error) {
       console.error("Failed to delete reply:", error);
     }
   };
+
+  const authorized = reply.user._id?.toString() === user._id?.toString();
+  // console.log(authorized);
 
   return (
     <DropdownMenu>
@@ -333,10 +336,17 @@ export function PostReplyOptions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32">
-        <DropdownMenuItem onClick={handleDeleteReplyClick}>
-          <Trash className="mr-2 h-4 w-4 text-red-500" />
-          <span className="text-red-500">Delete</span>
-        </DropdownMenuItem>
+        {authorized ? (
+          <DropdownMenuItem onClick={handleDeleteReplyClick}>
+            <Trash className="mr-2 h-4 w-4 text-red-500" />
+            <span className="text-red-500">Delete</span>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem>
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

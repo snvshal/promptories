@@ -10,7 +10,7 @@ export const getPosts = async () => {
 
     const posts: TPost[] = await Post.find({}).populate("user");
 
-    console.log(posts);
+    // console.log(posts);
     return posts as TPost[];
   } catch (error) {
     console.log(error);
