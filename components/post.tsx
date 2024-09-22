@@ -323,7 +323,7 @@ export function Header() {
           <ArrowLeft className="mr-2 h-5 w-5" />
           <span className="font-semibold">Back to Home</span>
         </Link>
-        <h1 className="text-2xl font-bold text-blue-600">Prompto</h1>
+        <h1 className="text-2xl font-bold text-blue-600">Promptories</h1>
       </div>
     </header>
   );
