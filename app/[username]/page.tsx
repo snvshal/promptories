@@ -1,4 +1,4 @@
-import UserProfileComponent from "@/components/profile/user";
+import UserProfileComponent, { UserNotFound } from "@/components/profile/user";
 import { TPost, TUser } from "@/types/schema.type";
 import {
   getBookmarkedPosts,
@@ -21,6 +21,8 @@ export default async function Layout({
   const posts = await getPostsByUsername(username);
   const likedPosts = await getLikedPosts(profileUser as TUser);
   const bookmarkedPosts = await getBookmarkedPosts(profileUser as TUser);
+
+  if (!profileUser) return <UserNotFound />;
 
   return (
     <UserProfileComponent

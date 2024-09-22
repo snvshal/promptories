@@ -1,3 +1,6 @@
+import { pu } from "@/components/home";
+import { TPost } from "@/types/schema.type";
+
 export const ps = (obj: object) => JSON.parse(JSON.stringify(obj));
 
 export const isValidPromptoryId = (promptory_id: string): boolean => {
@@ -11,4 +14,23 @@ export const isValidPromptoryId = (promptory_id: string): boolean => {
 
   // Check if the ID falls within valid timestamp range
   return idAsNumber >= earliestValidTimestamp && idAsNumber <= currentTimestamp;
+};
+
+export const handlePostShare = async (post: TPost) => {
+  const postUrl = `${process.env.METADATA_BASE_URL}/${pu(post).username}/promptories/${post.promptory_id}`; // Replace with dynamic post URL
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Check out this post!",
+        url: postUrl,
+      });
+    } catch (error) {
+      console.error("Error sharing", error);
+    }
+  } else {
+    // Fallback for copying the link
+    navigator.clipboard.writeText(postUrl);
+    alert("Link copied to clipboard");
+  }
 };
