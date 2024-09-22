@@ -19,24 +19,30 @@ import {
   Bookmark,
   Share2,
   Pen,
-  Ellipsis,
+  Send,
 } from "lucide-react";
 import { ModeToggle } from "./ui/theme-provider";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
 import { TimeAgo } from "./time-ago";
-import { handleLikePost } from "@/actions/handleLikePost";
-import { Types } from "mongoose";
-import { handleBookmarkPost } from "@/actions/handleBookmarkPost";
-import { useRouter } from "next/navigation";
-import { Keyboard, User } from "lucide-react";
-
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  handleLikePost,
+  handleBookmarkPost,
+} from "@/actions/handlePostActions";
+import { Types } from "mongoose";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { PostOptions } from "./post";
+import { Textarea } from "./ui/textarea";
+import { addReplyToPost } from "@/actions/addReplyToPost";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -71,10 +77,10 @@ export function HomePageComponent({
               <Bell className="h-5 w-5" />
             </Button>
             <ModeToggle />
-            <Link href={"/compose/promptory"}>
+            <Link href={"/compose/promptory"} prefetch={false}>
               <Pen size={15} />
             </Link>
-            <Link href={user?.username}>
+            <Link href={`/${user?.username}`} prefetch={false}>
               <Avatar>
                 <AvatarImage src={user?.avatar} alt={user?.username} />
                 <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
@@ -100,6 +106,14 @@ export function PostsComponent({
 }) {
   const router = useRouter();
 
+  if (!posts.length) {
+    return (
+      <div className="flex-center w-full p-4">
+        <p>No posts here.</p>
+      </div>
+    );
+  }
+
   const postClick = (post: TPost) =>
     router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
   return (
@@ -115,6 +129,7 @@ export function PostsComponent({
                 <Link
                   href={`/${pu(post).username}`}
                   className="flex-start space-x-4"
+                  prefetch={false}
                 >
                   <Avatar>
                     <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
@@ -131,7 +146,7 @@ export function PostsComponent({
                   &#8226; <TimeAgo timestamp={post.createdAt as Date} />
                 </p>
               </div>
-              <PostOptions />
+              <PostOptions user={user} post={post} />
             </div>
           </CardHeader>
           <CardContent
@@ -197,10 +212,11 @@ export function PostsComponent({
                   user._id as Types.ObjectId,
                 )}
               />
-              <Button variant="ghost" size="sm">
+              {/* <Button variant="ghost" size="sm">
                 <MessageCircle className="mr-2 h-4 w-4" />
                 {post.replies.length}
-              </Button>
+              </Button> */}
+              <PostReplyDialog post={post} />
               {/* Bookmark Button */}
               <BookmarkButton
                 postId={post._id as string}
@@ -211,7 +227,7 @@ export function PostsComponent({
                 )}
               />
             </div>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" aria-label="Share Post">
               <Share2 className="mr-2 h-4 w-4" />
               Share
             </Button>
@@ -253,7 +269,7 @@ export const LikeButton = ({
 
   return (
     <form onSubmit={handleLikeClick}>
-      <Button variant="ghost" size="sm">
+      <Button variant="ghost" size="sm" aria-label="Like Post">
         <Heart
           style={{ color: il(hasLiked) }}
           fill={il(hasLiked)}
@@ -298,7 +314,7 @@ export const BookmarkButton = ({
 
   return (
     <form onSubmit={handleBookmarkClick}>
-      <Button variant="ghost" size="sm">
+      <Button variant="ghost" size="sm" aria-label="Bookmark Post ">
         <Bookmark
           style={{ color: ib(hasBookmarked) }}
           className={`mr-2 h-4 w-4`}
@@ -310,36 +326,67 @@ export const BookmarkButton = ({
   );
 };
 
-// export default BookmarkButton;
+export function PostReplyDialog({ post }: { post: TPost }) {
+  const [dialogState, setDialogState] = useState(false);
+  const [replyContent, setReplyContent] = useState("");
+  const [emptyReplyError, setEmptyReplyError] = useState("");
+  const [repliesCount, setRepliesCount] = useState(post.replies.length);
 
-// export function PostOptionsButton() {
-//   return (
-//     <Button size={"icon"} variant={"ghost"} className="rounded-full">
-//       <Ellipsis className="h-4 w-4 text-muted-foreground" />
-//       <span className="sr-only">Post options</span>
-//     </Button>
-//   );
-// }
+  const handleReplySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-export function PostOptions() {
+    if (!replyContent) {
+      setEmptyReplyError("Reply is required!");
+      return;
+    }
+    try {
+      await addReplyToPost(post._id as string, replyContent);
+      setRepliesCount((prev) => prev + 1);
+      console.log("Reply submitted:", replyContent);
+      setReplyContent("");
+      setDialogState(false);
+      // Here you would typically send the reply to your backend
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size={"icon"} variant={"ghost"} className="rounded-full">
-          <Ellipsis className="h-4 w-4 text-muted-foreground" />
-          <span className="sr-only">Post options</span>
+    <Dialog open={dialogState} onOpenChange={setDialogState}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" aria-label="Reply to Post">
+          <MessageCircle className="mr-2 h-4 w-4" />
+          {repliesCount}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Keyboard className="mr-2 h-4 w-4" />
-          <span>Keyboard shortcuts</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Reply to Post</DialogTitle>
+          <DialogDescription>
+            Type your reply to this post. Click submit when you&#39;re done.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleReplySubmit} className="w-full">
+          <div className="grid gap-4 py-4">
+            <Textarea
+              placeholder="Type your reply here..."
+              value={replyContent}
+              onChange={(e) => {
+                setReplyContent(e.target.value);
+                setEmptyReplyError("");
+              }}
+              className="col-span-3"
+            />
+            {emptyReplyError && (
+              <p className="mt-1 text-sm text-red-500">{emptyReplyError}</p>
+            )}
+          </div>
+          <Button className="w-full" aria-label="Submit Reply">
+            <Send className="mr-2 h-4 w-4" />
+            Submit Reply
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

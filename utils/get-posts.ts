@@ -3,6 +3,7 @@ import { connectToDatabase } from "./db";
 import { TPost, TUser } from "@/types/schema.type";
 import { User } from "@/models/user.model";
 import { getUserByUsername } from "./get-user";
+import { isValidPromptoryId } from "./ps";
 
 export const getPosts = async () => {
   try {
@@ -37,6 +38,11 @@ export const getPostsByPromptoryId = async (
 ) => {
   try {
     await connectToDatabase();
+
+    if (!isValidPromptoryId(promptory_id)) {
+      throw new Error("Invalid promptoryId!");
+    }
+
     const user = await getUserByUsername(username);
     const post = await Post.findOne({
       promptory_id,
@@ -44,6 +50,10 @@ export const getPostsByPromptoryId = async (
     })
       .populate("user")
       .populate("replies.user");
+
+    if (!post) {
+      throw new Error("Post not found!");
+    }
 
     return post as TPost;
   } catch (error) {

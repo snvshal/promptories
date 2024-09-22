@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { promptory_types } from "@/lib/constants";
 import { savePostForm } from "@/actions/postFormAction";
 import { Header } from "./post";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
@@ -52,6 +53,8 @@ export default function PostForm() {
     },
   });
 
+  const router = useRouter();
+
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
@@ -59,6 +62,8 @@ export default function PostForm() {
       // Simulate API call
       console.log("Form saved:", data);
       reset();
+
+      router.push("/home");
     } catch (error) {
       console.error("Submission failed:", error);
     } finally {
