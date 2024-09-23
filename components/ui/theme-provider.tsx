@@ -55,10 +55,11 @@ export function ModeToggle() {
 }
 
 export function NextThemes() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const handleThemeSelection = (value: string) => setTheme(value);
 
   return (
-    <Select value={"system"} onValueChange={setTheme}>
+    <Select value={theme || "system"} onValueChange={handleThemeSelection}>
       <SelectTrigger>
         <SelectValue placeholder="Select a theme" />
       </SelectTrigger>
