@@ -7,11 +7,9 @@ export default function SettingsTabs() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const currentTab = pathname.includes("/appearance")
-    ? "appearance"
-    : pathname.includes("/username")
-      ? "username"
-      : "profile";
+  const tabs = ["appearance", "username", "account"];
+  const currentTab =
+    tabs.find((tab) => pathname.includes(`/${tab}`)) || "profile";
 
   const handleTabChange = (value: string) => {
     router.push(`/settings/${value}`);
@@ -30,10 +28,12 @@ export default function SettingsTabs() {
         <TabsTrigger value="profile">Profile</TabsTrigger>
         <TabsTrigger value="username">Username</TabsTrigger>
         <TabsTrigger value="appearance">Appearance</TabsTrigger>
+        <TabsTrigger value="account">Account</TabsTrigger>
       </TabsList>
       <TabsContent value="profile"></TabsContent>
       <TabsContent value="username"></TabsContent>
       <TabsContent value="appearance"></TabsContent>
+      <TabsContent value="account"></TabsContent>
     </Tabs>
     // </div>
   );

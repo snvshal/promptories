@@ -4,7 +4,7 @@ export type TPost = Document & {
   promptory_id: number;
   user: Types.ObjectId | TUser;
   caption: string;
-  model: string;
+  model_url: string;
   prompt: string;
   response: string;
   promptory_type: PromptoryType;

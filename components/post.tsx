@@ -22,6 +22,8 @@ import {
   Trash,
   Ellipsis,
   User,
+  SquareArrowOutUpRight,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { BookmarkButton, il, LikeButton, pu } from "./home";
@@ -405,7 +407,10 @@ export function PostOptions({ user, post }: { user: TUser; post: TPost }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32">
         {authorized ? (
-          <DropdownMenuItem onClick={handleDeletePostClick}>
+          <DropdownMenuItem
+            onClick={handleDeletePostClick}
+            className="cursor-pointer"
+          >
             <Trash className="mr-2 h-4 w-4 text-red-500" />
             <span className="text-red-500">Delete</span>
           </DropdownMenuItem>
@@ -418,6 +423,43 @@ export function PostOptions({ user, post }: { user: TUser; post: TPost }) {
             <span>Profile</span>
           </DropdownMenuItem>
         )}
+        <Link href={post.model_url} target="_black" prefetch={false}>
+          <DropdownMenuItem className="cursor-pointer">
+            <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
+            <span>Try it</span>
+          </DropdownMenuItem>
+        </Link>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function UserOptions({ user }: { user: TUser }) {
+  const router = useRouter();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Avatar className="cursor-pointer">
+          <AvatarImage src={user?.avatar} alt={user?.username} />
+          <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-32">
+        <DropdownMenuItem
+          onClick={() => router.push(`/${user?.username}`)}
+          className="cursor-pointer"
+        >
+          <User className="mr-2 h-4 w-4" />
+          <span>{user?.username}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/settings/profile")}
+          className="cursor-pointer"
+        >
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Settings</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

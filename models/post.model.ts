@@ -2,7 +2,7 @@ import { Schema, model, models } from "mongoose";
 import { promptory_types } from "@/lib/constants";
 import { TPost } from "@/types/schema.type";
 
-const PostSchema: Schema = new Schema(
+const PostSchema = new Schema<TPost>(
   {
     promptory_id: {
       type: Number,
@@ -17,7 +17,7 @@ const PostSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    model: {
+    model_url: {
       type: String,
       required: true,
     },

@@ -28,6 +28,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useRouter } from "next/navigation";
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -64,12 +65,16 @@ export default function ProfileSettings({ user }: { user: TUser }) {
     }
   };
 
+  const router = useRouter();
+
   const onSubmit = async (data: ProfileFormValues) => {
     try {
       // Simulate API call
       //   await new Promise((resolve) => setTimeout(resolve, 2000));
       await updateUserData(user._id as string, data);
       console.log(data);
+      router.push(`/${user?.username}`);
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
