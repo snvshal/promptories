@@ -11,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { PostsComponent } from "../home";
-import { signOut } from "next-auth/react";
 import { TPost, TUser } from "@/types/schema.type";
 import { useParams } from "next/navigation";
 import { User2 } from "lucide-react";
@@ -121,7 +120,7 @@ export function ProfileUserContent({
           </Avatar>
           <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
           <p className="text-muted-foreground">&#64;{profileUser?.username}</p>
-          <p className="mt-2 text-gray-700">{profileUser?.bio}</p>
+          <p className="mt-2">{profileUser?.bio}</p>
           <div className="mt-4 flex justify-center space-x-4">
             <div>
               <p className="font-semibold">{postCount}</p>
@@ -138,11 +137,7 @@ export function ProfileUserContent({
             </div>
           </div>
           <div className="mt-6 flex space-x-4">
-            {isAdmin ? (
-              <Button onClick={() => signOut()} variant="outline">
-                Sign Out
-              </Button>
-            ) : (
+            {!isAdmin && (
               <Button
                 variant={follow === "Follow" ? "default" : "secondary"}
                 onClick={handleAddFollower}

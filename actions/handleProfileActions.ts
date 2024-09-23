@@ -3,6 +3,7 @@
 import { connectToDatabase } from "@/utils/db";
 import { User } from "@/models/user.model";
 import { TUser } from "@/types/schema.type";
+import { ProfileFormValues } from "@/components/settings/profile";
 
 const reservedUsernames = [
   "admin",
@@ -49,12 +50,17 @@ export async function isUsernameUnique(
 
 export async function updateUserData(
   userId: string,
-  updateData: Partial<TUser>,
+  updateData: ProfileFormValues,
 ): Promise<{ success: boolean; message: string }> {
   try {
     await connectToDatabase();
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+    const updatedData = {
+      ...updateData,
+      socialLinks: { twitter: updateData.twitter, github: updateData.github },
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
       new: true, // Return the updated document
       runValidators: true, // Validate the update against the schema
     });

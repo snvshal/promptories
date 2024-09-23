@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,8 +18,8 @@ import {
   MessageCircle,
   Bookmark,
   Share2,
-  Pen,
   Send,
+  Feather,
 } from "lucide-react";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
@@ -39,10 +39,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { PostOptions } from "./post";
+import { PostOptions, UserOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { handlePostShare } from "@/utils/ps";
+import { searchPosts } from "@/actions/searchQuery";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -55,6 +56,12 @@ export function HomePageComponent({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
 
+  const SubmitQuery = async (e: FormEvent) => {
+    e.preventDefault();
+    const result = await searchPosts(searchQuery);
+    console.log(result);
+  };
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
@@ -65,28 +72,22 @@ export function HomePageComponent({
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4" />
-              <Input
-                type="search"
-                placeholder="Search prompts..."
-                className="w-64 pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+            <form onSubmit={SubmitQuery}>
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4" />
+                <Input
+                  type="search"
+                  placeholder="Search prompts..."
+                  className="w-64 pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </form>
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
-            <Link href={"/compose/promptory"} prefetch={false}>
-              <Pen size={15} />
-            </Link>
-            <Link href={`/${user?.username}`} prefetch={false}>
-              <Avatar>
-                <AvatarImage src={user?.avatar} alt={user?.username} />
-                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-            </Link>
+            <UserOptions user={user} />
           </div>
         </div>
       </header>
@@ -94,6 +95,7 @@ export function HomePageComponent({
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <PostsComponent user={user} posts={posts} />
       </main>
+      <ComposePromptoryButton />
     </div>
   );
 }
@@ -368,7 +370,12 @@ export function PostReplyDialog({ post }: { post: TPost }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Reply to Post</DialogTitle>
+          <DialogTitle>
+            Reply to{" "}
+            <Link href={`/${pu(post).username}`} className="text-blue-500">
+              &#64;{pu(post).username}
+            </Link>{" "}
+          </DialogTitle>
           <DialogDescription>
             Type your reply to this post. Click submit when you&#39;re done.
           </DialogDescription>
@@ -395,5 +402,18 @@ export function PostReplyDialog({ post }: { post: TPost }) {
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function ComposePromptoryButton() {
+  const router = useRouter();
+  return (
+    <Button
+      size={"icon"}
+      onClick={() => router.push("/compose/promptory")}
+      className="fixed bottom-8 right-8 h-12 w-12 rounded-full bg-primary p-2"
+    >
+      <Feather />
+    </Button>
   );
 }

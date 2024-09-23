@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
-  model: z.string().min(1, "Model is required"),
+  model_url: z.string().min(10, "Model is required"),
   prompt: z.string().min(1, "Prompt is required"),
   response: z.string().min(1, "Response is required"),
   promptory_type: z.enum(promptory_types as [string, ...string[]], {
@@ -45,7 +45,7 @@ export default function PostForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       caption: "",
-      model: "",
+      model_url: "",
       prompt: "",
       response: "",
       promptory_type: promptory_types[0],
@@ -97,19 +97,20 @@ export default function PostForm() {
           <div>
             <Label htmlFor="model">Model</Label>
             <Controller
-              name="model"
+              name="model_url"
               control={control}
               render={({ field }) => (
                 <Input id="model" placeholder="Enter model" {...field} />
               )}
             />
-            {errors.model && (
+            {errors.model_url && (
               <p className="mt-1 text-sm text-red-500">
-                {errors.model.message}
+                {errors.model_url.message}
               </p>
             )}
             <p className="mt-1 text-sm text-gray-500">
-              Enter model domain (full url) (e.g., https://chatgpt.com)
+              Enter full url of the website where we can try it. (e.g.,
+              https://chatgpt.com)
             </p>
           </div>
 

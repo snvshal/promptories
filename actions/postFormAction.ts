@@ -6,7 +6,7 @@ import { currentUser } from "@/utils/get-user";
 
 export type FPost = {
   caption: string;
-  model: string;
+  model_url: string;
   prompt: string;
   response: string;
   promptory_type: string;
@@ -22,7 +22,7 @@ export async function savePostForm(data: FPost) {
       user: user,
       promptory_id: Date.now(),
       caption: data.caption,
-      model: data.model,
+      model_url: data.model_url,
       prompt: data.prompt,
       response: data.response,
       promptory_type: data.promptory_type,
