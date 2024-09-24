@@ -4,7 +4,7 @@ import { User } from "@/models/user.model";
 import { connectToDatabase } from "@/utils/db";
 import { Types } from "mongoose";
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -70,4 +70,3 @@ export const authOptions: NextAuthOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
-export default handler;
