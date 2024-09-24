@@ -24,6 +24,7 @@ import {
   User,
   SquareArrowOutUpRight,
   Settings,
+  MessageSquareShare,
 } from "lucide-react";
 import Link from "next/link";
 import { BookmarkButton, il, LikeButton, pu } from "./home";
@@ -429,6 +430,15 @@ export function PostOptions({ user, post }: { user: TUser; post: TPost }) {
             <span>Try it</span>
           </DropdownMenuItem>
         </Link>
+
+        {post.chat_link && (
+          <Link href={post.chat_link} target="_black" prefetch={false}>
+            <DropdownMenuItem className="cursor-pointer">
+              <MessageSquareShare className="mr-2 h-4 w-4" />
+              <span>View chat</span>
+            </DropdownMenuItem>
+          </Link>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

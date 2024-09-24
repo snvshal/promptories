@@ -49,8 +49,8 @@ export default function ProfileSettings({ user }: { user: TUser }) {
       name: user.name,
       // email: "",
       bio: user.bio,
-      twitter: user.socialLinks?.twitter,
-      github: user.socialLinks?.github,
+      twitter: user.social_links?.twitter,
+      github: user.social_links?.github,
     },
   });
 

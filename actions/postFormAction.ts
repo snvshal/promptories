@@ -7,6 +7,7 @@ import { currentUser } from "@/utils/get-user";
 export type FPost = {
   caption: string;
   model_url: string;
+  chat_link?: string;
   prompt: string;
   response: string;
   promptory_type: string;
@@ -23,6 +24,7 @@ export async function savePostForm(data: FPost) {
       promptory_id: Date.now(),
       caption: data.caption,
       model_url: data.model_url,
+      chat_link: data.chat_link,
       prompt: data.prompt,
       response: data.response,
       promptory_type: data.promptory_type,

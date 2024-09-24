@@ -44,6 +44,7 @@ import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { handlePostShare } from "@/utils/ps";
 import { searchPosts } from "@/actions/searchQuery";
+import { useSession } from "next-auth/react";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -62,6 +63,8 @@ export function HomePageComponent({
     console.log(result);
   };
 
+  const { data: session, status } = useSession();
+  console.log(session, status);
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
