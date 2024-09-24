@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
-  model_url: z.string().min(10, "Model is required"),
+  model_url: z.string().url("Invalid model URL").min(10, "Model is required"),
   chat_link: z.string().optional(),
   prompt: z.string().min(1, "Prompt is required"),
   response: z.string().min(1, "Response is required"),
