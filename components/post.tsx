@@ -29,8 +29,7 @@ import {
 import Link from "next/link";
 import { BookmarkButton, il, LikeButton, pu } from "./home";
 import { TimeAgo } from "./time-ago";
-import { TPost, TReplies, TUser } from "@/types/schema.type";
-import { Types } from "mongoose";
+import { TPost, TReplies } from "@/types/schema.type";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { Separator } from "./ui/separator";
 import { deleteReply, handleLikeReply } from "@/actions/handleReplyActions";
@@ -42,15 +41,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { handleDeletePost } from "@/actions/handlePostActions";
-import { handlePostShare } from "@/utils/ps";
+import { handlePostShare, objId } from "@/utils/ps";
+import { useSession } from "next-auth/react";
 
-export default function SinglePostPage({
-  user,
-  post,
-}: {
-  user: TUser;
-  post: TPost;
-}) {
+export default function SinglePostPage({ post }: { post: TPost }) {
   return (
     <div className="min-h-screen">
       <Header />
@@ -79,7 +73,7 @@ export default function SinglePostPage({
                   &#8226; <TimeAgo timestamp={post.createdAt as Date} />
                 </p>
               </div>
-              <PostOptions user={user} post={post} />
+              <PostOptions post={post} />
             </div>
           </CardHeader>
           <CardContent className="ml-14 border-0">
@@ -112,27 +106,13 @@ export default function SinglePostPage({
           <CardFooter className="ml-12 flex justify-between">
             <div className="flex space-x-4">
               {/* Like Button */}
-              <LikeButton
-                postId={post._id as string}
-                initialLikes={post.likes.length}
-                userId={user._id as string}
-                hasLikedInitial={post.likes.includes(
-                  user._id as Types.ObjectId,
-                )}
-              />
+              <LikeButton post={post} />
               <Button variant="ghost" size="sm">
                 <MessageCircle className="mr-2 h-4 w-4" />
                 {post.replies.length}
               </Button>
               {/* Bookmark Button */}
-              <BookmarkButton
-                postId={post._id as string}
-                initialBookmarks={post.bookmarks.length}
-                userId={user._id as string}
-                hasBookmarkedInitial={post.bookmarks.includes(
-                  user._id as Types.ObjectId,
-                )}
-              />
+              <BookmarkButton post={post} />
             </div>
             <Button
               variant="ghost"
@@ -145,18 +125,16 @@ export default function SinglePostPage({
             </Button>
           </CardFooter>
         </Card>
-        <PostReplies user={user} post={post as TPost} replies={post.replies} />
+        <PostReplies post={post as TPost} replies={post.replies} />
       </main>
     </div>
   );
 }
 
 export function PostReplies({
-  user,
   post,
   replies,
 }: {
-  user: TUser;
   post: TPost;
   replies: TReplies[];
 }) {
@@ -212,7 +190,6 @@ export function PostReplies({
         )}
         <Separator className="my-4" />
         <PostRepliesContent
-          user={user}
           post={post}
           replies={postReplies}
           setPostReplies={setPostReplies}
@@ -223,16 +200,17 @@ export function PostReplies({
 }
 
 export function PostRepliesContent({
-  user,
   post,
   replies,
   setPostReplies,
 }: {
-  user: TUser;
   post: TPost;
   replies: TReplies[];
   setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
 }) {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   if (!replies.length) {
     return (
       <div className="space-y-4">
@@ -285,7 +263,6 @@ export function PostRepliesContent({
                 </p>
               </div>
               <PostReplyOptions
-                user={user}
                 postId={post._id as string}
                 reply={reply}
                 setPostReplies={setPostReplies}
@@ -301,9 +278,9 @@ export function PostRepliesContent({
             >
               <Heart
                 style={{
-                  color: il(reply.likes.includes(user._id as Types.ObjectId)),
+                  color: il(reply.likes.includes(objId(user?.id))),
                 }}
-                fill={il(reply.likes.includes(user._id as Types.ObjectId))}
+                fill={il(reply.likes.includes(objId(user?.id)))}
                 className="mr-2 h-4 w-4"
               />
               {reply.likes.length}
@@ -333,16 +310,16 @@ export function Header() {
 }
 
 export function PostReplyOptions({
-  user,
   postId,
   reply,
   setPostReplies,
 }: {
-  user: TUser;
   postId: string;
   reply: TReplies;
   setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
 }) {
+  const { status } = useSession();
+
   const router = useRouter();
 
   const handleDeleteReplyClick = async () => {
@@ -354,8 +331,9 @@ export function PostReplyOptions({
     }
   };
 
-  const authorized = reply.user._id?.toString() === user._id?.toString();
-  // console.log(authorized);
+  // const authorized = reply.user._id?.toString() === user._id?.toString();
+  const authorized = status === "authenticated";
+  console.log(authorized);
 
   return (
     <DropdownMenu>
@@ -385,7 +363,10 @@ export function PostReplyOptions({
   );
 }
 
-export function PostOptions({ user, post }: { user: TUser; post: TPost }) {
+export function PostOptions({ post }: { post: TPost }) {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const router = useRouter();
 
   const handleDeletePostClick = async () => {
@@ -396,7 +377,7 @@ export function PostOptions({ user, post }: { user: TUser; post: TPost }) {
     }
   };
 
-  const authorized = post.user._id?.toString() === user._id?.toString();
+  const authorized = post.user._id?.toString() === user?.id;
 
   return (
     <DropdownMenu>
@@ -444,14 +425,17 @@ export function PostOptions({ user, post }: { user: TUser; post: TPost }) {
   );
 }
 
-export function UserOptions({ user }: { user: TUser }) {
+export function UserOptions() {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const router = useRouter();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer">
-          <AvatarImage src={user?.avatar} alt={user?.username} />
+          <AvatarImage src={user?.image} alt={user?.username} />
           <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

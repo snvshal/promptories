@@ -46,3 +46,18 @@ export type TReplies = Document & {
   likes: (Types.ObjectId | TUser)[];
   timestamp: Date;
 };
+
+export type SessionUser = {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  bio?: string;
+  image?: string;
+  social_links?: {
+    twitter?: string;
+    github?: string;
+  };
+  followers: string[];
+  following: string[];
+};

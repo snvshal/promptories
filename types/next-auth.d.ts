@@ -1,5 +1,4 @@
 import NextAuth from "next-auth";
-import { Types } from "mongoose";
 
 declare module "next-auth" {
   interface Session {

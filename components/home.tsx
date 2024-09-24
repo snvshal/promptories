@@ -28,7 +28,6 @@ import {
   handleLikePost,
   handleBookmarkPost,
 } from "@/actions/handlePostActions";
-import { Types } from "mongoose";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -42,19 +41,13 @@ import {
 import { PostOptions, UserOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
-import { handlePostShare } from "@/utils/ps";
+import { handlePostShare, objId } from "@/utils/ps";
 import { searchPosts } from "@/actions/searchQuery";
 import { useSession } from "next-auth/react";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
-export function HomePageComponent({
-  user,
-  posts,
-}: {
-  user: TUser;
-  posts: TPost[];
-}) {
+export function HomePageComponent({ posts }: { posts: TPost[] }) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const SubmitQuery = async (e: FormEvent) => {
@@ -63,8 +56,6 @@ export function HomePageComponent({
     console.log(result);
   };
 
-  const { data: session, status } = useSession();
-  console.log(session, status);
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
@@ -90,26 +81,20 @@ export function HomePageComponent({
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
-            <UserOptions user={user} />
+            <UserOptions />
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <PostsComponent user={user} posts={posts} />
+        <PostsComponent posts={posts} />
       </main>
       <ComposePromptoryButton />
     </div>
   );
 }
 
-export function PostsComponent({
-  user,
-  posts,
-}: {
-  user: TUser;
-  posts: TPost[];
-}) {
+export function PostsComponent({ posts }: { posts: TPost[] }) {
   const router = useRouter();
 
   if (!posts.length) {
@@ -153,7 +138,7 @@ export function PostsComponent({
                   &#8226; <TimeAgo timestamp={post.createdAt as Date} />
                 </p>
               </div>
-              <PostOptions user={user} post={post} />
+              <PostOptions post={post} />
             </div>
           </CardHeader>
           <CardContent
@@ -210,29 +195,9 @@ export function PostsComponent({
           </CardContent>
           <CardFooter className="flex justify-between pl-20">
             <div className="flex space-x-4">
-              {/* Like Button */}
-              <LikeButton
-                postId={post._id as string}
-                initialLikes={post.likes.length}
-                userId={user._id as string}
-                hasLikedInitial={post.likes.includes(
-                  user._id as Types.ObjectId,
-                )}
-              />
-              {/* <Button variant="ghost" size="sm">
-                <MessageCircle className="mr-2 h-4 w-4" />
-                {post.replies.length}
-              </Button> */}
+              <LikeButton post={post} />
               <PostReplyDialog post={post} />
-              {/* Bookmark Button */}
-              <BookmarkButton
-                postId={post._id as string}
-                initialBookmarks={post.bookmarks.length}
-                userId={user._id as string}
-                hasBookmarkedInitial={post.bookmarks.includes(
-                  user._id as Types.ObjectId,
-                )}
-              />
+              <BookmarkButton post={post} />
             </div>
             <Button
               variant="ghost"
@@ -250,21 +215,15 @@ export function PostsComponent({
   );
 }
 
-export type LikeButtonProps = {
-  postId: string;
-  initialLikes: number;
-  userId: string;
-  hasLikedInitial: boolean;
-};
-
 export const il = (hasLiked: boolean) => (hasLiked ? "#b91c1c" : "none");
 
-export const LikeButton = ({
-  postId,
-  initialLikes,
-  userId,
-  hasLikedInitial,
-}: LikeButtonProps) => {
+export const LikeButton = ({ post }: { post: TPost }) => {
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  const initialLikes = post.likes.length;
+  const hasLikedInitial = post.likes.includes(objId(user?.id));
+
   const [likes, setLikes] = useState(initialLikes);
   const [hasLiked, setHasLiked] = useState(hasLikedInitial);
 
@@ -276,7 +235,7 @@ export const LikeButton = ({
     setLikes(hasLiked ? likes - 1 : likes + 1);
 
     // Server action to handle like/unlike
-    await handleLikePost(postId, userId);
+    await handleLikePost(post._id as string, user?.id as string);
   };
 
   return (
@@ -293,23 +252,15 @@ export const LikeButton = ({
   );
 };
 
-// export default LikeButton;
-
-export type BookmarkButtonProps = {
-  postId: string;
-  initialBookmarks: number;
-  userId: string;
-  hasBookmarkedInitial: boolean;
-};
-
 export const ib = (isSaved: boolean) => (isSaved ? "#3b82f6" : "none");
 
-export const BookmarkButton = ({
-  postId,
-  initialBookmarks,
-  userId,
-  hasBookmarkedInitial,
-}: BookmarkButtonProps) => {
+export const BookmarkButton = ({ post }: { post: TPost }) => {
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  const initialBookmarks = post.bookmarks.length;
+  const hasBookmarkedInitial = post.bookmarks.includes(objId(user?.id));
+
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial);
 
@@ -321,7 +272,7 @@ export const BookmarkButton = ({
     setBookmarks(hasBookmarked ? bookmarks - 1 : bookmarks + 1);
 
     // Server action to handle bookmark/unbookmark
-    await handleBookmarkPost(postId, userId);
+    await handleBookmarkPost(post._id as string, user?.id as string);
   };
 
   return (

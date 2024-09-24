@@ -27,7 +27,7 @@ import {
   isUsernameUnique,
   updateUsername,
 } from "@/actions/handleProfileActions";
-import { TUser } from "@/types/schema.type";
+import { useSession } from "next-auth/react";
 
 const usernameSchema = z.object({
   username: z
@@ -45,13 +45,16 @@ const usernameSchema = z.object({
     }),
 });
 
-type UsernameFormValues = z.infer<typeof usernameSchema>;
+export type UsernameFormValues = z.infer<typeof usernameSchema>;
 
-export default function ChangeUsernamePage({ user }: { user: TUser }) {
+export default function ChangeUsernamePage() {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const usernameForm = useForm<UsernameFormValues>({
     resolver: zodResolver(usernameSchema),
     defaultValues: {
-      username: user.username,
+      username: user?.username,
     },
   });
 
@@ -59,7 +62,7 @@ export default function ChangeUsernamePage({ user }: { user: TUser }) {
     try {
       // Simulate API call
       //   await new Promise((resolve) => setTimeout(resolve, 2000));
-      await updateUsername(user._id as string, data.username);
+      await updateUsername(user?.id as string, data.username);
       console.log(data);
       toast({
         title: "Username updated",
