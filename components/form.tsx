@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
   model_url: z.string().min(10, "Model is required"),
+  chat_link: z.string().optional(),
   prompt: z.string().min(1, "Prompt is required"),
   response: z.string().min(1, "Response is required"),
   promptory_type: z.enum(promptory_types as [string, ...string[]], {
@@ -46,6 +47,7 @@ export default function PostForm() {
     defaultValues: {
       caption: "",
       model_url: "",
+      chat_link: "",
       prompt: "",
       response: "",
       promptory_type: promptory_types[0],
@@ -95,12 +97,12 @@ export default function PostForm() {
           </div>
 
           <div>
-            <Label htmlFor="model">Model</Label>
+            <Label htmlFor="model_url">Model</Label>
             <Controller
               name="model_url"
               control={control}
               render={({ field }) => (
-                <Input id="model" placeholder="Enter model" {...field} />
+                <Input id="model_url" placeholder="Enter model" {...field} />
               )}
             />
             {errors.model_url && (
@@ -111,6 +113,29 @@ export default function PostForm() {
             <p className="mt-1 text-sm text-gray-500">
               Enter full url of the website where we can try it. (e.g.,
               https://chatgpt.com)
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="chat_link">Chat</Label>
+            <Controller
+              name="chat_link"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="chat_link"
+                  placeholder="Enter chat link"
+                  {...field}
+                />
+              )}
+            />
+            {errors.chat_link && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.chat_link?.message}
+              </p>
+            )}
+            <p className="mt-1 text-sm text-gray-500">
+              Enter public chat link of this promptory
             </p>
           </div>
 
@@ -197,7 +222,9 @@ export default function PostForm() {
               Enter tags separated by commas (e.g., tag1, tag2, tag3)
             </p>
             {errors.tags && (
-              <p className="mt-1 text-sm text-red-500">{errors.tags.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.tags?.message}
+              </p>
             )}
           </div>
 

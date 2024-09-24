@@ -57,7 +57,7 @@ export async function updateUserData(
 
     const updatedData = {
       ...updateData,
-      socialLinks: { twitter: updateData.twitter, github: updateData.github },
+      social_links: { twitter: updateData.twitter, github: updateData.github },
     };
 
     const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {

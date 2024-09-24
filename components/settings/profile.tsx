@@ -10,7 +10,6 @@ import { toast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TUser } from "@/types/schema.type";
 import { updateUserData } from "@/actions/handleProfileActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -29,6 +28,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -40,17 +40,20 @@ const profileSchema = z.object({
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
-export default function ProfileSettings({ user }: { user: TUser }) {
+export default function ProfileSettings() {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const [avatar, setAvatar] = useState("/placeholder.svg?height=100&width=100");
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user.name,
+      name: user?.name,
       // email: "",
-      bio: user.bio,
-      twitter: user.socialLinks?.twitter,
-      github: user.socialLinks?.github,
+      bio: user?.bio,
+      twitter: user?.social_links?.twitter,
+      github: user?.social_links?.github,
     },
   });
 
@@ -71,7 +74,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
     try {
       // Simulate API call
       //   await new Promise((resolve) => setTimeout(resolve, 2000));
-      await updateUserData(user._id as string, data);
+      await updateUserData(user?.id as string, data);
       console.log(data);
       router.push(`/${user?.username}`);
 

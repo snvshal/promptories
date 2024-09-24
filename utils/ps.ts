@@ -1,7 +1,11 @@
 import { pu } from "@/components/home";
 import { TPost } from "@/types/schema.type";
+import { Types } from "mongoose";
 
 export const ps = (obj: object) => JSON.parse(JSON.stringify(obj));
+
+export const objId = (id: string | undefined) =>
+  new Types.ObjectId(id as string);
 
 export const isValidPromptoryId = (promptory_id: string): boolean => {
   if (!promptory_id) return false;

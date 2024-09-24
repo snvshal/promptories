@@ -25,7 +25,7 @@ const UserSchema = new Schema<TUser>(
       type: String,
       default: "",
     },
-    socialLinks: {
+    social_links: {
       twitter: { type: String, default: "" },
       github: { type: String, default: "" },
     },

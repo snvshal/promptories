@@ -6,7 +6,7 @@ import {
   getPostsByUsername,
 } from "@/utils/get-posts";
 
-import { currentUser, getUserByUsername } from "@/utils/get-user";
+import { getUserByUsername } from "@/utils/get-user";
 import { ps } from "@/utils/ps";
 
 export default async function UserProfilePage({
@@ -16,7 +16,6 @@ export default async function UserProfilePage({
 }) {
   const { username } = params;
 
-  const user = await currentUser();
   const profileUser = await getUserByUsername(username);
   const posts = await getPostsByUsername(username);
   const likedPosts = await getLikedPosts(profileUser as TUser);
@@ -26,7 +25,6 @@ export default async function UserProfilePage({
 
   return (
     <UserProfileComponent
-      user={ps(user as TUser)}
       profileUser={ps(profileUser as TUser)}
       posts={ps(posts as TPost[])}
       likedPosts={ps(likedPosts as TPost[])}

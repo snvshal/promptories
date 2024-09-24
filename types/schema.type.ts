@@ -5,6 +5,7 @@ export type TPost = Document & {
   user: Types.ObjectId | TUser;
   caption: string;
   model_url: string;
+  chat_link: string;
   prompt: string;
   response: string;
   promptory_type: PromptoryType;
@@ -24,7 +25,7 @@ export type TUser = Document & {
   password: string;
   bio?: string;
   avatar?: string;
-  socialLinks?: {
+  social_links?: {
     twitter?: string;
     github?: string;
   };
@@ -44,4 +45,19 @@ export type TReplies = Document & {
   reply: string;
   likes: (Types.ObjectId | TUser)[];
   timestamp: Date;
+};
+
+export type SessionUser = {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  bio?: string;
+  image?: string;
+  social_links?: {
+    twitter?: string;
+    github?: string;
+  };
+  followers: string[];
+  following: string[];
 };

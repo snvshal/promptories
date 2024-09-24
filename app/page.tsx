@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default async function Home() {
   const session = await getServerSession();
-  console.log(session);
+  // console.log("session: ", session);
 
   if (session) return redirect("/home");
   return (

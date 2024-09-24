@@ -16,23 +16,23 @@ import { useParams } from "next/navigation";
 import { User2 } from "lucide-react";
 import { Header } from "../post";
 import { addFollower } from "@/actions/addFollower";
-import { Types } from "mongoose";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { objId } from "@/utils/ps";
 
 export default function UserProfileComponent({
-  user,
   profileUser,
   posts,
   likedPosts,
   bookmarkedPosts,
 }: {
-  user: TUser;
   profileUser: TUser;
   posts: TPost[];
   likedPosts: TPost[];
   bookmarkedPosts: TPost[];
 }) {
-  const isAdmin = user._id?.toString() === profileUser._id?.toString();
+  const { status } = useSession();
+  const isAdmin = status === "authenticated";
 
   return (
     <div className="min-h-screen">
@@ -43,8 +43,6 @@ export default function UserProfileComponent({
           <ProfileUserContent
             profileUser={profileUser}
             postCount={posts.length}
-            isAdmin={isAdmin}
-            user={user}
           />
           <Tabs defaultValue="posts" className="w-full">
             <TabsList
@@ -61,15 +59,15 @@ export default function UserProfileComponent({
 
             <div className="mt-8">
               <TabsContent value="posts">
-                <PostsComponent user={user} posts={posts} />
+                <PostsComponent posts={posts} />
               </TabsContent>
               {isAdmin && (
                 <>
                   <TabsContent value="likes">
-                    <PostsComponent user={user} posts={likedPosts} />
+                    <PostsComponent posts={likedPosts} />
                   </TabsContent>
                   <TabsContent value="saved">
-                    <PostsComponent user={user} posts={bookmarkedPosts} />
+                    <PostsComponent posts={bookmarkedPosts} />
                   </TabsContent>
                 </>
               )}
@@ -84,17 +82,15 @@ export default function UserProfileComponent({
 export function ProfileUserContent({
   profileUser,
   postCount,
-  isAdmin,
-  user,
 }: {
-  user: TUser;
   profileUser: TUser;
   postCount: number;
-  isAdmin: boolean;
 }) {
-  const initialFollowState = profileUser.followers.includes(
-    user._id as Types.ObjectId,
-  )
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const isAdmin = status === "authenticated";
+
+  const initialFollowState = profileUser.followers.includes(objId(user?.id))
     ? "Following"
     : "Follow";
 
@@ -154,7 +150,6 @@ export function ProfileUserContent({
 
 export function UserNotFound() {
   const { username } = useParams();
-  console.log(username);
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <Card className="mb-8">
