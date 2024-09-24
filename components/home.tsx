@@ -128,7 +128,9 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
                     <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-start gap-1">
-                    <p className="font-semibold">{pu(post).name}</p>
+                    <p className="font-semibold hover:underline">
+                      {pu(post).name}
+                    </p>
                     <p className="text-muted-foreground">
                       &#64;{pu(post).username}
                     </p>

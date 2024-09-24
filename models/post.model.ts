@@ -23,7 +23,6 @@ const PostSchema = new Schema<TPost>(
     },
     chat_link: {
       type: String,
-      required: true,
     },
     prompt: {
       type: String,

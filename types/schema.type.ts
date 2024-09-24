@@ -5,7 +5,7 @@ export type TPost = Document & {
   user: Types.ObjectId | TUser;
   caption: string;
   model_url: string;
-  chat_link: string;
+  chat_link?: string;
   prompt: string;
   response: string;
   promptory_type: PromptoryType;
