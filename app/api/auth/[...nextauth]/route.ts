@@ -1,10 +1,10 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { User } from "@/models/user.model";
 import { connectToDatabase } from "@/utils/db";
 import { Types } from "mongoose";
 
-export const authOptions: NextAuthOptions = {
+const handler = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -65,9 +65,8 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-};
+});
 
-const handler = NextAuth(authOptions);
+// const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
-export default handler;
