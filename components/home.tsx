@@ -291,7 +291,13 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
   );
 };
 
-export function PostReplyDialog({ post }: { post: TPost }) {
+export function PostReplyDialog({
+  post,
+  children,
+}: {
+  post: TPost;
+  children?: React.ReactNode;
+}) {
   const [dialogState, setDialogState] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [emptyReplyError, setEmptyReplyError] = useState("");
@@ -319,10 +325,14 @@ export function PostReplyDialog({ post }: { post: TPost }) {
   return (
     <Dialog open={dialogState} onOpenChange={setDialogState}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label="Reply to Post">
-          <MessageCircle className="mr-2 h-4 w-4" />
-          {repliesCount}
-        </Button>
+        {children ? (
+          children
+        ) : (
+          <Button variant="ghost" size="sm" aria-label="Reply to Post">
+            <MessageCircle className="mr-2 h-4 w-4" />
+            {repliesCount}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -330,7 +340,7 @@ export function PostReplyDialog({ post }: { post: TPost }) {
             Reply to{" "}
             <Link href={`/${pu(post).username}`} className="text-blue-500">
               &#64;{pu(post).username}
-            </Link>{" "}
+            </Link>
           </DialogTitle>
           <DialogDescription>
             Type your reply to this post. Click submit when you&#39;re done.
@@ -369,7 +379,7 @@ export function ComposePromptoryButton() {
       onClick={() => router.push("/compose/promptory")}
       className="fixed bottom-8 right-8 h-12 w-12 rounded-full bg-primary p-2"
     >
-      <Feather />
+      <Feather size={24} />
     </Button>
   );
 }

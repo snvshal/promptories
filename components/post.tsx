@@ -27,7 +27,7 @@ import {
   MessageSquareShare,
 } from "lucide-react";
 import Link from "next/link";
-import { BookmarkButton, il, LikeButton, pu } from "./home";
+import { BookmarkButton, il, LikeButton, PostReplyDialog, pu } from "./home";
 import { TimeAgo } from "./time-ago";
 import { TPost, TReplies } from "@/types/schema.type";
 import { addReplyToPost } from "@/actions/addReplyToPost";
@@ -107,10 +107,8 @@ export default function SinglePostPage({ post }: { post: TPost }) {
             <div className="flex space-x-4">
               {/* Like Button */}
               <LikeButton post={post} />
-              <Button variant="ghost" size="sm">
-                <MessageCircle className="mr-2 h-4 w-4" />
-                {post.replies.length}
-              </Button>
+              {/* Reply Button */}
+              <PostReplyDialog post={post} />
               {/* Bookmark Button */}
               <BookmarkButton post={post} />
             </div>
@@ -125,8 +123,9 @@ export default function SinglePostPage({ post }: { post: TPost }) {
             </Button>
           </CardFooter>
         </Card>
-        <PostReplies post={post as TPost} replies={post.replies} />
+        <PostReplies post={post} replies={post.replies} />
       </main>
+      <PromptoryReplyButton post={post} />
     </div>
   );
 }
@@ -456,5 +455,19 @@ export function UserOptions() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function PromptoryReplyButton({ post }: { post: TPost }) {
+  const router = useRouter();
+  return (
+    <PostReplyDialog post={post}>
+      <Button
+        size={"icon"}
+        className="fixed bottom-8 right-8 h-12 w-12 rounded-full bg-primary p-2"
+      >
+        <MessageCircle size={24} />
+      </Button>
+    </PostReplyDialog>
   );
 }
