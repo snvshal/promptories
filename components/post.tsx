@@ -87,7 +87,7 @@ export function PostReplies({
     }
   };
   return (
-    <Card className="mid-width-post w-full max-md:border-0 md:mb-8">
+    <Card className="mid-width-post-card">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
@@ -417,7 +417,7 @@ export function PostType({
     router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
 
   return (
-    <Card className="bordery-y-0 mid-width-post w-full md:mb-8">
+    <Card className="mid-width-post-card">
       <CardHeader className="pb-0 max-sm:px-4">
         <div className="flex-between">
           <div className="flex-start space-x-4">
