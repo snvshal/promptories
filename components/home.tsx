@@ -3,27 +3,21 @@
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import {
   Bell,
   Search,
   Heart,
   MessageCircle,
   Bookmark,
-  Share2,
   Send,
   Feather,
+  Home,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
-import { TimeAgo } from "./time-ago";
 import {
   handleLikePost,
   handleBookmarkPost,
@@ -38,10 +32,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { PostOptions, UserOptions } from "./post";
+import { PostType, UserOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
-import { handlePostShare, objId } from "@/utils/ps";
+import { objId } from "@/utils/ps";
 import { searchPosts } from "@/actions/searchQuery";
 import { useSession } from "next-auth/react";
 
@@ -65,7 +59,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
               Promptories
             </h1>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 max-md:hidden">
             <form onSubmit={SubmitQuery}>
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4" />
@@ -78,6 +72,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
                 />
               </div>
             </form>
+
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
@@ -86,17 +81,13 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <PostsComponent posts={posts} />
-      </main>
+      <PostsComponent posts={posts} />
       <ComposePromptoryButton />
     </div>
   );
 }
 
 export function PostsComponent({ posts }: { posts: TPost[] }) {
-  const router = useRouter();
-
   if (!posts.length) {
     return (
       <div className="flex-center w-full p-4">
@@ -105,115 +96,12 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
     );
   }
 
-  const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
-
   return (
-    <div className="space-y-6">
+    <main className="main-content">
       {posts.map((post) => (
-        <Card
-          key={post._id?.toString()}
-          className="bordery-y-0 w-full cursor-pointer"
-        >
-          <CardHeader className="pb-0">
-            <div className="flex-between">
-              <div className="flex-start space-x-4">
-                <Link
-                  href={`/${pu(post).username}`}
-                  className="flex-start space-x-4"
-                  prefetch={false}
-                >
-                  <Avatar>
-                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-start gap-1">
-                    <p className="font-semibold hover:underline">
-                      {pu(post).name}
-                    </p>
-                    <p className="text-muted-foreground">
-                      &#64;{pu(post).username}
-                    </p>
-                  </div>
-                </Link>
-                <p className="text-sm text-muted-foreground">
-                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
-                </p>
-              </div>
-              <PostOptions post={post} />
-            </div>
-          </CardHeader>
-          <CardContent
-            role="button"
-            onClick={() => postClick(post)}
-            className="border-0 pl-20"
-          >
-            <div className="mb-4">
-              <div className="relative overflow-hidden">
-                <p className="whitespace-pre-wrap">
-                  {post.caption.split(" ").slice(0, 24).join(" ")}
-                  {post.caption.split(" ").length > 24 && <span> ...</span>}
-                </p>
-                {post.caption.split(" ").length > 24 && (
-                  <button className="mb-2 text-blue-500 hover:underline">
-                    Show more
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag: string, index) => (
-                  <Badge key={index} variant="secondary">
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div className="bbn space-y-4 rounded-lg p-4">
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Prompt:</h3>
-                <p className="whitespace-pre-wrap">
-                  {post.prompt.split(" ").slice(0, 24).join(" ")}
-                  {post.prompt.split(" ").length > 24 && <span> ...</span>}
-                </p>
-                {post.prompt.split(" ").length > 24 && (
-                  <button className="mt-2 text-blue-500 hover:underline">
-                    Show more
-                  </button>
-                )}
-              </div>
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Response:</h3>
-                <p className="whitespace-pre-wrap">
-                  {post.response.split(" ").slice(0, 24).join(" ")}
-                  {post.response.split(" ").length > 24 && <span> ...</span>}
-                </p>
-                {post.response.split(" ").length > 24 && (
-                  <button className="mt-2 text-blue-500 hover:underline">
-                    Show more
-                  </button>
-                )}
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between pl-20">
-            <div className="flex space-x-4">
-              <LikeButton post={post} />
-              <PostReplyDialog post={post} />
-              <BookmarkButton post={post} />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handlePostShare(post)}
-              aria-label="Share Post"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
-            </Button>
-          </CardFooter>
-        </Card>
+        <PostType key={post._id?.toString()} post={post} type="posts" />
       ))}
-    </div>
+    </main>
   );
 }
 
@@ -291,7 +179,13 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
   );
 };
 
-export function PostReplyDialog({ post }: { post: TPost }) {
+export function PostReplyDialog({
+  post,
+  children,
+}: {
+  post: TPost;
+  children?: React.ReactNode;
+}) {
   const [dialogState, setDialogState] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [emptyReplyError, setEmptyReplyError] = useState("");
@@ -319,10 +213,14 @@ export function PostReplyDialog({ post }: { post: TPost }) {
   return (
     <Dialog open={dialogState} onOpenChange={setDialogState}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label="Reply to Post">
-          <MessageCircle className="mr-2 h-4 w-4" />
-          {repliesCount}
-        </Button>
+        {children ? (
+          children
+        ) : (
+          <Button variant="ghost" size="sm" aria-label="Reply to Post">
+            <MessageCircle className="mr-2 h-4 w-4" />
+            {repliesCount}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -330,7 +228,7 @@ export function PostReplyDialog({ post }: { post: TPost }) {
             Reply to{" "}
             <Link href={`/${pu(post).username}`} className="text-blue-500">
               &#64;{pu(post).username}
-            </Link>{" "}
+            </Link>
           </DialogTitle>
           <DialogDescription>
             Type your reply to this post. Click submit when you&#39;re done.
@@ -367,9 +265,48 @@ export function ComposePromptoryButton() {
     <Button
       size={"icon"}
       onClick={() => router.push("/compose/promptory")}
-      className="fixed bottom-8 right-8 h-12 w-12 rounded-full bg-primary p-2"
+      className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"
     >
-      <Feather />
+      <Feather size={24} />
     </Button>
+  );
+}
+
+export function BottomNavbar() {
+  const { data: session } = useSession();
+  const user = session?.user;
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 h-[var(--navbar-height)] border-t border-border bg-background md:hidden">
+      <div className="flex h-full items-center justify-around">
+        <Link href="/home" className="flex flex-col items-center p-2">
+          <Home className="h-6 w-6" />
+          <span className="mt-1 text-xs">Home</span>
+        </Link>
+        <Link href="/search" className="flex flex-col items-center p-2">
+          <Search className="h-6 w-6" />
+          <span className="mt-1 text-xs">Search</span>
+        </Link>
+        <Link
+          href="/settings/profile"
+          className="flex flex-col items-center p-2"
+        >
+          <Settings className="h-6 w-6" />
+          <span className="mt-1 text-xs">Settings</span>
+        </Link>
+        <Link href="/notifications" className="flex flex-col items-center p-2">
+          <Bell className="h-6 w-6" />
+          <span className="mt-1 text-xs">Notifications</span>
+        </Link>
+        <Link
+          href={`/${user?.username}`}
+          className="flex flex-col items-center p-2"
+        >
+          <Avatar className="cursor-pointer">
+            <AvatarImage src={user?.image} alt={user?.username} />
+            <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+        </Link>
+      </div>
+    </nav>
   );
 }

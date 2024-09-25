@@ -27,7 +27,7 @@ import {
   MessageSquareShare,
 } from "lucide-react";
 import Link from "next/link";
-import { BookmarkButton, il, LikeButton, pu } from "./home";
+import { BookmarkButton, il, LikeButton, PostReplyDialog, pu } from "./home";
 import { TimeAgo } from "./time-ago";
 import { TPost, TReplies } from "@/types/schema.type";
 import { addReplyToPost } from "@/actions/addReplyToPost";
@@ -48,85 +48,11 @@ export default function SinglePostPage({ post }: { post: TPost }) {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <Card key={post._id?.toString()} className="bordery-y-0 mb-8 w-full">
-          <CardHeader className="pb-0">
-            <div className="flex-between">
-              <div className="flex-start space-x-4">
-                <Link
-                  href={`/${pu(post).username}`}
-                  className="flex-start space-x-4"
-                  prefetch={false}
-                >
-                  <Avatar>
-                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-start gap-1">
-                    <p className="font-semibold">{pu(post).name}</p>
-                    <p className="text-muted-foreground">
-                      &#64;{pu(post).username}
-                    </p>
-                  </div>
-                </Link>
-                <p className="text-sm text-muted-foreground">
-                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
-                </p>
-              </div>
-              <PostOptions post={post} />
-            </div>
-          </CardHeader>
-          <CardContent className="ml-14 border-0">
-            <div className="mb-4">
-              <div className="relative overflow-hidden">
-                <p className="whitespace-pre-wrap">{post.caption}</p>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {post.tags.map((tag: string, index) => (
-                  <Badge key={index} variant="secondary">
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div className="bbn space-y-4 rounded-lg p-4">
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Prompt:</h3>
-                <p className="whitespace-pre-wrap">{post.prompt}</p>
-              </div>
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Response:</h3>
-                <ScrollArea className="h-60 rounded-md border p-4">
-                  <p className="whitespace-pre-wrap">{post.response}</p>
-                </ScrollArea>
-                {/* <p className="whitespace-pre-wrap">{post.response}</p> */}
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="ml-12 flex justify-between">
-            <div className="flex space-x-4">
-              {/* Like Button */}
-              <LikeButton post={post} />
-              <Button variant="ghost" size="sm">
-                <MessageCircle className="mr-2 h-4 w-4" />
-                {post.replies.length}
-              </Button>
-              {/* Bookmark Button */}
-              <BookmarkButton post={post} />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handlePostShare(post)}
-              aria-label="Share Post"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
-            </Button>
-          </CardFooter>
-        </Card>
-        <PostReplies post={post as TPost} replies={post.replies} />
+      <main className="main-content">
+        <PostType post={post} type="post" />
+        <PostReplies post={post} replies={post.replies} />
       </main>
+      <PromptoryReplyButton post={post} />
     </div>
   );
 }
@@ -161,7 +87,7 @@ export function PostReplies({
     }
   };
   return (
-    <Card className="w-full">
+    <Card className="mid-width-post w-full max-md:border-0 md:mb-8">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
@@ -387,7 +313,14 @@ export function PostOptions({ post }: { post: TPost }) {
           <span className="sr-only">Post options</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-32">
+      <DropdownMenuContent className="w-auto">
+        <DropdownMenuItem
+          onClick={() => router.push(`/${user?.username}`)}
+          className="cursor-pointer sm:hidden"
+        >
+          <User className="mr-2 h-4 w-4" />
+          <span>&#64;{user?.username}</span>
+        </DropdownMenuItem>
         {authorized ? (
           <DropdownMenuItem
             onClick={handleDeletePostClick}
@@ -411,7 +344,6 @@ export function PostOptions({ post }: { post: TPost }) {
             <span>Try it</span>
           </DropdownMenuItem>
         </Link>
-
         {post.chat_link && (
           <Link href={post.chat_link} target="_black" prefetch={false}>
             <DropdownMenuItem className="cursor-pointer">
@@ -439,13 +371,13 @@ export function UserOptions() {
           <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-32">
+      <DropdownMenuContent className="w-auto">
         <DropdownMenuItem
           onClick={() => router.push(`/${user?.username}`)}
           className="cursor-pointer"
         >
           <User className="mr-2 h-4 w-4" />
-          <span>{user?.username}</span>
+          <span>{user?.name}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => router.push("/settings/profile")}
@@ -456,5 +388,160 @@ export function UserOptions() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function PromptoryReplyButton({ post }: { post: TPost }) {
+  return (
+    <PostReplyDialog post={post}>
+      <Button
+        size={"icon"}
+        className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"
+      >
+        <MessageCircle size={24} />
+      </Button>
+    </PostReplyDialog>
+  );
+}
+
+export function PostType({
+  post,
+  type,
+}: {
+  post: TPost;
+  type: "post" | "posts";
+}) {
+  const router = useRouter();
+
+  const postClick = (post: TPost) =>
+    router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
+
+  return (
+    <Card className="bordery-y-0 mid-width-post w-full md:mb-8">
+      <CardHeader className="pb-0 max-sm:px-4">
+        <div className="flex-between">
+          <div className="flex-start space-x-4">
+            <Link
+              href={`/${pu(post).username}`}
+              className="flex-start space-x-4"
+              prefetch={false}
+            >
+              <Avatar>
+                <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
+                <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex-start gap-1">
+                <p className="font-semibold">{pu(post).name}</p>
+                <p
+                  className={`text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
+                >
+                  &#64;{pu(post).username}
+                </p>
+              </div>
+            </Link>
+            {type === "posts" && (
+              <p className="text-sm text-muted-foreground">
+                &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+              </p>
+            )}
+          </div>
+          <PostOptions post={post} />
+        </div>
+      </CardHeader>
+      <CardContent
+        role="button"
+        onClick={() => postClick(post)}
+        className="border-0 pl-20 max-md:pr-4 max-sm:pl-[4.5rem]"
+      >
+        <div className="mb-4">
+          <div className="relative overflow-hidden">
+            <PostContentType type={type} content={post.caption} />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {post.tags.map((tag: string, index) => (
+              <Badge key={index} variant="secondary">
+                #{tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+        <div className="bbn space-y-4 rounded-lg p-4">
+          <div className="relative overflow-hidden">
+            <h3 className="mb-2 font-semibold">Prompt:</h3>
+            <PostContentType type={type} content={post.prompt} />
+          </div>
+          <div className="relative overflow-hidden">
+            <h3 className="mb-2 font-semibold">Response:</h3>
+            <ScrollArea
+              className={`${type === "post" && "h-60 rounded-lg border p-4"}`}
+            >
+              <PostContentType type={type} content={post.response} />
+            </ScrollArea>
+          </div>
+        </div>
+      </CardContent>
+      {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
+      <CardFooter className="flex justify-between pl-[4.5rem] sm:pl-20">
+        <div className="flex space-x-4">
+          {/* Like Button */}
+          <LikeButton post={post} />
+          {/* Reply Button */}
+          <PostReplyDialog post={post} />
+          {/* Bookmark Button */}
+          <BookmarkButton post={post} />
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handlePostShare(post)}
+          aria-label="Share Post"
+        >
+          <Share2 className="mr-2 h-4 w-4" />
+          Share
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export function PostContentType({
+  type,
+  content,
+}: {
+  type: "post" | "posts";
+  content: string;
+}) {
+  if (type === "post") {
+    return <p className="whitespace-pre-wrap">{content}</p>;
+  } else {
+    return (
+      <>
+        <p className="whitespace-pre-wrap">
+          {content.split(" ").slice(0, 24).join(" ")}
+          {content.split(" ").length > 24 && <span> ...</span>}
+        </p>
+        {content.split(" ").length > 24 && (
+          <button className="text-blue-500 hover:underline">Show more</button>
+        )}
+      </>
+    );
+  }
+}
+
+export function PostTime({ createdAt }: { createdAt: Date }) {
+  return (
+    <div className="flex-start mb-6 ml-[4.5rem] mr-4 border-b pb-6 text-muted-foreground sm:ml-20 md:mr-6">
+      {new Date(createdAt as Date).toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })}{" "}
+      &#8226;{" "}
+      {new Date(createdAt as Date).toLocaleString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}
+    </div>
   );
 }

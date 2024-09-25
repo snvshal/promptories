@@ -9,7 +9,7 @@ export default function SettingsLayout({
     <div className="container p-10">
       <h1 className="mb-6 text-3xl font-bold">Settings</h1>
       <SettingsTabs />
-      {children}
+      <main className="bottom-navbar mx-auto max-w-4xl">{children}</main>
     </div>
   );
 }

@@ -1,11 +1,12 @@
+import "./globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { AuthSessionProvider } from "@/components/session-provider";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import { Toaster } from "@/components/ui/toaster";
+import { BottomNavbar } from "@/components/home";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -44,8 +45,9 @@ export default async function RootLayout({
           >
             {children}
           </ThemeProvider>
+          <Toaster />
+          <BottomNavbar />
         </AuthSessionProvider>
-        <Toaster />
       </body>
     </html>
   );
