@@ -14,7 +14,6 @@ import {
   Send,
   Feather,
   Home,
-  User,
   Settings,
 } from "lucide-react";
 import Link from "next/link";

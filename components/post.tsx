@@ -392,7 +392,6 @@ export function UserOptions() {
 }
 
 export function PromptoryReplyButton({ post }: { post: TPost }) {
-  const router = useRouter();
   return (
     <PostReplyDialog post={post}>
       <Button
