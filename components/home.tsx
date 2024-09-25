@@ -3,27 +3,18 @@
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import {
   Bell,
   Search,
   Heart,
   MessageCircle,
   Bookmark,
-  Share2,
   Send,
   Feather,
 } from "lucide-react";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
-import { TimeAgo } from "./time-ago";
 import {
   handleLikePost,
   handleBookmarkPost,
@@ -38,10 +29,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { PostOptions, UserOptions } from "./post";
+import { PostType, UserOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
-import { handlePostShare, objId } from "@/utils/ps";
+import { objId } from "@/utils/ps";
 import { searchPosts } from "@/actions/searchQuery";
 import { useSession } from "next-auth/react";
 
@@ -57,7 +48,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
@@ -86,7 +77,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
         <PostsComponent posts={posts} />
       </main>
       <ComposePromptoryButton />
@@ -95,8 +86,6 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
 }
 
 export function PostsComponent({ posts }: { posts: TPost[] }) {
-  const router = useRouter();
-
   if (!posts.length) {
     return (
       <div className="flex-center w-full p-4">
@@ -105,113 +94,10 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
     );
   }
 
-  const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
-
   return (
     <div className="space-y-6">
       {posts.map((post) => (
-        <Card
-          key={post._id?.toString()}
-          className="bordery-y-0 w-full cursor-pointer"
-        >
-          <CardHeader className="pb-0">
-            <div className="flex-between">
-              <div className="flex-start space-x-4">
-                <Link
-                  href={`/${pu(post).username}`}
-                  className="flex-start space-x-4"
-                  prefetch={false}
-                >
-                  <Avatar>
-                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-start gap-1">
-                    <p className="font-semibold hover:underline">
-                      {pu(post).name}
-                    </p>
-                    <p className="text-muted-foreground">
-                      &#64;{pu(post).username}
-                    </p>
-                  </div>
-                </Link>
-                <p className="text-sm text-muted-foreground">
-                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
-                </p>
-              </div>
-              <PostOptions post={post} />
-            </div>
-          </CardHeader>
-          <CardContent
-            role="button"
-            onClick={() => postClick(post)}
-            className="border-0 pl-20"
-          >
-            <div className="mb-4">
-              <div className="relative overflow-hidden">
-                <p className="whitespace-pre-wrap">
-                  {post.caption.split(" ").slice(0, 24).join(" ")}
-                  {post.caption.split(" ").length > 24 && <span> ...</span>}
-                </p>
-                {post.caption.split(" ").length > 24 && (
-                  <button className="mb-2 text-blue-500 hover:underline">
-                    Show more
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag: string, index) => (
-                  <Badge key={index} variant="secondary">
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div className="bbn space-y-4 rounded-lg p-4">
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Prompt:</h3>
-                <p className="whitespace-pre-wrap">
-                  {post.prompt.split(" ").slice(0, 24).join(" ")}
-                  {post.prompt.split(" ").length > 24 && <span> ...</span>}
-                </p>
-                {post.prompt.split(" ").length > 24 && (
-                  <button className="mt-2 text-blue-500 hover:underline">
-                    Show more
-                  </button>
-                )}
-              </div>
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Response:</h3>
-                <p className="whitespace-pre-wrap">
-                  {post.response.split(" ").slice(0, 24).join(" ")}
-                  {post.response.split(" ").length > 24 && <span> ...</span>}
-                </p>
-                {post.response.split(" ").length > 24 && (
-                  <button className="mt-2 text-blue-500 hover:underline">
-                    Show more
-                  </button>
-                )}
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between pl-20">
-            <div className="flex space-x-4">
-              <LikeButton post={post} />
-              <PostReplyDialog post={post} />
-              <BookmarkButton post={post} />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handlePostShare(post)}
-              aria-label="Share Post"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
-            </Button>
-          </CardFooter>
-        </Card>
+        <PostType key={post._id?.toString()} post={post} type="posts" />
       ))}
     </div>
   );

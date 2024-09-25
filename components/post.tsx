@@ -49,80 +49,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <Card key={post._id?.toString()} className="bordery-y-0 mb-8 w-full">
-          <CardHeader className="pb-0">
-            <div className="flex-between">
-              <div className="flex-start space-x-4">
-                <Link
-                  href={`/${pu(post).username}`}
-                  className="flex-start space-x-4"
-                  prefetch={false}
-                >
-                  <Avatar>
-                    <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                    <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-start gap-1">
-                    <p className="font-semibold">{pu(post).name}</p>
-                    <p className="text-muted-foreground">
-                      &#64;{pu(post).username}
-                    </p>
-                  </div>
-                </Link>
-                <p className="text-sm text-muted-foreground">
-                  &#8226; <TimeAgo timestamp={post.createdAt as Date} />
-                </p>
-              </div>
-              <PostOptions post={post} />
-            </div>
-          </CardHeader>
-          <CardContent className="ml-14 border-0">
-            <div className="mb-4">
-              <div className="relative overflow-hidden">
-                <p className="whitespace-pre-wrap">{post.caption}</p>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {post.tags.map((tag: string, index) => (
-                  <Badge key={index} variant="secondary">
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div className="bbn space-y-4 rounded-lg p-4">
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Prompt:</h3>
-                <p className="whitespace-pre-wrap">{post.prompt}</p>
-              </div>
-              <div className="relative overflow-hidden">
-                <h3 className="mb-2 font-semibold">Response:</h3>
-                <ScrollArea className="h-60 rounded-md border p-4">
-                  <p className="whitespace-pre-wrap">{post.response}</p>
-                </ScrollArea>
-                {/* <p className="whitespace-pre-wrap">{post.response}</p> */}
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="ml-12 flex justify-between">
-            <div className="flex space-x-4">
-              {/* Like Button */}
-              <LikeButton post={post} />
-              {/* Reply Button */}
-              <PostReplyDialog post={post} />
-              {/* Bookmark Button */}
-              <BookmarkButton post={post} />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handlePostShare(post)}
-              aria-label="Share Post"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
-            </Button>
-          </CardFooter>
-        </Card>
+        <PostType post={post} type="post" />
         <PostReplies post={post} replies={post.replies} />
       </main>
       <PromptoryReplyButton post={post} />
@@ -470,4 +397,123 @@ export function PromptoryReplyButton({ post }: { post: TPost }) {
       </Button>
     </PostReplyDialog>
   );
+}
+
+export function PostType({
+  post,
+  type,
+}: {
+  post: TPost;
+  type: "post" | "posts";
+}) {
+  const router = useRouter();
+
+  const postClick = (post: TPost) =>
+    router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
+
+  return (
+    <Card className="bordery-y-0 mb-8 w-full">
+      <CardHeader className="pb-0">
+        <div className="flex-between">
+          <div className="flex-start space-x-4">
+            <Link
+              href={`/${pu(post).username}`}
+              className="flex-start space-x-4"
+              prefetch={false}
+            >
+              <Avatar>
+                <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
+                <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex-start gap-1">
+                <p className="font-semibold">{pu(post).name}</p>
+                <p className="text-muted-foreground">
+                  &#64;{pu(post).username}
+                </p>
+              </div>
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+            </p>
+          </div>
+          <PostOptions post={post} />
+        </div>
+      </CardHeader>
+      <CardContent
+        role="button"
+        onClick={() => postClick(post)}
+        className="border-0 pl-20"
+      >
+        <div className="mb-4">
+          <div className="relative overflow-hidden">
+            <PostContentType type={type} content={post.caption} />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {post.tags.map((tag: string, index) => (
+              <Badge key={index} variant="secondary">
+                #{tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+        <div className="bbn space-y-4 rounded-lg p-4">
+          <div className="relative overflow-hidden">
+            <h3 className="mb-2 font-semibold">Prompt:</h3>
+            <PostContentType type={type} content={post.prompt} />
+          </div>
+          <div className="relative overflow-hidden">
+            <h3 className="mb-2 font-semibold">Response:</h3>
+            <ScrollArea
+              className={`${type === "post" && "h-60 rounded-md border p-4"}`}
+            >
+              <PostContentType type={type} content={post.response} />
+            </ScrollArea>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="ml-12 flex justify-between">
+        <div className="flex space-x-4">
+          {/* Like Button */}
+          <LikeButton post={post} />
+          {/* Reply Button */}
+          <PostReplyDialog post={post} />
+          {/* Bookmark Button */}
+          <BookmarkButton post={post} />
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handlePostShare(post)}
+          aria-label="Share Post"
+        >
+          <Share2 className="mr-2 h-4 w-4" />
+          Share
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export function PostContentType({
+  type,
+  content,
+}: {
+  type: "post" | "posts";
+  content: string;
+}) {
+  if (type === "post") {
+    return <p className="whitespace-pre-wrap">{content}</p>;
+  } else {
+    return (
+      <>
+        <p className="whitespace-pre-wrap">
+          {content.split(" ").slice(0, 24).join(" ")}
+          {content.split(" ").length > 24 && <span> ...</span>}
+        </p>
+        {content.split(" ").length > 24 && (
+          <button className="text-blue-500 hover:underline">Show more</button>
+        )}
+      </>
+    );
+  }
 }
