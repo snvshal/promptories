@@ -18,10 +18,8 @@ import {
   MessageCircle,
   Bookmark,
   Share2,
-  ArrowLeft,
   Search as SearchIcon,
 } from "lucide-react";
-import Link from "next/link";
 import { Header } from "./post";
 import { searchPosts } from "@/actions/searchQuery";
 
