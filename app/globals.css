@@ -29,6 +29,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --navbar-height: 4rem;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -89,4 +90,16 @@
 
 .flex-around {
   @apply flex items-center justify-around;
+}
+
+.bottom-navbar {
+  @apply max-md:pb-[var(--navbar-height)];
+}
+
+.mid-width-post {
+  @apply max-md:rounded-none max-md:border-0 max-md:border-b;
+}
+
+.main-content {
+  @apply bottom-navbar container mx-auto max-w-4xl py-8 max-md:pt-0 md:px-6 lg:px-8;
 }

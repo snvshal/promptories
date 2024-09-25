@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
   Bell,
@@ -12,6 +13,9 @@ import {
   Bookmark,
   Send,
   Feather,
+  Home,
+  User,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
@@ -48,7 +52,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
   };
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
@@ -56,7 +60,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
               Promptories
             </h1>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 max-md:hidden">
             <form onSubmit={SubmitQuery}>
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4" />
@@ -69,6 +73,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
                 />
               </div>
             </form>
+
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
@@ -77,9 +82,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
         </div>
       </header>
 
-      <main className="px-4 py-8 sm:px-6 lg:px-8">
-        <PostsComponent posts={posts} />
-      </main>
+      <PostsComponent posts={posts} />
       <ComposePromptoryButton />
     </div>
   );
@@ -95,11 +98,11 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
   }
 
   return (
-    <div className="space-y-6">
+    <main className="main-content">
       {posts.map((post) => (
         <PostType key={post._id?.toString()} post={post} type="posts" />
       ))}
-    </div>
+    </main>
   );
 }
 
@@ -263,9 +266,48 @@ export function ComposePromptoryButton() {
     <Button
       size={"icon"}
       onClick={() => router.push("/compose/promptory")}
-      className="fixed bottom-8 right-8 h-12 w-12 rounded-full bg-primary p-2"
+      className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"
     >
       <Feather size={24} />
     </Button>
+  );
+}
+
+export function BottomNavbar() {
+  const { data: session } = useSession();
+  const user = session?.user;
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 h-[var(--navbar-height)] border-t border-border bg-background md:hidden">
+      <div className="flex h-full items-center justify-around">
+        <Link href="/home" className="flex flex-col items-center p-2">
+          <Home className="h-6 w-6" />
+          <span className="mt-1 text-xs">Home</span>
+        </Link>
+        <Link href="/search" className="flex flex-col items-center p-2">
+          <Search className="h-6 w-6" />
+          <span className="mt-1 text-xs">Search</span>
+        </Link>
+        <Link
+          href="/settings/profile"
+          className="flex flex-col items-center p-2"
+        >
+          <Settings className="h-6 w-6" />
+          <span className="mt-1 text-xs">Settings</span>
+        </Link>
+        <Link href="/notifications" className="flex flex-col items-center p-2">
+          <Bell className="h-6 w-6" />
+          <span className="mt-1 text-xs">Notifications</span>
+        </Link>
+        <Link
+          href={`/${user?.username}`}
+          className="flex flex-col items-center p-2"
+        >
+          <Avatar className="cursor-pointer">
+            <AvatarImage src={user?.image} alt={user?.username} />
+            <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+        </Link>
+      </div>
+    </nav>
   );
 }

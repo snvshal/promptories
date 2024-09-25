@@ -48,7 +48,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="main-content">
         <PostType post={post} type="post" />
         <PostReplies post={post} replies={post.replies} />
       </main>
@@ -87,7 +87,7 @@ export function PostReplies({
     }
   };
   return (
-    <Card className="w-full">
+    <Card className="mid-width-post w-full max-md:border-0 md:mb-8">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
@@ -313,7 +313,14 @@ export function PostOptions({ post }: { post: TPost }) {
           <span className="sr-only">Post options</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-32">
+      <DropdownMenuContent className="w-auto">
+        <DropdownMenuItem
+          onClick={() => router.push(`/${user?.username}`)}
+          className="cursor-pointer sm:hidden"
+        >
+          <User className="mr-2 h-4 w-4" />
+          <span>&#64;{user?.username}</span>
+        </DropdownMenuItem>
         {authorized ? (
           <DropdownMenuItem
             onClick={handleDeletePostClick}
@@ -337,7 +344,6 @@ export function PostOptions({ post }: { post: TPost }) {
             <span>Try it</span>
           </DropdownMenuItem>
         </Link>
-
         {post.chat_link && (
           <Link href={post.chat_link} target="_black" prefetch={false}>
             <DropdownMenuItem className="cursor-pointer">
@@ -365,13 +371,13 @@ export function UserOptions() {
           <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-32">
+      <DropdownMenuContent className="w-auto">
         <DropdownMenuItem
           onClick={() => router.push(`/${user?.username}`)}
           className="cursor-pointer"
         >
           <User className="mr-2 h-4 w-4" />
-          <span>{user?.username}</span>
+          <span>{user?.name}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => router.push("/settings/profile")}
@@ -391,7 +397,7 @@ export function PromptoryReplyButton({ post }: { post: TPost }) {
     <PostReplyDialog post={post}>
       <Button
         size={"icon"}
-        className="fixed bottom-8 right-8 h-12 w-12 rounded-full bg-primary p-2"
+        className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"
       >
         <MessageCircle size={24} />
       </Button>
@@ -412,8 +418,8 @@ export function PostType({
     router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
 
   return (
-    <Card className="bordery-y-0 mb-8 w-full">
-      <CardHeader className="pb-0">
+    <Card className="bordery-y-0 mid-width-post w-full md:mb-8">
+      <CardHeader className="pb-0 max-sm:px-4">
         <div className="flex-between">
           <div className="flex-start space-x-4">
             <Link
@@ -427,14 +433,18 @@ export function PostType({
               </Avatar>
               <div className="flex-start gap-1">
                 <p className="font-semibold">{pu(post).name}</p>
-                <p className="text-muted-foreground">
+                <p
+                  className={`text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
+                >
                   &#64;{pu(post).username}
                 </p>
               </div>
             </Link>
-            <p className="text-sm text-muted-foreground">
-              &#8226; <TimeAgo timestamp={post.createdAt as Date} />
-            </p>
+            {type === "posts" && (
+              <p className="text-sm text-muted-foreground">
+                &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+              </p>
+            )}
           </div>
           <PostOptions post={post} />
         </div>
@@ -442,7 +452,7 @@ export function PostType({
       <CardContent
         role="button"
         onClick={() => postClick(post)}
-        className="border-0 pl-20"
+        className="border-0 pl-20 max-md:pr-4 max-sm:pl-[4.5rem]"
       >
         <div className="mb-4">
           <div className="relative overflow-hidden">
@@ -464,14 +474,15 @@ export function PostType({
           <div className="relative overflow-hidden">
             <h3 className="mb-2 font-semibold">Response:</h3>
             <ScrollArea
-              className={`${type === "post" && "h-60 rounded-md border p-4"}`}
+              className={`${type === "post" && "h-60 rounded-lg border p-4"}`}
             >
               <PostContentType type={type} content={post.response} />
             </ScrollArea>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="ml-12 flex justify-between">
+      {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
+      <CardFooter className="flex justify-between pl-[4.5rem] sm:pl-20">
         <div className="flex space-x-4">
           {/* Like Button */}
           <LikeButton post={post} />
@@ -516,4 +527,22 @@ export function PostContentType({
       </>
     );
   }
+}
+
+export function PostTime({ createdAt }: { createdAt: Date }) {
+  return (
+    <div className="flex-start mb-6 ml-[4.5rem] mr-4 border-b pb-6 text-muted-foreground sm:ml-20 md:mr-6">
+      {new Date(createdAt as Date).toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })}{" "}
+      &#8226;{" "}
+      {new Date(createdAt as Date).toLocaleString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}
+    </div>
+  );
 }

@@ -38,42 +38,40 @@ export default function UserProfileComponent({
     <div className="min-h-screen">
       <Header />
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-          <ProfileUserContent
-            profileUser={profileUser}
-            postCount={posts.length}
-          />
-          <Tabs defaultValue="posts" className="w-full">
-            <TabsList
-              className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} `}
-            >
-              <TabsTrigger value="posts">Posts</TabsTrigger>
-              {isAdmin && (
-                <>
-                  <TabsTrigger value="likes">Likes</TabsTrigger>
-                  <TabsTrigger value="saved">Saved</TabsTrigger>
-                </>
-              )}
-            </TabsList>
+      <main className="main-content">
+        <ProfileUserContent
+          profileUser={profileUser}
+          postCount={posts.length}
+        />
+        <Tabs defaultValue="posts" className="w-full">
+          <TabsList
+            className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} `}
+          >
+            <TabsTrigger value="posts">Posts</TabsTrigger>
+            {isAdmin && (
+              <>
+                <TabsTrigger value="likes">Likes</TabsTrigger>
+                <TabsTrigger value="saved">Saved</TabsTrigger>
+              </>
+            )}
+          </TabsList>
 
-            <div className="mt-8">
-              <TabsContent value="posts">
-                <PostsComponent posts={posts} />
-              </TabsContent>
-              {isAdmin && (
-                <>
-                  <TabsContent value="likes">
-                    <PostsComponent posts={likedPosts} />
-                  </TabsContent>
-                  <TabsContent value="saved">
-                    <PostsComponent posts={bookmarkedPosts} />
-                  </TabsContent>
-                </>
-              )}
-            </div>
-          </Tabs>
-        </div>
+          <div className="mt-8">
+            <TabsContent value="posts">
+              <PostsComponent posts={posts} />
+            </TabsContent>
+            {isAdmin && (
+              <>
+                <TabsContent value="likes">
+                  <PostsComponent posts={likedPosts} />
+                </TabsContent>
+                <TabsContent value="saved">
+                  <PostsComponent posts={bookmarkedPosts} />
+                </TabsContent>
+              </>
+            )}
+          </div>
+        </Tabs>
       </main>
     </div>
   );
