@@ -96,8 +96,8 @@
   @apply max-md:pb-[var(--navbar-height)];
 }
 
-.mid-width-post {
-  @apply max-md:rounded-none max-md:border-0 max-md:border-b;
+.mid-width-post-card {
+  @apply w-full max-md:rounded-none max-md:border-0 max-md:border-b md:mb-8;
 }
 
 .main-content {
