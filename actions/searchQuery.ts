@@ -3,6 +3,7 @@
 import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model"; // Mongoose model
 import { ps } from "@/utils/ps";
+import { User } from "@/models/user.model";
 
 export async function searchPosts(input: string) {
   try {
@@ -31,9 +32,17 @@ export async function searchPosts(input: string) {
       };
     }
 
-    const results = await Post.find(searchQuery);
+    const searchUserQuery = {
+      $or: [
+        { username: { $regex: input, $options: "i" } },
+        { name: { $regex: input, $options: "i" } },
+      ],
+    };
 
-    return ps(results);
+    const posts = await Post.find(searchQuery).populate("user");
+    const users = await User.find(searchUserQuery);
+
+    return ps({ posts, users });
   } catch (error) {
     console.error(error);
   }
