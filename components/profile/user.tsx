@@ -12,11 +12,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { PostsComponent } from "../home";
 import { TPost, TUser } from "@/types/schema.type";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { User2 } from "lucide-react";
 import { Header } from "../post";
 import { addFollower } from "@/actions/addFollower";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { objId } from "@/utils/ps";
 
@@ -31,9 +31,38 @@ export default function UserProfileComponent({
   likedPosts: TPost[];
   bookmarkedPosts: TPost[];
 }) {
+  const router = useRouter();
   const { data: session } = useSession();
   const isAdmin = profileUser._id?.toString() === session?.user?.id;
 
+  const searchParams = useSearchParams();
+  const query = searchParams.get("tab");
+
+  // Define the Tab type based on isAdmin
+  type Tab = "posts" | "likes" | "saved";
+
+  // Set initial tab based on query or default to "posts"
+  const initialTab: Tab =
+    isAdmin || query === "posts"
+      ? "posts"
+      : query === "likes" || query === "saved"
+        ? query
+        : "posts";
+
+  const [tab, setTab] = useState<Tab>(initialTab);
+
+  useEffect(() => {
+    if (query === "posts" || query === "likes" || query === "saved") {
+      setTab(query as Tab);
+    } else {
+      setTab("posts"); // Default to posts if query is invalid
+    }
+  }, [query]); // Dependency array includes query
+
+  const toggleTab = (tab: string) => {
+    setTab(tab as Tab);
+    router.push(`?tab=${tab}`);
+  };
   return (
     <div className="min-h-screen">
       <Header />
@@ -43,15 +72,33 @@ export default function UserProfileComponent({
           profileUser={profileUser}
           postCount={posts.length}
         />
-        <Tabs defaultValue="posts" className="w-full">
+        <Tabs defaultValue={tab} className="w-full">
           <TabsList
             className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} `}
           >
-            <TabsTrigger value="posts">Posts</TabsTrigger>
+            <TabsTrigger
+              role="button"
+              value="posts"
+              onClick={() => toggleTab("posts")}
+            >
+              Posts
+            </TabsTrigger>
             {isAdmin && (
               <>
-                <TabsTrigger value="likes">Likes</TabsTrigger>
-                <TabsTrigger value="saved">Saved</TabsTrigger>
+                <TabsTrigger
+                  role="button"
+                  value="likes"
+                  onClick={() => toggleTab("likes")}
+                >
+                  Likes
+                </TabsTrigger>
+                <TabsTrigger
+                  role="button"
+                  value="saved"
+                  onClick={() => toggleTab("saved")}
+                >
+                  Saved
+                </TabsTrigger>
               </>
             )}
           </TabsList>
