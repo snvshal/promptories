@@ -3,29 +3,15 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Heart,
-  MessageCircle,
-  Bookmark,
-  Share2,
-  Search as SearchIcon,
-} from "lucide-react";
+import { Search as SearchIcon } from "lucide-react";
 import { Header } from "./post";
 import { searchPosts } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
 import { PostsComponent } from "./home";
 import { useSession } from "next-auth/react";
-import { objId } from "@/utils/ps";
 import { addFollower } from "@/actions/addFollower";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -55,18 +41,18 @@ export default function SearchComponent() {
     router.push(`/search?q=${searchQuery}`);
   };
 
-  const fetchSearchResults = async () => {
-    try {
-      const { posts, users } = await searchPosts(query as string);
-      setMatchedPosts(posts);
-      setMatchedUsers(users);
-      console.log("Searching for:", query);
-    } catch (error) {
-      console.error("Error fetching search results:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchSearchResults = async () => {
+      try {
+        const { posts, users } = await searchPosts(query as string);
+        setMatchedPosts(posts);
+        setMatchedUsers(users);
+        console.log("Searching for:", query);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    };
+
     if (query?.trim()) {
       fetchSearchResults();
     }
