@@ -31,8 +31,8 @@ export default function UserProfileComponent({
   likedPosts: TPost[];
   bookmarkedPosts: TPost[];
 }) {
-  const { status } = useSession();
-  const isAdmin = status === "authenticated";
+  const { data: session } = useSession();
+  const isAdmin = profileUser._id?.toString() === session?.user?.id;
 
   return (
     <div className="min-h-screen">
@@ -84,9 +84,9 @@ export function ProfileUserContent({
   profileUser: TUser;
   postCount: number;
 }) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
-  const isAdmin = status === "authenticated";
+  const isAdmin = profileUser._id?.toString() === user?.id;
 
   const initialFollowState = profileUser.followers.includes(objId(user?.id))
     ? "Following"
