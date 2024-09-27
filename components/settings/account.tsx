@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { signOut } from "next-auth/react";
 
 export default function AccountSettings() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -28,7 +29,8 @@ export default function AccountSettings() {
     // Here you would typically call your sign-out function
     console.log("Signing out...");
     // After signing out, redirect to the home page or login page
-    router.push("/");
+    // router.push("/");
+    signOut();
   };
 
   const handleDeleteAccount = () => {
