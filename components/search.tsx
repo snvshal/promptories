@@ -22,10 +22,6 @@ export default function SearchComponent({
 }: {
   user: TUser;
 }) {
-  // const { data: session } = useSession();
-  // const currentUser = session?.user;
-  // console.log(currentUser);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
@@ -104,8 +100,6 @@ export default function SearchComponent({
         profileUser._id?.toString() as string,
       );
 
-      // console.log(updatedState);
-
       // Update follow state for the specific profile user
       setFollowStates((prevStates) => ({
         ...prevStates,
@@ -115,17 +109,14 @@ export default function SearchComponent({
       }));
 
       setFollowers((prevStates) => {
-        // Retrieve the current follower count from the previous state
         const currentFollowerCount =
           prevStates[profileUser._id?.toString() as string];
 
-        // Determine if we are following or unfollowing
-        const isUnfollowing = updatedState === "Follow"; // 'Follow' means the user is currently unfollowing
+        const isUnfollowing = updatedState === "Follow";
 
-        // Calculate the new follower count
         const newFollowerCount = isUnfollowing
-          ? Math.max(currentFollowerCount - 1, 0) // Decrement if unfollowing, ensuring it doesn't go below zero
-          : currentFollowerCount + 1; // Increment if following
+          ? Math.max(currentFollowerCount - 1, 0)
+          : currentFollowerCount + 1;
 
         return {
           ...prevStates,
@@ -136,8 +127,6 @@ export default function SearchComponent({
       console.error("Error updating follower state:", error);
     }
   };
-
-  // console.log(followStates);
 
   return (
     <div className="min-h-screen">
