@@ -11,7 +11,6 @@ import { Header } from "./post";
 import { searchPosts } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
 import { PostsComponent } from "./home";
-import { useSession } from "next-auth/react";
 import { addFollower } from "@/actions/addFollower";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -26,9 +25,11 @@ export default function SearchComponent({
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
+  const [tab, setTab] = useState<"posts" | "users">("posts");
 
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
+  const queryTab = searchParams.get("tab");
   const router = useRouter();
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
@@ -39,8 +40,11 @@ export default function SearchComponent({
       setEmptyQueryError("Search query cannot be empty");
       return;
     }
-    router.push(`/search?q=${searchQuery}`);
+    router.push(`?q=${searchQuery}&tab=posts`);
   };
+
+  const handleTabChange = (value: string) =>
+    router.push(`?q=${searchQuery}&tab=${value}`);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -48,6 +52,7 @@ export default function SearchComponent({
         const { posts, users } = await searchPosts(query as string);
         setMatchedPosts(posts);
         setMatchedUsers(users);
+        setTab(queryTab as "posts" | "users");
         console.log("Searching for:", query);
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -57,7 +62,7 @@ export default function SearchComponent({
     if (query?.trim()) {
       fetchSearchResults();
     }
-  }, [query]);
+  }, [query, queryTab]);
 
   // Follow state for each user stored in an object (ID as key, follow status as value)
   const [followStates, setFollowStates] = useState<
@@ -161,11 +166,7 @@ export default function SearchComponent({
           </CardContent>
         </Card>
 
-        <Tabs
-          defaultValue="posts"
-          className="w-full"
-          //   onValueChange={(value) => setActiveTab(value)}
-        >
+        <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="posts">Posts</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
@@ -209,7 +210,9 @@ export default function SearchComponent({
                         </p>
                       </div>
                     </Link>
-                    {!(user._id?.toString() === currentUser?.id) && (
+                    {!(
+                      user._id?.toString() === currentUser._id?.toString()
+                    ) && (
                       <Button
                         variant={
                           followStates[user._id?.toString() as string] ===
