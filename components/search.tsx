@@ -15,11 +15,16 @@ import { useSession } from "next-auth/react";
 import { addFollower } from "@/actions/addFollower";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { st } from "@/utils/ps";
 
-export default function SearchComponent() {
-  const { data: session } = useSession();
-  const currentUser = session?.user;
-  console.log(currentUser);
+export default function SearchComponent({
+  user: currentUser,
+}: {
+  user: TUser;
+}) {
+  // const { data: session } = useSession();
+  // const currentUser = session?.user;
+  // console.log(currentUser);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [emptyQueryError, setEmptyQueryError] = useState("");
@@ -63,17 +68,32 @@ export default function SearchComponent() {
     Record<string, "Follow" | "Following">
   >({});
 
+  const [followers, setFollowers] = useState<Record<string, number>>({});
+
   // Function to initialize follow state for all matched users
   useEffect(() => {
     if (currentUser && matchedUsers?.length) {
       const initialStates: Record<string, "Follow" | "Following"> = {};
       matchedUsers.forEach((profileUser: TUser) => {
-        initialStates[profileUser._id?.toString() as string] =
-          currentUser.following.includes(profileUser._id?.toString() as string)
-            ? "Following"
-            : "Follow";
+        initialStates[profileUser._id?.toString() as string] = st(
+          currentUser.following,
+        ).includes(profileUser._id?.toString() as string)
+          ? "Following"
+          : "Follow";
       });
       setFollowStates(initialStates); // Set initial follow states
+    }
+  }, [matchedUsers, currentUser]);
+
+  // Function to initialize follow state for all matched users
+  useEffect(() => {
+    if (currentUser && matchedUsers?.length) {
+      const initialStates: Record<string, number> = {};
+      matchedUsers.forEach((profileUser: TUser) => {
+        initialStates[profileUser._id?.toString() as string] =
+          profileUser.followers.length;
+      });
+      setFollowers(initialStates); // Set initial follow states
     }
   }, [matchedUsers, currentUser]);
 
@@ -93,6 +113,25 @@ export default function SearchComponent() {
           | "Follow"
           | "Following",
       }));
+
+      setFollowers((prevStates) => {
+        // Retrieve the current follower count from the previous state
+        const currentFollowerCount =
+          prevStates[profileUser._id?.toString() as string];
+
+        // Determine if we are following or unfollowing
+        const isUnfollowing = updatedState === "Follow"; // 'Follow' means the user is currently unfollowing
+
+        // Calculate the new follower count
+        const newFollowerCount = isUnfollowing
+          ? Math.max(currentFollowerCount - 1, 0) // Decrement if unfollowing, ensuring it doesn't go below zero
+          : currentFollowerCount + 1; // Increment if following
+
+        return {
+          ...prevStates,
+          [profileUser._id?.toString() as string]: newFollowerCount,
+        };
+      });
     } catch (error) {
       console.error("Error updating follower state:", error);
     }
@@ -150,7 +189,10 @@ export default function SearchComponent() {
           <TabsContent value="users">
             <div className="mt-6 space-y-6">
               {matchedUsers?.map((user) => (
-                <Card key={user.id} className="mid-width-post-card">
+                <Card
+                  key={user._id?.toString()}
+                  className="mid-width-post-card"
+                >
                   <CardContent className="flex items-center space-x-4 py-4">
                     <Avatar
                       role="button"
@@ -171,7 +213,7 @@ export default function SearchComponent() {
                       </p>
                       <div className="mt-2 flex space-x-4">
                         <p className="text-sm text-muted-foreground">
-                          {user.followers.length} followers
+                          {followers[user._id?.toString() as string]} followers
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {/* {user.posts.length} posts */}
