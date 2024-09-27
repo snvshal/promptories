@@ -38,3 +38,6 @@ export const handlePostShare = async (post: TPost) => {
     alert("Link copied to clipboard");
   }
 };
+
+export const st = (t: Types.ObjectId[]) =>
+  t?.map((i) => i.toString() as string);

@@ -11,23 +11,25 @@ import { Header } from "./post";
 import { searchPosts } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
 import { PostsComponent } from "./home";
-import { useSession } from "next-auth/react";
 import { addFollower } from "@/actions/addFollower";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { st } from "@/utils/ps";
 
-export default function SearchComponent() {
-  const { data: session } = useSession();
-  const currentUser = session?.user;
-  console.log(currentUser);
-
+export default function SearchComponent({
+  user: currentUser,
+}: {
+  user: TUser;
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
+  const [tab, setTab] = useState<"posts" | "users">("posts");
 
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
+  const queryTab = searchParams.get("tab");
   const router = useRouter();
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
@@ -38,8 +40,11 @@ export default function SearchComponent() {
       setEmptyQueryError("Search query cannot be empty");
       return;
     }
-    router.push(`/search?q=${searchQuery}`);
+    router.push(`?q=${searchQuery}&tab=posts`);
   };
+
+  const handleTabChange = (value: string) =>
+    router.push(`?q=${searchQuery}&tab=${value}`);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -47,6 +52,7 @@ export default function SearchComponent() {
         const { posts, users } = await searchPosts(query as string);
         setMatchedPosts(posts);
         setMatchedUsers(users);
+        setTab(queryTab as "posts" | "users");
         console.log("Searching for:", query);
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -56,24 +62,39 @@ export default function SearchComponent() {
     if (query?.trim()) {
       fetchSearchResults();
     }
-  }, [query]);
+  }, [query, queryTab]);
 
   // Follow state for each user stored in an object (ID as key, follow status as value)
   const [followStates, setFollowStates] = useState<
     Record<string, "Follow" | "Following">
   >({});
 
+  const [followers, setFollowers] = useState<Record<string, number>>({});
+
   // Function to initialize follow state for all matched users
   useEffect(() => {
     if (currentUser && matchedUsers?.length) {
       const initialStates: Record<string, "Follow" | "Following"> = {};
       matchedUsers.forEach((profileUser: TUser) => {
-        initialStates[profileUser._id?.toString() as string] =
-          currentUser.following.includes(profileUser._id?.toString() as string)
-            ? "Following"
-            : "Follow";
+        initialStates[profileUser._id?.toString() as string] = st(
+          currentUser.following,
+        ).includes(profileUser._id?.toString() as string)
+          ? "Following"
+          : "Follow";
       });
       setFollowStates(initialStates); // Set initial follow states
+    }
+  }, [matchedUsers, currentUser]);
+
+  // Function to initialize follow state for all matched users
+  useEffect(() => {
+    if (currentUser && matchedUsers?.length) {
+      const initialStates: Record<string, number> = {};
+      matchedUsers.forEach((profileUser: TUser) => {
+        initialStates[profileUser._id?.toString() as string] =
+          profileUser.followers.length;
+      });
+      setFollowers(initialStates); // Set initial follow states
     }
   }, [matchedUsers, currentUser]);
 
@@ -84,8 +105,6 @@ export default function SearchComponent() {
         profileUser._id?.toString() as string,
       );
 
-      // console.log(updatedState);
-
       // Update follow state for the specific profile user
       setFollowStates((prevStates) => ({
         ...prevStates,
@@ -93,12 +112,26 @@ export default function SearchComponent() {
           | "Follow"
           | "Following",
       }));
+
+      setFollowers((prevStates) => {
+        const currentFollowerCount =
+          prevStates[profileUser._id?.toString() as string];
+
+        const isUnfollowing = updatedState === "Follow";
+
+        const newFollowerCount = isUnfollowing
+          ? Math.max(currentFollowerCount - 1, 0)
+          : currentFollowerCount + 1;
+
+        return {
+          ...prevStates,
+          [profileUser._id?.toString() as string]: newFollowerCount,
+        };
+      });
     } catch (error) {
       console.error("Error updating follower state:", error);
     }
   };
-
-  // console.log(followStates);
 
   return (
     <div className="min-h-screen">
@@ -133,11 +166,7 @@ export default function SearchComponent() {
           </CardContent>
         </Card>
 
-        <Tabs
-          defaultValue="posts"
-          className="w-full"
-          //   onValueChange={(value) => setActiveTab(value)}
-        >
+        <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="posts">Posts</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
@@ -150,7 +179,10 @@ export default function SearchComponent() {
           <TabsContent value="users">
             <div className="mt-6 space-y-6">
               {matchedUsers?.map((user) => (
-                <Card key={user.id} className="mid-width-post-card">
+                <Card
+                  key={user._id?.toString()}
+                  className="mid-width-post-card"
+                >
                   <CardContent className="flex items-center space-x-4 py-4">
                     <Avatar
                       role="button"
@@ -171,14 +203,16 @@ export default function SearchComponent() {
                       </p>
                       <div className="mt-2 flex space-x-4">
                         <p className="text-sm text-muted-foreground">
-                          {user.followers.length} followers
+                          {followers[user._id?.toString() as string]} followers
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {/* {user.posts.length} posts */}
                         </p>
                       </div>
                     </Link>
-                    {!(user._id?.toString() === currentUser?.id) && (
+                    {!(
+                      user._id?.toString() === currentUser._id?.toString()
+                    ) && (
                       <Button
                         variant={
                           followStates[user._id?.toString() as string] ===
