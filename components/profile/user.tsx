@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostsComponent } from "../home";
 import { TPost, TUser } from "@/types/schema.type";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { LinkIcon, User2 } from "lucide-react";
+import { User2 } from "lucide-react";
 import { Header } from "../post";
 import { addFollower } from "@/actions/addFollower";
 import { useEffect, useState } from "react";

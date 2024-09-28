@@ -132,13 +132,6 @@ export default function SearchComponent() {
 }
 
 export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
-  if (!matchedUsers.length) {
-    return (
-      <div className="flex-center w-full p-4">
-        <p>No users matched </p>
-      </div>
-    );
-  }
   const { data: session, update } = useSession();
   const currentUser = session?.user;
 
@@ -218,6 +211,15 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
       console.error("Error updating follower state:", error);
     }
   };
+
+  if (!matchedUsers.length) {
+    return (
+      <div className="flex-center w-full p-4">
+        <p>No users matched </p>
+      </div>
+    );
+  }
+
   return (
     <>
       {matchedUsers?.map((user) => (
