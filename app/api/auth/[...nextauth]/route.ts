@@ -30,7 +30,12 @@ const handler = NextAuth({
         return false;
       }
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update" && session?.user) {
+        // Update the token with the new session data
+        return { ...token, ...session.user };
+      }
+
       if (user) {
         const dbUser = await User.findOne({ email: user.email });
         if (dbUser) {

@@ -41,7 +41,7 @@ const profileSchema = z.object({
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileSettings() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const user = session?.user;
 
   const [avatar, setAvatar] = useState("/placeholder.svg?height=100&width=100");
@@ -49,11 +49,11 @@ export default function ProfileSettings() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name,
+      name: user?.name as string,
       // email: "",
-      bio: user?.bio,
-      twitter: user?.social_links?.twitter,
-      github: user?.social_links?.github,
+      bio: user?.bio as string,
+      twitter: user?.social_links?.twitter as string,
+      github: user?.social_links?.github as string,
     },
   });
 
@@ -75,7 +75,20 @@ export default function ProfileSettings() {
       // Simulate API call
       //   await new Promise((resolve) => setTimeout(resolve, 2000));
       await updateUserData(user?.id as string, data);
-      console.log(data);
+
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          name: data.name,
+          bio: data.bio,
+          social_links: {
+            twitter: data.twitter,
+            github: data.github,
+          },
+        },
+      });
+
       router.push(`/${user?.username}`);
 
       toast({

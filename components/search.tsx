@@ -14,24 +14,23 @@ import { PostsComponent } from "./home";
 import { addFollower } from "@/actions/addFollower";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { st } from "@/utils/ps";
+import { useSession } from "next-auth/react";
 
-export default function SearchComponent({
-  user: currentUser,
-}: {
-  user: TUser;
-}) {
+export default function SearchComponent() {
+  const { data: session, update } = useSession();
+  const currentUser = session?.user;
+
   const [searchQuery, setSearchQuery] = useState("");
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
-  const [tab, setTab] = useState<"posts" | "users">("posts");
 
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const queryTab = searchParams.get("tab");
   const router = useRouter();
 
+  // router.push(`?tab=posts`);
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -52,7 +51,7 @@ export default function SearchComponent({
         const { posts, users } = await searchPosts(query as string);
         setMatchedPosts(posts);
         setMatchedUsers(users);
-        setTab(queryTab as "posts" | "users");
+        // setTab(queryTab as "posts" | "users");
         console.log("Searching for:", query);
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -76,11 +75,10 @@ export default function SearchComponent({
     if (currentUser && matchedUsers?.length) {
       const initialStates: Record<string, "Follow" | "Following"> = {};
       matchedUsers.forEach((profileUser: TUser) => {
-        initialStates[profileUser._id?.toString() as string] = st(
-          currentUser.following,
-        ).includes(profileUser._id?.toString() as string)
-          ? "Following"
-          : "Follow";
+        initialStates[profileUser._id?.toString() as string] =
+          currentUser.following?.includes(profileUser._id?.toString() as string)
+            ? "Following"
+            : "Follow";
       });
       setFollowStates(initialStates); // Set initial follow states
     }
@@ -101,7 +99,7 @@ export default function SearchComponent({
   // Handle follow/unfollow logic for a specific user
   const handleFollowToggle = async (profileUser: TUser) => {
     try {
-      const updatedState = await addFollower(
+      const { updatedState, following } = await addFollower(
         profileUser._id?.toString() as string,
       );
 
@@ -113,19 +111,33 @@ export default function SearchComponent({
           | "Following",
       }));
 
-      setFollowers((prevStates) => {
-        const currentFollowerCount =
-          prevStates[profileUser._id?.toString() as string];
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          following: [...following],
+        },
+      });
+
+      setFollowers((prevFollowers) => {
+        const userId = profileUser._id?.toString() as string;
+        const currentFollowerCount = prevFollowers[userId] ?? 0; // Default to 0 if undefined
+
+        console.log(typeof prevFollowers);
 
         const isUnfollowing = updatedState === "Follow";
-
         const newFollowerCount = isUnfollowing
-          ? Math.max(currentFollowerCount - 1, 0)
+          ? Math.max(currentFollowerCount - 1, 0) // Avoid negative follower count
           : currentFollowerCount + 1;
 
+        console.log({
+          ...prevFollowers,
+          [userId]: newFollowerCount,
+        });
+
         return {
-          ...prevStates,
-          [profileUser._id?.toString() as string]: newFollowerCount,
+          ...prevFollowers,
+          [userId]: newFollowerCount,
         };
       });
     } catch (error) {
@@ -143,7 +155,7 @@ export default function SearchComponent({
         <Card className="mid-width-post-card">
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
-              Search Prompto
+              Search Promptories
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -166,18 +178,33 @@ export default function SearchComponent({
           </CardContent>
         </Card>
 
-        <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
+        <Tabs
+          value={(queryTab as string) || "posts"}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="posts">Posts</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
           <TabsContent value="posts">
             <div className="mt-6 space-y-6">
-              <PostsComponent posts={matchedPosts as TPost[]} />
+              {!query ? (
+                <div className="flex-center mt-16 w-full">
+                  Searched posts will appear here
+                </div>
+              ) : (
+                <PostsComponent posts={matchedPosts as TPost[]} />
+              )}
             </div>
           </TabsContent>
           <TabsContent value="users">
             <div className="mt-6 space-y-6">
+              {!query && (
+                <div className="flex-center mt-16 w-full">
+                  Searched users will appear here
+                </div>
+              )}
               {matchedUsers?.map((user) => (
                 <Card
                   key={user._id?.toString()}
@@ -210,9 +237,7 @@ export default function SearchComponent({
                         </p>
                       </div>
                     </Link>
-                    {!(
-                      user._id?.toString() === currentUser._id?.toString()
-                    ) && (
+                    {!(user._id?.toString() === currentUser?.id) && (
                       <Button
                         variant={
                           followStates[user._id?.toString() as string] ===

@@ -3,6 +3,7 @@
 import { User } from "@/models/user.model";
 import { connectToDatabase } from "@/utils/db";
 import { currentUser } from "@/utils/get-user";
+import { ps, st } from "@/utils/ps";
 import { Types } from "mongoose";
 
 export async function addFollower(userId: string) {
@@ -44,7 +45,10 @@ export async function addFollower(userId: string) {
     await profileUser.save();
     await user.save();
 
-    return isFollowing ? "Follow" : "Following";
+    return ps({
+      updatedState: isFollowing ? "Follow" : "Following",
+      following: st(user.following),
+    });
   } catch (error) {
     console.error("Error adding follower:", error);
     throw new Error("Failed to update follower.");

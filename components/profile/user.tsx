@@ -33,6 +33,7 @@ export default function UserProfileComponent({
 }) {
   const router = useRouter();
   const { data: session } = useSession();
+
   const isAdmin = profileUser._id?.toString() === session?.user?.id;
 
   const searchParams = useSearchParams();
@@ -152,7 +153,7 @@ export function ProfileUserContent({
     }
   };
   return (
-    <Card className="mb-8">
+    <Card className="mid-width-post-card mb-8">
       <CardContent className="pt-6">
         <div className="flex flex-col items-center text-center">
           <Avatar className="mb-4 h-24 w-24">

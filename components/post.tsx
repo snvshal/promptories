@@ -449,8 +449,8 @@ export function PostType({
         </div>
       </CardHeader>
       <CardContent
-        role="button"
-        onClick={() => postClick(post)}
+        role={type === "posts" ? "button" : undefined}
+        onClick={type === "posts" ? () => postClick(post) : undefined}
         className="border-0 pl-20 max-md:pr-4 max-sm:pl-[4.5rem]"
       >
         <div className="mb-4">
