@@ -17,16 +17,14 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 
 export default function SearchComponent() {
-  const { data: session, update } = useSession();
-  const currentUser = session?.user;
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q");
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(query);
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
 
-  const searchParams = useSearchParams();
-  const query = searchParams.get("q");
   const queryTab = searchParams.get("tab");
   const router = useRouter();
 
@@ -34,7 +32,7 @@ export default function SearchComponent() {
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!searchQuery.trim()) {
+    if (!searchQuery?.trim()) {
       setSearchQuery("");
       setEmptyQueryError("Search query cannot be empty");
       return;
@@ -43,7 +41,7 @@ export default function SearchComponent() {
   };
 
   const handleTabChange = (value: string) =>
-    router.push(`?q=${searchQuery}&tab=${value}`);
+    router.push(`?q=${query}&tab=${value}`);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -62,6 +60,89 @@ export default function SearchComponent() {
       fetchSearchResults();
     }
   }, [query, queryTab]);
+
+  return (
+    <div className="min-h-screen">
+      <div className="max-md:hidden">
+        <Header />
+      </div>
+
+      <main className="main-content">
+        <Card className="mid-width-post-card">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Search Promptories
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSearchSubmit} className="flex space-x-2">
+              <Input
+                type="text"
+                placeholder="Search for posts, users, or tags..."
+                value={searchQuery as string}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1"
+              />
+              <Button type="submit">
+                <SearchIcon className="mr-2 h-4 w-4" />
+                Search
+              </Button>
+            </form>
+            {emptyQueryError && (
+              <p className="mt-1 text-sm text-red-500">{emptyQueryError}</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Tabs
+          value={(queryTab as string) || "posts"}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="posts">Posts</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
+          </TabsList>
+          <TabsContent value="posts">
+            <div className="mt-6 space-y-6">
+              {!query ? (
+                <div className="flex-center mt-16 w-full">
+                  <p>Searched posts will appear here</p>
+                </div>
+              ) : (
+                <PostsComponent posts={matchedPosts as TPost[]} />
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="users">
+            <div className="mt-6 space-y-6">
+              {!query ? (
+                <div className="flex-center w-full p-4">
+                  <p>Searched users will appear here</p>
+                </div>
+              ) : (
+                <MatchedUsers matchedUsers={matchedUsers} />
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+  );
+}
+
+export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
+  if (!matchedUsers.length) {
+    return (
+      <div className="flex-center w-full p-4">
+        <p>No users matched </p>
+      </div>
+    );
+  }
+  const { data: session, update } = useSession();
+  const currentUser = session?.user;
+
+  const router = useRouter();
 
   // Follow state for each user stored in an object (ID as key, follow status as value)
   const [followStates, setFollowStates] = useState<
@@ -123,17 +204,10 @@ export default function SearchComponent() {
         const userId = profileUser._id?.toString() as string;
         const currentFollowerCount = prevFollowers[userId] ?? 0; // Default to 0 if undefined
 
-        console.log(typeof prevFollowers);
-
         const isUnfollowing = updatedState === "Follow";
         const newFollowerCount = isUnfollowing
           ? Math.max(currentFollowerCount - 1, 0) // Avoid negative follower count
           : currentFollowerCount + 1;
-
-        console.log({
-          ...prevFollowers,
-          [userId]: newFollowerCount,
-        });
 
         return {
           ...prevFollowers,
@@ -144,119 +218,50 @@ export default function SearchComponent() {
       console.error("Error updating follower state:", error);
     }
   };
-
   return (
-    <div className="min-h-screen">
-      <div className="max-md:hidden">
-        <Header />
-      </div>
+    <>
+      {matchedUsers?.map((user) => (
+        <Card key={user._id?.toString()} className="mid-width-post-card">
+          <CardContent className="flex items-center space-x-4 py-4">
+            <Avatar
+              role="button"
+              className="h-16 w-16"
+              onClick={() => router.push(`/${user.username}`)}
+            >
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
 
-      <main className="main-content">
-        <Card className="mid-width-post-card">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Search Promptories
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSearchSubmit} className="flex space-x-2">
-              <Input
-                type="text"
-                placeholder="Search for posts, users, or tags..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
-              />
-              <Button type="submit">
-                <SearchIcon className="mr-2 h-4 w-4" />
-                Search
+            <Link href={`/${user.username}`} className="flex-1">
+              <h3 className="text-lg font-semibold">{user.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                &#64;{user.username}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{user.bio}</p>
+              <div className="mt-2 flex space-x-4">
+                <p className="text-sm text-muted-foreground">
+                  {followers[user._id?.toString() as string]} followers
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {/* {user.posts.length} posts */}
+                </p>
+              </div>
+            </Link>
+            {!(user._id?.toString() === currentUser?.id) && (
+              <Button
+                variant={
+                  followStates[user._id?.toString() as string] === "Follow"
+                    ? "default"
+                    : "secondary"
+                }
+                onClick={() => handleFollowToggle(user)}
+              >
+                {followStates[user._id?.toString() as string]}
               </Button>
-            </form>
-            {emptyQueryError && (
-              <p className="mt-1 text-sm text-red-500">{emptyQueryError}</p>
             )}
           </CardContent>
         </Card>
-
-        <Tabs
-          value={(queryTab as string) || "posts"}
-          onValueChange={handleTabChange}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="posts">Posts</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-          </TabsList>
-          <TabsContent value="posts">
-            <div className="mt-6 space-y-6">
-              {!query ? (
-                <div className="flex-center mt-16 w-full">
-                  Searched posts will appear here
-                </div>
-              ) : (
-                <PostsComponent posts={matchedPosts as TPost[]} />
-              )}
-            </div>
-          </TabsContent>
-          <TabsContent value="users">
-            <div className="mt-6 space-y-6">
-              {!query && (
-                <div className="flex-center mt-16 w-full">
-                  Searched users will appear here
-                </div>
-              )}
-              {matchedUsers?.map((user) => (
-                <Card
-                  key={user._id?.toString()}
-                  className="mid-width-post-card"
-                >
-                  <CardContent className="flex items-center space-x-4 py-4">
-                    <Avatar
-                      role="button"
-                      className="h-16 w-16"
-                      onClick={() => router.push(`/${user.username}`)}
-                    >
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-
-                    <Link href={`/${user.username}`} className="flex-1">
-                      <h3 className="text-lg font-semibold">{user.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        &#64;{user.username}
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {user.bio}
-                      </p>
-                      <div className="mt-2 flex space-x-4">
-                        <p className="text-sm text-muted-foreground">
-                          {followers[user._id?.toString() as string]} followers
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {/* {user.posts.length} posts */}
-                        </p>
-                      </div>
-                    </Link>
-                    {!(user._id?.toString() === currentUser?.id) && (
-                      <Button
-                        variant={
-                          followStates[user._id?.toString() as string] ===
-                          "Follow"
-                            ? "default"
-                            : "secondary"
-                        }
-                        onClick={() => handleFollowToggle(user)}
-                      >
-                        {followStates[user._id?.toString() as string]}
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+      ))}
+    </>
   );
 }
