@@ -19,6 +19,8 @@ import { addFollower } from "@/actions/addFollower";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { objId } from "@/utils/ps";
+import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 
 export default function UserProfileComponent({
   profileUser,
@@ -33,6 +35,7 @@ export default function UserProfileComponent({
 }) {
   const router = useRouter();
   const { data: session } = useSession();
+
   const isAdmin = profileUser._id?.toString() === session?.user?.id;
 
   const searchParams = useSearchParams();
@@ -152,7 +155,7 @@ export function ProfileUserContent({
     }
   };
   return (
-    <Card className="mb-8">
+    <Card className="mid-width-post-card mb-8">
       <CardContent className="pt-6">
         <div className="flex flex-col items-center text-center">
           <Avatar className="mb-4 h-24 w-24">
@@ -162,6 +165,28 @@ export function ProfileUserContent({
           <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
           <p className="text-muted-foreground">&#64;{profileUser?.username}</p>
           <p className="mt-2">{profileUser?.bio}</p>
+          <div className="mt-4 flex items-center space-x-4">
+            {profileUser.social_links?.github && (
+              <Link
+                href={profileUser.social_links?.github as string}
+                className="text-muted-foreground hover:text-primary"
+              >
+                <GitHubLogoIcon className="h-5 w-5" />
+              </Link>
+            )}
+            {profileUser.social_links?.twitter && (
+              <Link
+                href={profileUser.social_links?.twitter as string}
+                className="text-muted-foreground hover:text-primary"
+              >
+                <TwitterLogoIcon className="h-5 w-5" />
+              </Link>
+            )}
+
+            {/* <Link href="#" className="text-muted-foreground hover:text-primary">
+              <LinkIcon className="h-5 w-5" />
+            </Link> */}
+          </div>
           <div className="mt-4 flex justify-center space-x-4">
             <div>
               <p className="font-semibold">{postCount}</p>

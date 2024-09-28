@@ -36,7 +36,6 @@ import { PostType, UserOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { objId } from "@/utils/ps";
-import { searchPosts } from "@/actions/searchQuery";
 import { useSession } from "next-auth/react";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
@@ -44,10 +43,11 @@ export const pu = (post: TPost | TReplies) => post.user as TUser;
 export function HomePageComponent({ posts }: { posts: TPost[] }) {
   const [searchQuery, setSearchQuery] = useState("");
 
+  const router = useRouter();
+
   const SubmitQuery = async (e: FormEvent) => {
     e.preventDefault();
-    const result = await searchPosts(searchQuery);
-    console.log(result);
+    router.push(`/search?q=${searchQuery}`);
   };
 
   return (
