@@ -34,8 +34,26 @@ const profileSchema = z.object({
   name: z.string().min(2).max(50),
   // email: z.string().email(),
   bio: z.string().max(160).optional(),
-  twitter: z.string().max(40).optional(),
-  github: z.string().max(40).optional(),
+  twitter: z
+    .string()
+    .url("Invalid URL")
+    .max(40)
+    .regex(
+      /^https:\/\/(www\.)?(twitter\.com|x\.com)\/[a-zA-Z0-9_]+$/,
+      "Invalid Twitter/X URL",
+    )
+    .optional()
+    .or(z.literal("")),
+  github: z
+    .string()
+    .url("Invalid URL")
+    .max(40)
+    .regex(
+      /^https:\/\/(www\.)?github\.com\/[a-zA-Z0-9_-]+$/,
+      "Invalid GitHub URL",
+    )
+    .optional()
+    .or(z.literal("")),
 });
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
