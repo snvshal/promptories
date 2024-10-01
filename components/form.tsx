@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
   model_url: z.string().url("Invalid model URL").min(10, "Model is required"),
-  chat_link: z.string().optional(),
+  chat_link: z.string().url("Invalid chat URL").optional().or(z.literal("")),
   prompt: z.string().min(1, "Prompt is required"),
   response: z.string().min(1, "Response is required"),
   promptory_type: z.enum(promptory_types as [string, ...string[]], {
@@ -77,8 +77,8 @@ export default function PostForm() {
     <>
       <Header />
 
-      <div className="mx-auto max-w-2xl space-y-8 p-6">
-        <h1 className="text-3xl font-bold">Create New Post</h1>
+      <main className="main-content max-md:p-4 max-md:pb-20">
+        <h1 className="mb-4 text-3xl font-bold">Create New Post</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <Label htmlFor="caption">Caption</Label>
@@ -232,7 +232,7 @@ export default function PostForm() {
             {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         </form>
-      </div>
+      </main>
     </>
   );
 }
