@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,6 +43,7 @@ import { useRouter } from "next/navigation";
 import { handleDeletePost } from "@/actions/handlePostActions";
 import { handlePostShare, objId } from "@/utils/ps";
 import { useSession } from "next-auth/react";
+import { Types } from "mongoose";
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   return (
@@ -125,6 +126,8 @@ export function PostReplies({
   );
 }
 
+const tsa = (a: Types.ObjectId[]) => a.map((i) => i.toString() as string);
+
 export function PostRepliesContent({
   post,
   replies,
@@ -137,9 +140,23 @@ export function PostRepliesContent({
   const { data: session } = useSession();
   const user = session?.user;
 
+  const [hasLiked, setHasLiked] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (user && replies?.length) {
+      const hasLikedInitial: Record<string, boolean> = {};
+      replies.forEach((reply: TReplies) => {
+        hasLikedInitial[reply._id?.toString() as string] = tsa(
+          reply.likes as Types.ObjectId[],
+        ).includes(user?.id);
+      });
+      setHasLiked(hasLikedInitial);
+    }
+  }, [user, replies]);
+
   if (!replies.length) {
     return (
-      <div className="space-y-4">
+      <div className="min-h-svh space-y-4">
         <p className="text-muted-foreground">No replies here yet!</p>
       </div>
     );
@@ -156,6 +173,10 @@ export function PostRepliesContent({
             : reply,
         ) as TReplies[],
       );
+
+      setHasLiked((prev) => {
+        return { ...prev, [replyId]: !prev[replyId] };
+      });
     } catch (error) {
       console.error("Error updating likes on the client:", error);
     }
@@ -195,22 +216,26 @@ export function PostRepliesContent({
               />
             </div>
 
-            <p className="mt-1">{reply.reply}</p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleLikeReplyClick(reply._id as string)}
-              className="mt-2"
-            >
-              <Heart
-                style={{
-                  color: il(reply.likes.includes(objId(user?.id))),
-                }}
-                fill={il(reply.likes.includes(objId(user?.id)))}
-                className="mr-2 h-4 w-4"
-              />
-              {reply.likes.length}
-            </Button>
+            <div className="flex-between gap-2">
+              <p className="mt-1">{reply.reply}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleLikeReplyClick(reply._id as string)}
+                className="hover:bg-background"
+              >
+                <Heart
+                  style={{
+                    color: hasLiked[reply._id?.toString() as string]
+                      ? "#b91c1c"
+                      : "#fff",
+                  }}
+                  fill={il(hasLiked[reply._id?.toString() as string])}
+                  className="h-4 w-4"
+                />
+              </Button>
+            </div>
+            <p className="text-muted-foreground">{reply.likes.length} likes</p>
           </div>
         </div>
       ))}
@@ -259,7 +284,7 @@ export function PostReplyOptions({
 
   // const authorized = reply.user._id?.toString() === user._id?.toString();
   const authorized = status === "authenticated";
-  console.log(authorized);
+  // console.log(authorized);
 
   return (
     <DropdownMenu>
