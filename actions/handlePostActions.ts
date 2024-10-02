@@ -6,16 +6,16 @@ import { Types } from "mongoose";
 import { currentUser } from "@/utils/get-user";
 
 // Server action to like or unlike a post
-export async function handleLikePost(postId: string, userId: string) {
+export async function handleLikePost(postId: string) {
   try {
     await connectToDatabase();
 
     // Check if postId and userId are valid ObjectIds
-    if (!Types.ObjectId.isValid(postId) || !Types.ObjectId.isValid(userId)) {
+    if (!Types.ObjectId.isValid(postId)) {
       throw new Error("Invalid post or user ID!");
     }
 
-    const userObjectId = new Types.ObjectId(userId);
+    const user = await currentUser();
 
     // Find the post
     const post = await Post.findById(postId);
@@ -24,13 +24,13 @@ export async function handleLikePost(postId: string, userId: string) {
       throw new Error("Post not found!");
     }
 
-    const isLiked = post.likes.includes(userObjectId);
+    const isLiked = post.likes.includes(user?._id);
 
     // If already liked, remove the like; otherwise, add it
     if (isLiked) {
-      post.likes.pull(userObjectId);
+      post.likes.pull(user?._id);
     } else {
-      post.likes.push(userObjectId);
+      post.likes.push(user?._id);
     }
 
     // Save the post without validating the replies array
