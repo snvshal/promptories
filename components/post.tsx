@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { handleDeletePost } from "@/actions/handlePostActions";
-import { handlePostShare, objId } from "@/utils/ps";
+import { handlePostShare } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
 
