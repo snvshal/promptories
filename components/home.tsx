@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,7 +32,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { PostType, UserOptions } from "./post";
+import { PostType, tsa, UserOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { objId } from "@/utils/ps";
@@ -112,10 +112,16 @@ export const LikeButton = ({ post }: { post: TPost }) => {
   const user = session?.user;
 
   const initialLikes = post.likes.length;
-  const hasLikedInitial = post.likes.includes(objId(user?.id));
 
   const [likes, setLikes] = useState(initialLikes);
-  const [hasLiked, setHasLiked] = useState(hasLikedInitial);
+  const [hasLiked, setHasLiked] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      const hasLikedInitial = tsa(post.likes).includes(user.id as string);
+      setHasLiked(hasLikedInitial);
+    }
+  }, [user, post.likes]);
 
   const handleLikeClick = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +131,7 @@ export const LikeButton = ({ post }: { post: TPost }) => {
     setLikes(hasLiked ? likes - 1 : likes + 1);
 
     // Server action to handle like/unlike
-    await handleLikePost(post._id as string, user?.id as string);
+    await handleLikePost(post._id as string);
   };
 
   return (

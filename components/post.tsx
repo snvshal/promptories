@@ -126,7 +126,8 @@ export function PostReplies({
   );
 }
 
-const tsa = (a: Types.ObjectId[]) => a.map((i) => i.toString() as string);
+export const tsa = (a: Types.ObjectId[]) =>
+  a.map((i) => i.toString() as string);
 
 export function PostRepliesContent({
   post,
@@ -226,9 +227,7 @@ export function PostRepliesContent({
               >
                 <Heart
                   style={{
-                    color: hasLiked[reply._id?.toString() as string]
-                      ? "#b91c1c"
-                      : "#fff",
+                    color: il(hasLiked[reply._id?.toString() as string]),
                   }}
                   fill={il(hasLiked[reply._id?.toString() as string])}
                   className="h-4 w-4"
