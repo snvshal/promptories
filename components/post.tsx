@@ -157,7 +157,7 @@ export function PostRepliesContent({
 
   if (!replies.length) {
     return (
-      <div className="min-h-svh space-y-4">
+      <div className="space-y-4">
         <p className="text-muted-foreground">No replies here yet!</p>
       </div>
     );
@@ -217,24 +217,28 @@ export function PostRepliesContent({
               />
             </div>
 
-            <div className="flex-between gap-2">
-              <p className="mt-1">{reply.reply}</p>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleLikeReplyClick(reply._id as string)}
-                className="hover:bg-background"
-              >
-                <Heart
-                  style={{
-                    color: il(hasLiked[reply._id?.toString() as string]),
-                  }}
-                  fill={il(hasLiked[reply._id?.toString() as string])}
-                  className="h-4 w-4"
-                />
-              </Button>
+            <div className="flex items-start justify-between gap-2">
+              <p>{reply.reply}</p>
+              <div className="flex-start flex-col">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleLikeReplyClick(reply._id as string)}
+                  className="hover:bg-background"
+                >
+                  <Heart
+                    style={{
+                      color: il(hasLiked[reply._id?.toString() as string]),
+                    }}
+                    fill={il(hasLiked[reply._id?.toString() as string])}
+                    className="h-4 w-4"
+                  />
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  {reply.likes.length}
+                </p>
+              </div>
             </div>
-            <p className="text-muted-foreground">{reply.likes.length} likes</p>
           </div>
         </div>
       ))}
