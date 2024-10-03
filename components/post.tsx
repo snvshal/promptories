@@ -46,27 +46,34 @@ import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
 
 export default function SinglePostPage({ post }: { post: TPost }) {
+  const [postReplies, setPostReplies] = useState(post.replies);
+
   return (
     <div className="min-h-screen">
       <Header />
       <main className="main-content">
         <PostType post={post} type="post" />
-        <PostReplies post={post} replies={post.replies} />
+        <PostReplies
+          post={post}
+          postReplies={postReplies}
+          setPostReplies={setPostReplies}
+        />
       </main>
-      <PromptoryReplyButton post={post} />
+      <PromptoryReplyButton post={post} setPostReplies={setPostReplies} />
     </div>
   );
 }
 
 export function PostReplies({
   post,
-  replies,
+  postReplies,
+  setPostReplies,
 }: {
   post: TPost;
-  replies: TReplies[];
+  postReplies: TReplies[];
+  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
 }) {
   const [replyText, setReplyText] = useState("");
-  const [postReplies, setPostReplies] = useState(replies);
   const [emptyReplyError, setEmptyReplyError] = useState("");
 
   const handleReplySubmit = async (e: React.FormEvent) => {
@@ -419,9 +426,15 @@ export function UserOptions() {
   );
 }
 
-export function PromptoryReplyButton({ post }: { post: TPost }) {
+export function PromptoryReplyButton({
+  post,
+  setPostReplies,
+}: {
+  post: TPost;
+  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+}) {
   return (
-    <PostReplyDialog post={post}>
+    <PostReplyDialog post={post} setPostReplies={setPostReplies}>
       <Button
         size={"icon"}
         className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"

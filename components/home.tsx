@@ -1,6 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -188,9 +194,11 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 export function PostReplyDialog({
   post,
   children,
+  setPostReplies,
 }: {
   post: TPost;
   children?: React.ReactNode;
+  setPostReplies?: Dispatch<SetStateAction<TReplies[]>>;
 }) {
   const [dialogState, setDialogState] = useState(false);
   const [replyContent, setReplyContent] = useState("");
@@ -205,7 +213,14 @@ export function PostReplyDialog({
       return;
     }
     try {
-      await addReplyToPost(post._id as string, replyContent);
+      const updatedPost: TPost = await addReplyToPost(
+        post._id as string,
+        replyContent,
+      );
+
+      console.log(updatedPost);
+      if (setPostReplies) setPostReplies(updatedPost.replies);
+
       setRepliesCount((prev) => prev + 1);
       console.log("Reply submitted:", replyContent);
       setReplyContent("");
