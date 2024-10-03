@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import {
   MessageCircle,
@@ -44,29 +43,37 @@ import { handleDeletePost } from "@/actions/handlePostActions";
 import { handlePostShare } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
+import { SetAction } from "@/types/generics.type";
 
 export default function SinglePostPage({ post }: { post: TPost }) {
+  const [postReplies, setPostReplies] = useState(post.replies);
+
   return (
     <div className="min-h-screen">
       <Header />
       <main className="main-content">
         <PostType post={post} type="post" />
-        <PostReplies post={post} replies={post.replies} />
+        <PostReplies
+          post={post}
+          postReplies={postReplies}
+          setPostReplies={setPostReplies}
+        />
       </main>
-      <PromptoryReplyButton post={post} />
+      <PromptoryReplyButton post={post} setPostReplies={setPostReplies} />
     </div>
   );
 }
 
 export function PostReplies({
   post,
-  replies,
+  postReplies,
+  setPostReplies,
 }: {
   post: TPost;
-  replies: TReplies[];
+  postReplies: TReplies[];
+  setPostReplies: SetAction<TReplies[]>;
 }) {
   const [replyText, setReplyText] = useState("");
-  const [postReplies, setPostReplies] = useState(replies);
   const [emptyReplyError, setEmptyReplyError] = useState("");
 
   const handleReplySubmit = async (e: React.FormEvent) => {
@@ -89,10 +96,10 @@ export function PostReplies({
   };
   return (
     <Card className="mid-width-post-card">
-      <CardHeader>
+      <CardHeader className="max-md:p-4">
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-md:px-4">
         <form onSubmit={handleReplySubmit} className="w-full">
           <div className="flex space-x-2">
             <Input
@@ -136,7 +143,7 @@ export function PostRepliesContent({
 }: {
   post: TPost;
   replies: TReplies[];
-  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+  setPostReplies: SetAction<TReplies[]>;
 }) {
   const { data: session } = useSession();
   const user = session?.user;
@@ -157,7 +164,7 @@ export function PostRepliesContent({
 
   if (!replies.length) {
     return (
-      <div className="min-h-svh space-y-4">
+      <div className="space-y-4">
         <p className="text-muted-foreground">No replies here yet!</p>
       </div>
     );
@@ -217,24 +224,28 @@ export function PostRepliesContent({
               />
             </div>
 
-            <div className="flex-between gap-2">
-              <p className="mt-1">{reply.reply}</p>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleLikeReplyClick(reply._id as string)}
-                className="hover:bg-background"
-              >
-                <Heart
-                  style={{
-                    color: il(hasLiked[reply._id?.toString() as string]),
-                  }}
-                  fill={il(hasLiked[reply._id?.toString() as string])}
-                  className="h-4 w-4"
-                />
-              </Button>
+            <div className="flex items-start justify-between gap-2">
+              <p>{reply.reply}</p>
+              <div className="flex-start flex-col">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleLikeReplyClick(reply._id as string)}
+                  className="hover:bg-background"
+                >
+                  <Heart
+                    style={{
+                      color: il(hasLiked[reply._id?.toString() as string]),
+                    }}
+                    fill={il(hasLiked[reply._id?.toString() as string])}
+                    className="h-4 w-4"
+                  />
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  {reply.likes.length}
+                </p>
+              </div>
             </div>
-            <p className="text-muted-foreground">{reply.likes.length} likes</p>
           </div>
         </div>
       ))}
@@ -266,7 +277,7 @@ export function PostReplyOptions({
 }: {
   postId: string;
   reply: TReplies;
-  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+  setPostReplies: SetAction<TReplies[]>;
 }) {
   const { status } = useSession();
 
@@ -415,9 +426,15 @@ export function UserOptions() {
   );
 }
 
-export function PromptoryReplyButton({ post }: { post: TPost }) {
+export function PromptoryReplyButton({
+  post,
+  setPostReplies,
+}: {
+  post: TPost;
+  setPostReplies: SetAction<TReplies[]>;
+}) {
   return (
-    <PostReplyDialog post={post}>
+    <PostReplyDialog post={post} setPostReplies={setPostReplies}>
       <Button
         size={"icon"}
         className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"
@@ -442,7 +459,7 @@ export function PostType({
 
   return (
     <Card className="mid-width-post-card">
-      <CardHeader className="pb-0 max-sm:px-4">
+      <CardHeader className="pb-0 max-md:px-4">
         <div className="flex-between">
           <div className="flex-start space-x-4">
             <Link
@@ -496,16 +513,12 @@ export function PostType({
           </div>
           <div className="relative overflow-hidden">
             <h3 className="mb-2 font-semibold">Response:</h3>
-            <ScrollArea
-              className={`${type === "post" && "h-60 rounded-lg border p-4"}`}
-            >
-              <PostContentType type={type} content={post.response} />
-            </ScrollArea>
+            <PostContentType type={type} content={post.response} />
           </div>
         </div>
       </CardContent>
       {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
-      <CardFooter className="flex justify-between pl-[4.5rem] sm:pl-20">
+      <CardFooter className="flex justify-between pl-[4.5rem] max-md:pr-4 sm:pl-20">
         <div className="flex space-x-4">
           {/* Like Button */}
           <LikeButton post={post} />

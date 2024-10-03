@@ -37,6 +37,7 @@ import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { objId } from "@/utils/ps";
 import { useSession } from "next-auth/react";
+import { SetAction } from "@/types/generics.type";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -188,9 +189,11 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 export function PostReplyDialog({
   post,
   children,
+  setPostReplies,
 }: {
   post: TPost;
   children?: React.ReactNode;
+  setPostReplies?: SetAction<TReplies[]>;
 }) {
   const [dialogState, setDialogState] = useState(false);
   const [replyContent, setReplyContent] = useState("");
@@ -205,7 +208,14 @@ export function PostReplyDialog({
       return;
     }
     try {
-      await addReplyToPost(post._id as string, replyContent);
+      const updatedPost: TPost = await addReplyToPost(
+        post._id as string,
+        replyContent,
+      );
+
+      console.log(updatedPost);
+      if (setPostReplies) setPostReplies(updatedPost.replies);
+
       setRepliesCount((prev) => prev + 1);
       console.log("Reply submitted:", replyContent);
       setReplyContent("");
