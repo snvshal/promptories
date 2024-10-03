@@ -97,10 +97,10 @@ export function PostReplies({
   };
   return (
     <Card className="mid-width-post-card">
-      <CardHeader>
+      <CardHeader className="max-md:p-4">
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-md:px-4">
         <form onSubmit={handleReplySubmit} className="w-full">
           <div className="flex space-x-2">
             <Input
@@ -460,7 +460,7 @@ export function PostType({
 
   return (
     <Card className="mid-width-post-card">
-      <CardHeader className="pb-0 max-sm:px-4">
+      <CardHeader className="pb-0 max-md:px-4">
         <div className="flex-between">
           <div className="flex-start space-x-4">
             <Link
@@ -514,16 +514,12 @@ export function PostType({
           </div>
           <div className="relative overflow-hidden">
             <h3 className="mb-2 font-semibold">Response:</h3>
-            <ScrollArea
-              className={`${type === "post" && "h-60 rounded-lg border p-4"}`}
-            >
-              <PostContentType type={type} content={post.response} />
-            </ScrollArea>
+            <PostContentType type={type} content={post.response} />
           </div>
         </div>
       </CardContent>
       {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
-      <CardFooter className="flex justify-between pl-[4.5rem] sm:pl-20">
+      <CardFooter className="flex justify-between pl-[4.5rem] max-md:pr-4 sm:pl-20">
         <div className="flex space-x-4">
           {/* Like Button */}
           <LikeButton post={post} />
