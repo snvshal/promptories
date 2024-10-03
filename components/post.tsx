@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -44,6 +44,7 @@ import { handleDeletePost } from "@/actions/handlePostActions";
 import { handlePostShare } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
+import { SetAction } from "@/types/generics.type";
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies);
@@ -71,7 +72,7 @@ export function PostReplies({
 }: {
   post: TPost;
   postReplies: TReplies[];
-  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+  setPostReplies: SetAction<TReplies[]>;
 }) {
   const [replyText, setReplyText] = useState("");
   const [emptyReplyError, setEmptyReplyError] = useState("");
@@ -143,7 +144,7 @@ export function PostRepliesContent({
 }: {
   post: TPost;
   replies: TReplies[];
-  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+  setPostReplies: SetAction<TReplies[]>;
 }) {
   const { data: session } = useSession();
   const user = session?.user;
@@ -277,7 +278,7 @@ export function PostReplyOptions({
 }: {
   postId: string;
   reply: TReplies;
-  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+  setPostReplies: SetAction<TReplies[]>;
 }) {
   const { status } = useSession();
 
@@ -431,7 +432,7 @@ export function PromptoryReplyButton({
   setPostReplies,
 }: {
   post: TPost;
-  setPostReplies: Dispatch<SetStateAction<TReplies[]>>;
+  setPostReplies: SetAction<TReplies[]>;
 }) {
   return (
     <PostReplyDialog post={post} setPostReplies={setPostReplies}>

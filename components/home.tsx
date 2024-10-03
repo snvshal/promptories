@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,6 +37,7 @@ import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { objId } from "@/utils/ps";
 import { useSession } from "next-auth/react";
+import { SetAction } from "@/types/generics.type";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -198,7 +193,7 @@ export function PostReplyDialog({
 }: {
   post: TPost;
   children?: React.ReactNode;
-  setPostReplies?: Dispatch<SetStateAction<TReplies[]>>;
+  setPostReplies?: SetAction<TReplies[]>;
 }) {
   const [dialogState, setDialogState] = useState(false);
   const [replyContent, setReplyContent] = useState("");
