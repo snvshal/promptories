@@ -24,6 +24,7 @@ import {
   SquareArrowOutUpRight,
   Settings,
   MessageSquareShare,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import { BookmarkButton, il, LikeButton, PostReplyDialog, pu } from "./home";
@@ -44,7 +45,7 @@ import { handlePostShare } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
 import { SetAction } from "@/types/generics.type";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { ScrollArea } from "./ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +54,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tag } from "lucide-react";
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies);
