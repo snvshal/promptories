@@ -293,7 +293,6 @@ export function BottomNavbar() {
   const user = session?.user;
 
   const pathname = usePathname();
-  console.log(pathname.startsWith("/home"));
   if (status === "unauthenticated") return null;
 
   return (
