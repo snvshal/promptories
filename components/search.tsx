@@ -20,7 +20,7 @@ export default function SearchComponent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
 
-  const [searchQuery, setSearchQuery] = useState(query);
+  const [searchQuery, setSearchQuery] = useState(query ?? "");
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
