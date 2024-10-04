@@ -44,6 +44,16 @@ import { handlePostShare } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
 import { SetAction } from "@/types/generics.type";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Tag } from "lucide-react";
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies);
@@ -256,7 +266,7 @@ export function PostRepliesContent({
 export function Header() {
   return (
     <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
-      <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 md:px-6 lg:px-8">
         <Link
           href="/home"
           className="flex items-center text-blue-600 hover:text-blue-800"
@@ -328,6 +338,8 @@ export function PostOptions({ post }: { post: TPost }) {
   const { data: session } = useSession();
   const user = session?.user;
 
+  const [open, setOpen] = useState(false);
+
   const router = useRouter();
 
   const handleDeletePostClick = async () => {
@@ -379,6 +391,13 @@ export function PostOptions({ post }: { post: TPost }) {
             <span>Try it</span>
           </DropdownMenuItem>
         </Link>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={() => setOpen(true)}
+        >
+          <Tag className="mr-2 h-4 w-4" />
+          <span>View tags</span>
+        </DropdownMenuItem>
         {post.chat_link && (
           <Link href={post.chat_link} target="_black" prefetch={false}>
             <DropdownMenuItem className="cursor-pointer">
@@ -388,6 +407,7 @@ export function PostOptions({ post }: { post: TPost }) {
           </Link>
         )}
       </DropdownMenuContent>
+      <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
     </DropdownMenu>
   );
 }
@@ -459,7 +479,7 @@ export function PostType({
 
   return (
     <Card className="mid-width-post-card">
-      <CardHeader className="pb-0 max-md:px-4">
+      <CardHeader className={`${type === "post" && "mb-4"} pb-0 max-md:px-4`}>
         <div className="flex-between">
           <div className="flex-start space-x-4">
             <Link
@@ -471,7 +491,9 @@ export function PostType({
                 <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
-              <div className="flex-start gap-1">
+              <div
+                className={`${type === "post" && "flex-col gap-0"} flex-start gap-1`}
+              >
                 <p className="font-semibold">{pu(post).name}</p>
                 <p
                   className={`text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
@@ -492,19 +514,10 @@ export function PostType({
       <CardContent
         role={type === "posts" ? "button" : undefined}
         onClick={type === "posts" ? () => postClick(post) : undefined}
-        className="border-0 pl-20 max-md:pr-4 max-sm:pl-[4.5rem]"
+        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} border-0 max-md:pr-4`}
       >
-        <div className="mb-4">
-          <div className="relative overflow-hidden">
-            <PostContentType type={type} content={post.caption} />
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {post.tags.map((tag: string, index) => (
-              <Badge key={index} variant="secondary">
-                #{tag}
-              </Badge>
-            ))}
-          </div>
+        <div className="relative mb-4 overflow-hidden">
+          <PostContentType type={type} content={post.caption} />
         </div>
         <div className="bbn space-y-4 rounded-lg p-4">
           <div className="relative overflow-hidden">
@@ -518,7 +531,9 @@ export function PostType({
         </div>
       </CardContent>
       {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
-      <CardFooter className="flex justify-between pl-[4.5rem] max-md:pr-4 sm:pl-20">
+      <CardFooter
+        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} flex justify-between max-md:pr-4`}
+      >
         <div className="flex space-x-4">
           {/* Like Button */}
           <LikeButton post={post} />
@@ -567,7 +582,7 @@ export function PostContentType({
 
 export function PostTime({ createdAt }: { createdAt: Date }) {
   return (
-    <div className="flex-start mb-6 ml-[4.5rem] mr-4 border-b pb-6 text-muted-foreground sm:ml-20 md:mr-6">
+    <div className="flex-start mb-6 ml-4 mr-4 border-b pb-6 text-muted-foreground md:ml-6 md:mr-6">
       {new Date(createdAt as Date).toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
@@ -580,5 +595,53 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
         year: "numeric",
       })}
     </div>
+  );
+}
+
+export function PostTagsDialog({
+  tags,
+  open,
+  setOpen,
+}: {
+  tags: string[];
+  open: boolean;
+  setOpen: SetAction<boolean>;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="hidden gap-2">
+          <Tag className="h-4 w-4" />
+          View Tags
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Post Tags</DialogTitle>
+          <DialogDescription>
+            These tags categorize and describe the main topics of this post.
+          </DialogDescription>
+        </DialogHeader>
+        <ScrollArea className="h-40 rounded-lg border p-4">
+          {tags.length ? (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag: string, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  // className="flex-shrink-0"
+                >
+                  #{tag}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <p className="italic text-muted-foreground">
+              There is no tags for this post.
+            </p>
+          )}
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
   );
 }
