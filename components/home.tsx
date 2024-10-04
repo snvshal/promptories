@@ -22,7 +22,7 @@ import {
   handleLikePost,
   handleBookmarkPost,
 } from "@/actions/handlePostActions";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -289,29 +289,43 @@ export function ComposePromptoryButton() {
 }
 
 export function BottomNavbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const user = session?.user;
+
+  const pathname = usePathname();
+  if (status === "unauthenticated") return null;
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 h-[var(--navbar-height)] border-t border-border bg-background md:hidden">
       <div className="flex h-full items-center justify-around">
         <Link href="/home" className="flex flex-col items-center p-2">
-          <Home className="h-6 w-6" />
-          <span className="mt-1 text-xs">Home</span>
+          <Home
+            className="h-6 w-6"
+            fill={pathname.startsWith("/home") ? "currentColor" : "none"}
+          />
         </Link>
         <Link href="/search" className="flex flex-col items-center p-2">
-          <Search className="h-6 w-6" />
-          <span className="mt-1 text-xs">Search</span>
+          <Search
+            className="h-6 w-6"
+            strokeWidth={pathname.startsWith("/search") ? 4 : 2}
+          />
         </Link>
         <Link
           href="/settings/profile"
           className="flex flex-col items-center p-2"
         >
-          <Settings className="h-6 w-6" />
-          <span className="mt-1 text-xs">Settings</span>
+          <Settings
+            className="h-6 w-6"
+            fill={pathname.startsWith("/settings") ? "currentColor" : "none"}
+          />
         </Link>
         <Link href="/notifications" className="flex flex-col items-center p-2">
-          <Bell className="h-6 w-6" />
-          <span className="mt-1 text-xs">Notifications</span>
+          <Bell
+            className="h-6 w-6"
+            fill={
+              pathname.startsWith("/notifications") ? "currentColor" : "none"
+            }
+          />
         </Link>
         <Link
           href={`/${user?.username}`}
