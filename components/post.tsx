@@ -357,9 +357,24 @@ export function PostOptions({ post }: { post: TPost }) {
 
   const handleDeletePostClick = async () => {
     try {
-      await handleDeletePost(post._id as string);
+      const element = document.querySelector(
+        `[data-key="${post._id as string}"]`,
+      );
+
+      if (element) {
+        await handleDeletePost(post._id as string);
+        element.remove();
+      }
+
+      toast({
+        description: "Your post has been deleted.",
+      });
     } catch (error) {
-      console.error(error);
+      toast({
+        title: "Error",
+        description: "There was a problem deleting your post.",
+        variant: "destructive",
+      });
     }
   };
 

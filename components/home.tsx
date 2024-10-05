@@ -104,7 +104,9 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
   return (
     <>
       {posts.map((post) => (
-        <PostType key={post._id?.toString()} post={post} type="posts" />
+        <div data-key={post._id?.toString()} key={post._id?.toString()}>
+          <PostType post={post} type="posts" />
+        </div>
       ))}
     </>
   );
