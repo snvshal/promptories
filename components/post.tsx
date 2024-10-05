@@ -54,6 +54,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies);
@@ -100,8 +101,15 @@ export function PostReplies({
       console.log("Reply submitted:", replyText);
       setReplyText("");
       // Here you would typically send the reply to your backend
+      toast({
+        description: "Your reply has been sent.",
+      });
     } catch (error) {
-      console.error(error);
+      toast({
+        title: "Error",
+        description: "There was a problem sending your reply.",
+        variant: "destructive",
+      });
     }
   };
   return (
@@ -265,7 +273,7 @@ export function PostRepliesContent({
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
+    <header className="sticky top-0 z-10 border-b bg-background shadow-sm sm:pl-16">
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 md:px-6 lg:px-8">
         <Link
           href="/home"
@@ -455,10 +463,7 @@ export function PromptoryReplyButton({
 }) {
   return (
     <PostReplyDialog post={post} setPostReplies={setPostReplies}>
-      <Button
-        size={"icon"}
-        className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"
-      >
+      <Button size={"icon"} className="compose-button">
         <MessageCircle size={24} />
       </Button>
     </PostReplyDialog>
@@ -492,7 +497,7 @@ export function PostType({
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div
-                className={`${type === "post" && "flex-col gap-0"} flex-start gap-1`}
+                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex-start`}
               >
                 <p className="font-semibold">{pu(post).name}</p>
                 <p
@@ -626,11 +631,7 @@ export function PostTagsDialog({
           {tags.length ? (
             <div className="flex flex-wrap gap-2">
               {tags.map((tag: string, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  // className="flex-shrink-0"
-                >
+                <Badge key={index} variant="secondary">
                   #{tag}
                 </Badge>
               ))}
