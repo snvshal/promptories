@@ -93,7 +93,7 @@
 }
 
 .bottom-navbar {
-  @apply max-md:pb-[var(--navbar-height)];
+  @apply max-md:pb-[var(--navbar-height)] sm:pl-[var(--navbar-height)];
 }
 
 .mid-width-post-card {
@@ -101,5 +101,9 @@
 }
 
 .main-content {
-  @apply bottom-navbar container mx-auto max-w-4xl py-8 max-md:pt-0 md:px-6 lg:px-8;
+  @apply bottom-navbar container mx-auto box-border max-w-4xl py-8 max-md:pt-0 md:px-6 lg:px-8;
+}
+
+.compose-button {
+  @apply fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 sm:bottom-10;
 }

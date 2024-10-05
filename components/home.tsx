@@ -38,6 +38,7 @@ import { addReplyToPost } from "@/actions/addReplyToPost";
 import { objId } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { SetAction } from "@/types/generics.type";
+import { toast } from "@/hooks/use-toast";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -53,7 +54,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b bg-background shadow-sm">
+      <header className="sticky top-0 z-10 border-b bg-background shadow-sm sm:pl-16">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
             <h1 className="mr-8 text-2xl font-bold text-blue-600">
@@ -82,7 +83,10 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
         </div>
       </header>
 
-      <PostsComponent posts={posts} />
+      <main className="main-content">
+        <PostsComponent posts={posts} />
+      </main>
+
       <ComposePromptoryButton />
     </div>
   );
@@ -98,11 +102,11 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
   }
 
   return (
-    <main className="main-content">
+    <>
       {posts.map((post) => (
         <PostType key={post._id?.toString()} post={post} type="posts" />
       ))}
-    </main>
+    </>
   );
 }
 
@@ -160,6 +164,13 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial);
+
+  useEffect(() => {
+    if (user?.id) {
+      const initialBookmarks = tsa(post.bookmarks).includes(user.id as string);
+      setHasBookmarked(initialBookmarks);
+    }
+  }, [user, post.bookmarks]);
 
   const handleBookmarkClick = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,8 +232,15 @@ export function PostReplyDialog({
       setReplyContent("");
       setDialogState(false);
       // Here you would typically send the reply to your backend
+      toast({
+        description: "Your reply has been sent.",
+      });
     } catch (error) {
-      console.error(error);
+      toast({
+        title: "Error",
+        description: "There was a problem sending your reply.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -281,62 +299,78 @@ export function ComposePromptoryButton() {
     <Button
       size={"icon"}
       onClick={() => router.push("/compose/promptory")}
-      className="fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 md:bottom-10"
+      className="compose-button"
     >
       <Feather size={24} />
     </Button>
   );
 }
 
-export function BottomNavbar() {
-  const { data: session, status } = useSession();
-  const user = session?.user;
+export function Navbar() {
+  const { status } = useSession();
 
-  const pathname = usePathname();
   if (status === "unauthenticated") return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-[var(--navbar-height)] border-t border-border bg-background md:hidden">
-      <div className="flex h-full items-center justify-around">
-        <Link href="/home" className="flex flex-col items-center p-2">
-          <Home
-            className="h-6 w-6"
-            fill={pathname.startsWith("/home") ? "currentColor" : "none"}
-          />
-        </Link>
-        <Link href="/search" className="flex flex-col items-center p-2">
-          <Search
-            className="h-6 w-6"
-            strokeWidth={pathname.startsWith("/search") ? 4 : 2}
-          />
-        </Link>
-        <Link
-          href="/settings/profile"
-          className="flex flex-col items-center p-2"
-        >
-          <Settings
-            className="h-6 w-6"
-            fill={pathname.startsWith("/settings") ? "currentColor" : "none"}
-          />
-        </Link>
-        <Link href="/notifications" className="flex flex-col items-center p-2">
-          <Bell
-            className="h-6 w-6"
-            fill={
-              pathname.startsWith("/notifications") ? "currentColor" : "none"
-            }
-          />
-        </Link>
-        <Link
-          href={`/${user?.username}`}
-          className="flex flex-col items-center p-2"
-        >
-          <Avatar className="cursor-pointer">
-            <AvatarImage src={user?.image} alt={user?.username} />
-            <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-        </Link>
+    <nav className="fixed bottom-0 left-0 z-50 h-[var(--navbar-height)] border-t border-border bg-background max-sm:right-0 sm:top-0 sm:h-dvh sm:w-[var(--navbar-height)] sm:border-r md:hidden">
+      <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
+        <div className="flex h-full w-full flex-col justify-start gap-4">
+          <NavLinks />
+        </div>
+        <UserProfileLink />
+      </div>
+      <div className="flex h-full items-center justify-around sm:hidden">
+        <NavLinks />
+        <UserProfileLink />
       </div>
     </nav>
+  );
+}
+
+export function NavLinks() {
+  const pathname = usePathname();
+  return (
+    <>
+      <Link href="/home" className="flex flex-col items-center p-2">
+        <Home
+          className="h-6 w-6"
+          fill={pathname.startsWith("/home") ? "currentColor" : "none"}
+        />
+      </Link>
+      <Link href="/search" className="flex flex-col items-center p-2">
+        <Search
+          className="h-6 w-6"
+          strokeWidth={pathname.startsWith("/search") ? 4 : 2}
+        />
+      </Link>
+      <Link href="/settings/profile" className="flex flex-col items-center p-2">
+        <Settings
+          className="h-6 w-6"
+          fill={pathname.startsWith("/settings") ? "currentColor" : "none"}
+        />
+      </Link>
+      <Link href="/notifications" className="flex flex-col items-center p-2">
+        <Bell
+          className="h-6 w-6"
+          fill={pathname.startsWith("/notifications") ? "currentColor" : "none"}
+        />
+      </Link>
+    </>
+  );
+}
+
+export function UserProfileLink() {
+  const { data: session } = useSession();
+  const user = session?.user;
+  return (
+    <Link
+      href={`/${user?.username}`}
+      className="flex flex-col items-center p-2"
+    >
+      <Avatar className="cursor-pointer">
+        <AvatarImage src={user?.image} alt={user?.username} />
+        <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+      </Avatar>
+    </Link>
   );
 }

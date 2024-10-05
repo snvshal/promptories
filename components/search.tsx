@@ -68,13 +68,13 @@ export default function SearchComponent() {
       </div>
 
       <main className="main-content">
-        <Card className="mid-width-post-card">
-          <CardHeader>
+        <Card className="mid-width-post-card md:mb-4">
+          <CardHeader className="max-md:p-4">
             <CardTitle className="text-xl font-semibold">
               Search Promptories
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="max-md:p-4 max-md:pt-0">
             <form onSubmit={handleSearchSubmit} className="flex space-x-2">
               <Input
                 type="text"
@@ -99,31 +99,29 @@ export default function SearchComponent() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="posts">Posts</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-          </TabsList>
-          <TabsContent value="posts">
-            <div className="mt-6 space-y-6">
-              {!query ? (
-                <div className="flex-center mt-16 w-full">
-                  <p>Searched posts will appear here</p>
-                </div>
-              ) : (
-                <PostsComponent posts={matchedPosts as TPost[]} />
-              )}
-            </div>
+          <div className="max-md:border-b max-md:p-4 md:mb-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="posts">Posts</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="posts" className="m-0">
+            {!query ? (
+              <div className="flex-center mt-16 w-full">
+                <p>Searched posts will appear here</p>
+              </div>
+            ) : (
+              <PostsComponent posts={matchedPosts as TPost[]} />
+            )}
           </TabsContent>
-          <TabsContent value="users">
-            <div className="mt-6 space-y-6">
-              {!query ? (
-                <div className="flex-center w-full p-4">
-                  <p>Searched users will appear here</p>
-                </div>
-              ) : (
-                <MatchedUsers matchedUsers={matchedUsers} />
-              )}
-            </div>
+          <TabsContent value="users" className="m-0">
+            {!query ? (
+              <div className="flex-center w-full p-4">
+                <p>Searched users will appear here</p>
+              </div>
+            ) : (
+              <MatchedUsers matchedUsers={matchedUsers} />
+            )}
           </TabsContent>
         </Tabs>
       </main>
