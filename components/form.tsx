@@ -19,6 +19,7 @@ import { promptory_types } from "@/lib/constants";
 import { savePostForm } from "@/actions/postFormAction";
 import { Header } from "./post";
 import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
@@ -66,10 +67,16 @@ export default function PostForm() {
       reset();
 
       router.push("/home");
+
+      toast({
+        description: "Your post has been sent.",
+      });
     } catch (error) {
-      console.error("Submission failed:", error);
-    } finally {
-      setIsSubmitting(false);
+      toast({
+        title: "Error",
+        description: "There was a problem sending your post.",
+        variant: "destructive",
+      });
     }
   };
 
