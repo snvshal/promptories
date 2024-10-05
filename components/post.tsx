@@ -489,7 +489,9 @@ export function PostType({
 
   return (
     <Card className="mid-width-post-card">
-      <CardHeader className={`${type === "post" && "mb-4"} pb-0 max-md:px-4`}>
+      <CardHeader
+        className={`${type === "post" && "mb-4"} pb-0 max-md:p-4 max-md:pb-0`}
+      >
         <div className="flex-between">
           <div className="flex-start space-x-4">
             <Link

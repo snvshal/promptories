@@ -83,7 +83,10 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
         </div>
       </header>
 
-      <PostsComponent posts={posts} />
+      <main className="main-content">
+        <PostsComponent posts={posts} />
+      </main>
+
       <ComposePromptoryButton />
     </div>
   );
@@ -99,11 +102,11 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
   }
 
   return (
-    <main className="main-content">
+    <>
       {posts.map((post) => (
         <PostType key={post._id?.toString()} post={post} type="posts" />
       ))}
-    </main>
+    </>
   );
 }
 

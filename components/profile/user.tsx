@@ -75,52 +75,53 @@ export default function UserProfileComponent({
           profileUser={profileUser}
           postCount={posts.length}
         />
-        <Tabs defaultValue={tab} className="w-full">
-          <TabsList
-            className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} `}
-          >
-            <TabsTrigger
-              role="button"
-              value="posts"
-              onClick={() => toggleTab("posts")}
-            >
-              Posts
-            </TabsTrigger>
-            {isAdmin && (
-              <>
-                <TabsTrigger
-                  role="button"
-                  value="likes"
-                  onClick={() => toggleTab("likes")}
-                >
-                  Likes
-                </TabsTrigger>
-                <TabsTrigger
-                  role="button"
-                  value="saved"
-                  onClick={() => toggleTab("saved")}
-                >
-                  Saved
-                </TabsTrigger>
-              </>
-            )}
-          </TabsList>
 
-          <div className="mt-8">
-            <TabsContent value="posts">
-              <PostsComponent posts={posts} />
-            </TabsContent>
-            {isAdmin && (
-              <>
-                <TabsContent value="likes">
-                  <PostsComponent posts={likedPosts} />
-                </TabsContent>
-                <TabsContent value="saved">
-                  <PostsComponent posts={bookmarkedPosts} />
-                </TabsContent>
-              </>
-            )}
+        <Tabs defaultValue={tab} className="w-full">
+          <div className="max-md:border-b max-md:p-4 md:mb-4">
+            <TabsList
+              className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} `}
+            >
+              <TabsTrigger
+                role="button"
+                value="posts"
+                onClick={() => toggleTab("posts")}
+              >
+                Posts
+              </TabsTrigger>
+              {isAdmin && (
+                <>
+                  <TabsTrigger
+                    role="button"
+                    value="likes"
+                    onClick={() => toggleTab("likes")}
+                  >
+                    Likes
+                  </TabsTrigger>
+                  <TabsTrigger
+                    role="button"
+                    value="saved"
+                    onClick={() => toggleTab("saved")}
+                  >
+                    Saved
+                  </TabsTrigger>
+                </>
+              )}
+            </TabsList>
           </div>
+
+          <TabsContent value="posts" className="m-0">
+            <PostsComponent posts={posts} />
+          </TabsContent>
+          {isAdmin && (
+            <>
+              <TabsContent value="likes" className="m-0">
+                <PostsComponent posts={likedPosts} />
+              </TabsContent>
+              <TabsContent value="saved" className="m-0">
+                <PostsComponent posts={bookmarkedPosts} />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </main>
     </div>
@@ -155,7 +156,7 @@ export function ProfileUserContent({
     }
   };
   return (
-    <Card className="mid-width-post-card mb-8">
+    <Card className="mid-width-post-card md:mb-4">
       <CardContent className="pt-6">
         <div className="flex flex-col items-center text-center">
           <Avatar className="mb-4 h-24 w-24">
