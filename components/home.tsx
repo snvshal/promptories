@@ -165,6 +165,13 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial);
 
+  useEffect(() => {
+    if (user?.id) {
+      const initialBookmarks = tsa(post.bookmarks).includes(user.id as string);
+      setHasBookmarked(initialBookmarks);
+    }
+  }, [user, post.bookmarks]);
+
   const handleBookmarkClick = async (e: React.FormEvent) => {
     e.preventDefault();
 
