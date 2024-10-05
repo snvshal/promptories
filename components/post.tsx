@@ -305,8 +305,15 @@ export function PostReplyOptions({
     try {
       const newReplies = await deleteReply(postId, reply._id as string);
       setPostReplies(newReplies as TReplies[]);
+      toast({
+        description: "Your reply has been deleted.",
+      });
     } catch (error) {
-      console.error("Failed to delete reply:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem deleting your reply.",
+        variant: "destructive",
+      });
     }
   };
 
