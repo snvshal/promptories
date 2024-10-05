@@ -297,7 +297,7 @@ export function PostReplyOptions({
   reply: TReplies;
   setPostReplies: SetAction<TReplies[]>;
 }) {
-  const { status } = useSession();
+  const { data: session } = useSession();
 
   const router = useRouter();
 
@@ -310,9 +310,7 @@ export function PostReplyOptions({
     }
   };
 
-  // const authorized = reply.user._id?.toString() === user._id?.toString();
-  const authorized = status === "authenticated";
-  // console.log(authorized);
+  const authorized = reply.user._id?.toString() === session?.user.id;
 
   return (
     <DropdownMenu>
