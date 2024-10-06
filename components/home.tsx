@@ -49,6 +49,9 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
 
   const SubmitQuery = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!searchQuery.trim()) return null;
+
     router.push(`/search?q=${searchQuery}`);
   };
 
