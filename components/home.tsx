@@ -98,7 +98,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
 export function PostsComponent({ posts }: { posts: TPost[] }) {
   if (!posts.length) {
     return (
-      <div className="flex-center w-full p-4">
+      <div className="flex-center w-full p-4 max-md:pt-10">
         <p>No posts here.</p>
       </div>
     );

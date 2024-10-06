@@ -351,8 +351,6 @@ export function PostOptions({ post }: { post: TPost }) {
   const { data: session } = useSession();
   const user = session?.user;
 
-  const [open, setOpen] = useState(false);
-
   const router = useRouter();
 
   const handleDeletePostClick = async () => {
@@ -390,42 +388,18 @@ export function PostOptions({ post }: { post: TPost }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-auto">
         <DropdownMenuItem
-          onClick={() => router.push(`/${user?.username}`)}
+          onClick={() => router.push(`/${pu(post).username}`)}
           className="cursor-pointer sm:hidden"
         >
           <User className="mr-2 h-4 w-4" />
-          <span>&#64;{user?.username}</span>
+          <span>&#64;{pu(post).username}</span>
         </DropdownMenuItem>
-        {authorized ? (
-          <DropdownMenuItem
-            onClick={handleDeletePostClick}
-            className="cursor-pointer"
-          >
-            <Trash className="mr-2 h-4 w-4 text-red-500" />
-            <span className="text-red-500">Delete</span>
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem
-            onClick={() => router.push(`/${pu(post).username}`)}
-            className="cursor-pointer"
-          >
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-          </DropdownMenuItem>
-        )}
         <Link href={post.model_url} target="_black" prefetch={false}>
           <DropdownMenuItem className="cursor-pointer">
             <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
             <span>Try it</span>
           </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => setOpen(true)}
-        >
-          <Tag className="mr-2 h-4 w-4" />
-          <span>View tags</span>
-        </DropdownMenuItem>
         {post.chat_link && (
           <Link href={post.chat_link} target="_black" prefetch={false}>
             <DropdownMenuItem className="cursor-pointer">
@@ -434,8 +408,16 @@ export function PostOptions({ post }: { post: TPost }) {
             </DropdownMenuItem>
           </Link>
         )}
+        {authorized && (
+          <DropdownMenuItem
+            onClick={handleDeletePostClick}
+            className="cursor-pointer"
+          >
+            <Trash className="mr-2 h-4 w-4 text-red-500" />
+            <span className="text-red-500">Delete</span>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
-      <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
     </DropdownMenu>
   );
 }
@@ -497,6 +479,8 @@ export function PostType({
   post: TPost;
   type: "post" | "posts";
 }) {
+  const [open, setOpen] = useState(false);
+
   const router = useRouter();
 
   const postClick = (post: TPost) =>
@@ -562,22 +546,24 @@ export function PostType({
         className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} flex justify-between max-md:pb-4 max-md:pr-4`}
       >
         <div className="flex space-x-4">
-          {/* Like Button */}
           <LikeButton post={post} />
-          {/* Reply Button */}
           <PostReplyDialog post={post} />
-          {/* Bookmark Button */}
           <BookmarkButton post={post} />
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handlePostShare(post)}
-          aria-label="Share Post"
-        >
-          <Share2 className="mr-2 h-4 w-4" />
-          Share
-        </Button>
+        <div>
+          {post.tags.length > 0 && (
+            <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handlePostShare(post)}
+            aria-label="Share Post"
+          >
+            <Share2 className="h-4 w-4" />
+            <span className="ml-2 max-md:hidden">Share</span>
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
@@ -637,9 +623,9 @@ export function PostTagsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="hidden gap-2">
+        <Button variant="ghost" size="sm" aria-label="View Tags">
           <Tag className="h-4 w-4" />
-          View Tags
+          <span className="ml-2 max-md:hidden">View Tags</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
