@@ -84,9 +84,14 @@ export default function PostForm() {
     <>
       <Header />
 
-      <main className="main-content max-md:p-4 max-md:pb-20">
-        <h1 className="mb-4 text-3xl font-bold">Create New Post</h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <main className="main-content">
+        <h1 className="mb-4 text-3xl font-bold max-md:p-4 max-md:pb-0">
+          Create New Post
+        </h1>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6 max-md:p-4"
+        >
           <div>
             <Label htmlFor="caption">Caption</Label>
             <Controller
