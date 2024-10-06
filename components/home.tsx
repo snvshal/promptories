@@ -319,7 +319,7 @@ export function Navbar() {
   return (
     <nav className="fixed bottom-0 left-0 z-50 h-[var(--navbar-height)] border-t border-border bg-background max-sm:right-0 sm:top-0 sm:h-dvh sm:w-[var(--navbar-height)] sm:border-r md:hidden">
       <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
-        <div className="flex h-full w-full flex-col justify-start gap-4">
+        <div className="flex h-full w-full flex-col items-center justify-start gap-4">
           <NavLinks />
         </div>
         <UserProfileLink />
@@ -336,29 +336,29 @@ export function NavLinks() {
   const pathname = usePathname();
   return (
     <>
-      <Link href="/home" className="flex flex-col items-center p-2">
-        <Home
-          className="h-6 w-6"
-          fill={pathname.startsWith("/home") ? "currentColor" : "none"}
-        />
+      <Link
+        href="/home"
+        className={`${pathname === "/home" ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      >
+        <Home className="h-6 w-6" />
       </Link>
-      <Link href="/search" className="flex flex-col items-center p-2">
-        <Search
-          className="h-6 w-6"
-          strokeWidth={pathname.startsWith("/search") ? 4 : 2}
-        />
+      <Link
+        href="/search"
+        className={`${pathname.startsWith("/search") ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      >
+        <Search className="h-6 w-6" />
       </Link>
-      <Link href="/settings/profile" className="flex flex-col items-center p-2">
-        <Settings
-          className="h-6 w-6"
-          fill={pathname.startsWith("/settings") ? "currentColor" : "none"}
-        />
+      <Link
+        href="/settings/profile"
+        className={`${pathname.startsWith("/settings") ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      >
+        <Settings className="h-6 w-6" />
       </Link>
-      <Link href="/notifications" className="flex flex-col items-center p-2">
-        <Bell
-          className="h-6 w-6"
-          fill={pathname.startsWith("/notifications") ? "currentColor" : "none"}
-        />
+      <Link
+        href="/notifications"
+        className={`${pathname === "/notifications" ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      >
+        <Bell className="h-6 w-6" />
       </Link>
     </>
   );
@@ -367,15 +367,19 @@ export function NavLinks() {
 export function UserProfileLink() {
   const { data: session } = useSession();
   const user = session?.user;
+  const pathname = usePathname();
+
   return (
-    <Link
-      href={`/${user?.username}`}
-      className="flex flex-col items-center p-2"
-    >
-      <Avatar className="cursor-pointer">
-        <AvatarImage src={user?.image} alt={user?.username} />
-        <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-      </Avatar>
-    </Link>
+    <div className="flex-center">
+      <Link
+        href={`/${user?.username}`}
+        className={`${pathname.slice(1) === user?.username ? "outline outline-offset-2 outline-muted-foreground" : "outline-none"} rounded-full`}
+      >
+        <Avatar className="cursor-pointer">
+          <AvatarImage src={user?.image} alt={user?.username} />
+          <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+      </Link>
+    </div>
   );
 }
