@@ -17,11 +17,12 @@ export default async function UserProfilePage({
   const { username } = params;
 
   const profileUser = await getUserByUsername(username);
+
+  if (!profileUser) return <UserNotFound />;
+
   const posts = await getPostsByUsername(username);
   const likedPosts = await getLikedPosts(profileUser as TUser);
   const bookmarkedPosts = await getBookmarkedPosts(profileUser as TUser);
-
-  if (!profileUser) return <UserNotFound />;
 
   return (
     <UserProfileComponent

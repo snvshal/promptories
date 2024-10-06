@@ -96,7 +96,7 @@
   @apply max-md:pb-[var(--navbar-height)] sm:pl-[var(--navbar-height)];
 }
 
-.mid-width-post-card {
+.mid-width-card-content {
   @apply w-full max-md:rounded-none max-md:border-0 max-md:border-b md:mb-8;
 }
 

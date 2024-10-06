@@ -156,7 +156,7 @@ export function ProfileUserContent({
     }
   };
   return (
-    <Card className="mid-width-post-card md:mb-4">
+    <Card className="mid-width-card-content md:mb-4">
       <CardContent className="pt-6">
         <div className="flex flex-col items-center text-center">
           <Avatar className="mb-4 h-24 w-24">
@@ -222,8 +222,8 @@ export function ProfileUserContent({
 export function UserNotFound() {
   const { username } = useParams();
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Card className="mb-8">
+    <div className="main-content">
+      <Card className="mid-width-card-content">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center text-center">
             <Avatar className="mb-4 h-24 w-24">
