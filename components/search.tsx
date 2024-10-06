@@ -68,7 +68,7 @@ export default function SearchComponent() {
       </div>
 
       <main className="main-content">
-        <Card className="mid-width-post-card md:mb-4">
+        <Card className="mid-width-card-content md:mb-4">
           <CardHeader className="max-md:p-4">
             <CardTitle className="text-xl font-semibold">
               Search Promptories
@@ -221,7 +221,7 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
   return (
     <>
       {matchedUsers?.map((user) => (
-        <Card key={user._id?.toString()} className="mid-width-post-card">
+        <Card key={user._id?.toString()} className="mid-width-card-content">
           <CardContent className="flex items-center space-x-4 py-4">
             <Avatar
               role="button"

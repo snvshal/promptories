@@ -156,7 +156,7 @@ export function ProfileUserContent({
     }
   };
   return (
-    <Card className="mid-width-post-card md:mb-4">
+    <Card className="mid-width-card-content md:mb-4">
       <CardContent className="pt-6">
         <div className="flex flex-col items-center text-center">
           <Avatar className="mb-4 h-24 w-24">
@@ -222,32 +222,35 @@ export function ProfileUserContent({
 export function UserNotFound() {
   const { username } = useParams();
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="flex flex-col items-center text-center">
-            <Avatar className="mb-4 h-24 w-24">
-              <AvatarImage src={""} alt={"user not found!"} />
-              <AvatarFallback>
-                <User2 size={48} />
-              </AvatarFallback>
-            </Avatar>
-            <CardHeader className="text-2xl font-bold">
-              User Not Found!
-            </CardHeader>
-            <div className="pb-3">
-              <p>
-                We couldn&#39;t find a user with the username &#34;{username}
-                &#34;.
-              </p>
+    <div className="min-h-screen">
+      <Header />
+      <div className="main-content">
+        <Card className="mid-width-card-content max-md:border-0">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center text-center">
+              <Avatar className="mb-4 h-24 w-24">
+                <AvatarImage src={""} alt={"user not found!"} />
+                <AvatarFallback>
+                  <User2 size={48} />
+                </AvatarFallback>
+              </Avatar>
+              <CardHeader className="text-2xl font-bold">
+                User Not Found!
+              </CardHeader>
+              <div className="pb-3">
+                <p>
+                  We couldn&#39;t find a user with the username &#34;{username}
+                  &#34;.
+                </p>
+              </div>
+              <CardFooter>
+                The user may have changed their username or the account may no
+                longer exist.
+              </CardFooter>
             </div>
-            <CardFooter>
-              The user may have changed their username or the account may no
-              longer exist.
-            </CardFooter>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

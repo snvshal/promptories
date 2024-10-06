@@ -113,7 +113,7 @@ export function PostReplies({
     }
   };
   return (
-    <Card className="mid-width-post-card">
+    <Card className="mid-width-card-content">
       <CardHeader className="max-md:p-4">
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
@@ -503,7 +503,7 @@ export function PostType({
     router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
 
   return (
-    <Card className="mid-width-post-card">
+    <Card className="mid-width-card-content">
       <CardHeader
         className={`${type === "post" && "mb-4"} pb-0 max-md:p-4 max-md:pb-0`}
       >
@@ -541,7 +541,7 @@ export function PostType({
       <CardContent
         role={type === "posts" ? "button" : undefined}
         onClick={type === "posts" ? () => postClick(post) : undefined}
-        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} border-0 max-md:pr-4`}
+        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} border-0 max-md:pb-4 max-md:pr-4`}
       >
         <div className="relative mb-4 overflow-hidden">
           <PostContentType type={type} content={post.caption} />
@@ -559,7 +559,7 @@ export function PostType({
       </CardContent>
       {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
       <CardFooter
-        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} flex justify-between max-md:pr-4`}
+        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} flex justify-between max-md:pb-4 max-md:pr-4`}
       >
         <div className="flex space-x-4">
           {/* Like Button */}
@@ -609,7 +609,7 @@ export function PostContentType({
 
 export function PostTime({ createdAt }: { createdAt: Date }) {
   return (
-    <div className="flex-start mb-6 ml-4 mr-4 border-b pb-6 text-muted-foreground md:ml-6 md:mr-6">
+    <div className="flex-start mb-4 ml-4 mr-4 border-b pb-4 text-muted-foreground md:ml-6 md:mr-6">
       {new Date(createdAt as Date).toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
