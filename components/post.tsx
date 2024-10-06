@@ -551,7 +551,9 @@ export function PostType({
           <BookmarkButton post={post} />
         </div>
         <div>
-          <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
+          {post.tags.length > 0 && (
+            <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
+          )}
           <Button
             variant="ghost"
             size="sm"
