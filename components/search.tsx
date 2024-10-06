@@ -206,8 +206,8 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 
   if (!matchedUsers.length) {
     return (
-      <div className="flex-center w-full p-4">
-        <p>No users matched </p>
+      <div className="flex-center w-full p-4 max-md:pt-10">
+        <p>No users matched</p>
       </div>
     );
   }
