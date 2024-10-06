@@ -222,7 +222,7 @@ export function ProfileUserContent({
 export function UserNotFound() {
   const { username } = useParams();
   return (
-    <>
+    <div className="min-h-screen">
       <Header />
       <div className="main-content">
         <Card className="mid-width-card-content max-md:border-0">
@@ -251,6 +251,6 @@ export function UserNotFound() {
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   );
 }
