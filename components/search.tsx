@@ -94,36 +94,30 @@ export default function SearchComponent() {
           </CardContent>
         </Card>
 
-        <Tabs
-          value={(queryTab as string) || "posts"}
-          onValueChange={handleTabChange}
-          className="w-full"
-        >
-          <div className="max-md:border-b max-md:p-4 md:mb-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="posts">Posts</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-            </TabsList>
-          </div>
-          <TabsContent value="posts" className="m-0">
-            {!query ? (
-              <div className="flex-center mt-16 w-full">
-                <p>Searched posts will appear here</p>
-              </div>
-            ) : (
+        {query ? (
+          <Tabs
+            value={(queryTab as string) || "posts"}
+            onValueChange={handleTabChange}
+            className="w-full"
+          >
+            <div className="max-md:border-b max-md:p-4 md:mb-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="posts">Posts</TabsTrigger>
+                <TabsTrigger value="users">Users</TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value="posts" className="m-0">
               <PostsComponent posts={matchedPosts as TPost[]} />
-            )}
-          </TabsContent>
-          <TabsContent value="users" className="m-0">
-            {!query ? (
-              <div className="flex-center w-full p-4">
-                <p>Searched users will appear here</p>
-              </div>
-            ) : (
+            </TabsContent>
+            <TabsContent value="users" className="m-0">
               <MatchedUsers matchedUsers={matchedUsers} />
-            )}
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <div className="flex-center w-full p-4 max-md:pt-10">
+            <p>Searched results will appear here</p>
+          </div>
+        )}
       </main>
     </div>
   );
