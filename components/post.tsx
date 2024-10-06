@@ -390,29 +390,12 @@ export function PostOptions({ post }: { post: TPost }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-auto">
         <DropdownMenuItem
-          onClick={() => router.push(`/${user?.username}`)}
+          onClick={() => router.push(`/${pu(post).username}`)}
           className="cursor-pointer sm:hidden"
         >
           <User className="mr-2 h-4 w-4" />
-          <span>&#64;{user?.username}</span>
+          <span>&#64;{pu(post).username}</span>
         </DropdownMenuItem>
-        {authorized ? (
-          <DropdownMenuItem
-            onClick={handleDeletePostClick}
-            className="cursor-pointer"
-          >
-            <Trash className="mr-2 h-4 w-4 text-red-500" />
-            <span className="text-red-500">Delete</span>
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem
-            onClick={() => router.push(`/${pu(post).username}`)}
-            className="cursor-pointer"
-          >
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-          </DropdownMenuItem>
-        )}
         <Link href={post.model_url} target="_black" prefetch={false}>
           <DropdownMenuItem className="cursor-pointer">
             <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
@@ -433,6 +416,15 @@ export function PostOptions({ post }: { post: TPost }) {
               <span>View chat</span>
             </DropdownMenuItem>
           </Link>
+        )}
+        {authorized && (
+          <DropdownMenuItem
+            onClick={handleDeletePostClick}
+            className="cursor-pointer"
+          >
+            <Trash className="mr-2 h-4 w-4 text-red-500" />
+            <span className="text-red-500">Delete</span>
+          </DropdownMenuItem>
         )}
       </DropdownMenuContent>
       <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
