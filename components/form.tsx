@@ -20,8 +20,8 @@ import { savePostForm, updatePostForm } from "@/actions/postFormAction";
 import { NavigateBackHeader } from "./post";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { TPost } from "@/types/schema.type";
 import { pu } from "./home";
+import { PostFormProps } from "@/types/props.type";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
@@ -36,14 +36,6 @@ const formSchema = z.object({
 });
 
 export type FormValues = z.infer<typeof formSchema>;
-
-export type PostFormProps = OperationType & {
-  defaultValues: FormValues;
-};
-
-export type OperationType =
-  | { operationType: "POST"; post?: never }
-  | { operationType: "PATCH"; post: TPost };
 
 export default function PostForm({
   defaultValues,
