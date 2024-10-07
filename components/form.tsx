@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { promptory_types } from "@/lib/constants";
 import { savePostForm } from "@/actions/postFormAction";
-import { Header } from "./post";
+import { NavigateBackHeader } from "./post";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 
@@ -82,8 +82,7 @@ export default function PostForm() {
 
   return (
     <>
-      <Header />
-
+      <NavigateBackHeader />
       <main className="main-content">
         <h1 className="mb-4 text-3xl font-bold max-md:p-4 max-md:pb-0">
           Create New Post

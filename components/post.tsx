@@ -27,7 +27,14 @@ import {
   Tag,
 } from "lucide-react";
 import Link from "next/link";
-import { BookmarkButton, il, LikeButton, PostReplyDialog, pu } from "./home";
+import {
+  BookmarkButton,
+  DynamicHeader,
+  il,
+  LikeButton,
+  PostReplyDialog,
+  pu,
+} from "./home";
 import { TimeAgo } from "./time-ago";
 import { TPost, TReplies } from "@/types/schema.type";
 import { addReplyToPost } from "@/actions/addReplyToPost";
@@ -61,7 +68,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <NavigateBackHeader />
       <main className="main-content">
         <PostType post={post} type="post" />
         <PostReplies
@@ -271,9 +278,9 @@ export function PostRepliesContent({
   );
 }
 
-export function Header() {
+export function NavigateBackHeader() {
   return (
-    <header className="sticky top-0 z-10 border-b bg-background shadow-sm sm:pl-16">
+    <DynamicHeader>
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 md:px-6 lg:px-8">
         <Link
           href="/home"
@@ -284,7 +291,7 @@ export function Header() {
         </Link>
         <h1 className="text-2xl font-bold text-blue-600">Promptories</h1>
       </div>
-    </header>
+    </DynamicHeader>
   );
 }
 
