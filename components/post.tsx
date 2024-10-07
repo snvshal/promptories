@@ -25,6 +25,7 @@ import {
   Settings,
   MessageSquareShare,
   Tag,
+  Edit,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -414,6 +415,19 @@ export function PostOptions({ post }: { post: TPost }) {
               <span>View chat</span>
             </DropdownMenuItem>
           </Link>
+        )}
+        {authorized && (
+          <DropdownMenuItem
+            onClick={() =>
+              router.push(
+                `/${pu(post).username}/promptories/${post.promptory_id}/edit`,
+              )
+            }
+            className="cursor-pointer"
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            <span>Edit</span>
+          </DropdownMenuItem>
         )}
         {authorized && (
           <DropdownMenuItem
