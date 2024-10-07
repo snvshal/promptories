@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { promptory_types } from "@/lib/constants";
-import { savePostForm, updatePostForm } from "@/actions/postFormAction";
+import { savePostForm, updatePostForm } from "@/actions/postFormActions";
 import { NavigateBackHeader } from "./post";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";

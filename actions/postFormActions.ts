@@ -35,19 +35,12 @@ export async function savePostForm(data: FPost) {
   }
 }
 
-export const parseTags = async (tags: string): Promise<string[]> => {
-  return tags
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter((tag) => tag.length);
-};
-
 export async function updatePostForm(data: FPost, postId: string) {
   try {
     await connectToDatabase();
 
     await Post.findByIdAndUpdate(
-      postId, // Find the post by its ID
+      postId,
       {
         caption: data.caption,
         model_url: data.model_url,
@@ -57,9 +50,16 @@ export async function updatePostForm(data: FPost, postId: string) {
         promptory_type: data.promptory_type,
         tags: await parseTags(data.tags as string),
       },
-      { new: true, useFindAndModify: false }, // Options: return the updated doc
+      { new: true, useFindAndModify: false },
     );
   } catch (error) {
     console.error("Error saving post:", error);
   }
 }
+
+export const parseTags = async (tags: string): Promise<string[]> => {
+  return tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length);
+};
