@@ -32,7 +32,28 @@ export async function savePostForm(data: FPost) {
     });
   } catch (error) {
     console.error("Error saving post:", error);
-    throw new Error("Failed to save post.");
+  }
+}
+
+export async function updatePostForm(data: FPost, postId: string) {
+  try {
+    await connectToDatabase();
+
+    await Post.findByIdAndUpdate(
+      postId,
+      {
+        caption: data.caption,
+        model_url: data.model_url,
+        chat_link: data.chat_link,
+        prompt: data.prompt,
+        response: data.response,
+        promptory_type: data.promptory_type,
+        tags: await parseTags(data.tags as string),
+      },
+      { new: true, useFindAndModify: false },
+    );
+  } catch (error) {
+    console.error("Error saving post:", error);
   }
 }
 

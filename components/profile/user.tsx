@@ -14,7 +14,7 @@ import { PostsComponent } from "../home";
 import { TPost, TUser } from "@/types/schema.type";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { User2 } from "lucide-react";
-import { Header } from "../post";
+import { NavigateBackHeader } from "../post";
 import { addFollower } from "@/actions/addFollower";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -68,7 +68,7 @@ export default function UserProfileComponent({
   };
   return (
     <div className="min-h-screen">
-      <Header />
+      <NavigateBackHeader />
 
       <main className="main-content">
         <ProfileUserContent
@@ -223,7 +223,7 @@ export function UserNotFound() {
   const { username } = useParams();
   return (
     <div className="min-h-screen">
-      <Header />
+      <NavigateBackHeader />
       <div className="main-content">
         <Card className="mid-width-card-content max-md:border-0">
           <CardContent className="pt-6">

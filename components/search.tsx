@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search as SearchIcon } from "lucide-react";
-import { Header } from "./post";
+import { NavigateBackHeader } from "./post";
 import { searchPosts } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
 import { PostsComponent } from "./home";
@@ -27,6 +27,7 @@ export default function SearchComponent() {
 
   const queryTab = searchParams.get("tab");
   const router = useRouter();
+  console.log(query);
 
   // router.push(`?tab=posts`);
   const handleSearchSubmit = async (e: React.FormEvent) => {
@@ -63,10 +64,7 @@ export default function SearchComponent() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-md:hidden">
-        <Header />
-      </div>
-
+      <NavigateBackHeader />
       <main className="main-content">
         <Card className="mid-width-card-content md:mb-4">
           <CardHeader className="max-md:p-4">

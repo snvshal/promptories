@@ -54,10 +54,9 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
 
     router.push(`/search?q=${searchQuery}`);
   };
-
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b bg-background shadow-sm sm:pl-16">
+      <DynamicHeader>
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
             <h1 className="mr-8 text-2xl font-bold text-blue-600">
@@ -84,14 +83,50 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
             <UserOptions />
           </div>
         </div>
-      </header>
-
+      </DynamicHeader>
       <main className="main-content">
         <PostsComponent posts={posts} />
       </main>
-
       <ComposePromptoryButton />
     </div>
+  );
+}
+
+export function DynamicHeader({ children }: { children: React.ReactNode }) {
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollTop, setLastScrollTop] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const scrollDiff = Math.abs(scrollTop - lastScrollTop);
+
+      // Only change state if scroll difference exceeds 4rem (64px)
+      if (scrollDiff > 64) {
+        if (scrollTop > lastScrollTop) {
+          // Scrolling down, hide the header
+          setIsVisible(false);
+        } else {
+          // Scrolling up, show the header
+          setIsVisible(true);
+        }
+
+        setLastScrollTop(scrollTop);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollTop]);
+
+  return (
+    <header
+      className={`sticky top-0 z-10 z-50 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out sm:pl-16 ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      } shadow`}
+    >
+      {children}
+    </header>
   );
 }
 

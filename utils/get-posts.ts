@@ -3,7 +3,6 @@ import { connectToDatabase } from "./db";
 import { TPost, TUser } from "@/types/schema.type";
 import { User } from "@/models/user.model";
 import { getUserByUsername } from "./get-user";
-import { isValidPromptoryId } from "./ps";
 
 export const getPosts = async () => {
   try {
@@ -11,7 +10,6 @@ export const getPosts = async () => {
 
     const posts: TPost[] = await Post.find({}).populate("user");
 
-    // console.log(posts);
     return posts as TPost[];
   } catch (error) {
     console.log(error);
@@ -25,35 +23,30 @@ export const getPostsByUsername = async (username: string) => {
 
     const posts: TPost[] = await Post.find({ user }).populate("user");
 
-    // console.log(posts);
     return posts as TPost[];
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getPostsByPromptoryId = async (
+export const getPostByPromptoryId = async (
   username: string,
   promptory_id: string,
 ) => {
   try {
     await connectToDatabase();
 
-    if (!isValidPromptoryId(promptory_id)) {
-      throw new Error("Invalid promptoryId!");
-    }
-
     const user = await getUserByUsername(username);
-    const post = await Post.findOne({
-      promptory_id,
-      user: user?._id,
-    })
+    if (!user) return null;
+
+    const pp = await Post.find({ promptory_id })
       .populate("user")
       .populate("replies.user");
 
-    if (!post) {
-      throw new Error("Post not found!");
-    }
+    if (!pp) return null;
+
+    const post = pp.find((post) => post.user.equals(user?._id));
+    if (!post) throw new Error("Post not found!");
 
     return post as TPost;
   } catch (error) {
@@ -69,8 +62,6 @@ export const getLikedPosts = async (profileUser: TUser) => {
       "user",
     );
 
-    // console.log("likedPosts: ", likedPosts);
-
     return likedPosts as TPost[];
   } catch (error) {
     console.log(error);
@@ -84,8 +75,6 @@ export const getBookmarkedPosts = async (profileUser: TUser) => {
     const bookmarkedPosts = await Post.find({
       bookmarks: profileUser._id,
     }).populate("user");
-
-    // console.log("likedPosts: ", bookmarkedPosts);
 
     return bookmarkedPosts as TPost[];
   } catch (error) {

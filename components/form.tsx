@@ -16,10 +16,12 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { promptory_types } from "@/lib/constants";
-import { savePostForm } from "@/actions/postFormAction";
-import { Header } from "./post";
+import { savePostForm, updatePostForm } from "@/actions/postFormActions";
+import { NavigateBackHeader } from "./post";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
+import { pu } from "./home";
+import { PostFormProps } from "@/types/props.type";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
@@ -35,7 +37,11 @@ const formSchema = z.object({
 
 export type FormValues = z.infer<typeof formSchema>;
 
-export default function PostForm() {
+export default function PostForm({
+  defaultValues,
+  operationType,
+  post,
+}: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -45,15 +51,7 @@ export default function PostForm() {
     reset,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      caption: "",
-      model_url: "",
-      chat_link: "",
-      prompt: "",
-      response: "",
-      promptory_type: promptory_types[0],
-      tags: "",
-    },
+    defaultValues,
   });
 
   const router = useRouter();
@@ -61,16 +59,25 @@ export default function PostForm() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      await savePostForm(data); // Call the server action
+      if (operationType === "POST") {
+        await savePostForm(data); // Call the server action
+
+        router.push("/home");
+        toast({
+          description: "Your post has been sent.",
+        });
+      } else if (operationType === "PATCH" && post) {
+        await updatePostForm(data, post._id as string); // Call the server action
+
+        router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
+        toast({
+          description: "Your post has been updated.",
+        });
+      }
+
       // Simulate API call
       console.log("Form saved:", data);
       reset();
-
-      router.push("/home");
-
-      toast({
-        description: "Your post has been sent.",
-      });
     } catch (error) {
       toast({
         title: "Error",
@@ -82,8 +89,7 @@ export default function PostForm() {
 
   return (
     <>
-      <Header />
-
+      <NavigateBackHeader />
       <main className="main-content">
         <h1 className="mb-4 text-3xl font-bold max-md:p-4 max-md:pb-0">
           Create New Post
