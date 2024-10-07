@@ -7,19 +7,6 @@ export const ps = (obj: object) => JSON.parse(JSON.stringify(obj));
 export const objId = (id: string | undefined) =>
   new Types.ObjectId(id as string);
 
-export const isValidPromptoryId = (promptory_id: string): boolean => {
-  if (!promptory_id) return false;
-
-  const idAsNumber = Number(promptory_id);
-  if (isNaN(idAsNumber)) return false;
-
-  const currentTimestamp = Date.now();
-  const earliestValidTimestamp = new Date("1970-01-01").getTime();
-
-  // Check if the ID falls within valid timestamp range
-  return idAsNumber >= earliestValidTimestamp && idAsNumber <= currentTimestamp;
-};
-
 export const handlePostShare = async (post: TPost) => {
   const postUrl = `${process.env.METADATA_BASE_URL}/${pu(post).username}/promptories/${post.promptory_id}`; // Replace with dynamic post URL
 
