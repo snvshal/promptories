@@ -5,37 +5,41 @@ import { Post } from "@/models/post.model"; // Mongoose model
 import { ps } from "@/utils/ps";
 import { User } from "@/models/user.model";
 
-export async function searchPosts(input: string) {
+export async function searchPosts(query: string) {
   try {
     await connectToDatabase();
 
     let searchQuery = {};
 
-    // Check the prefix of the input
-    if (input.startsWith("#")) {
-      searchQuery = { tags: { $regex: input.slice(1), $options: "i" } };
-    } else if (input.startsWith("c:")) {
-      searchQuery = { caption: { $regex: input.slice(2), $options: "i" } };
-    } else if (input.startsWith("p:")) {
-      searchQuery = { prompt: { $regex: input.slice(2), $options: "i" } };
-    } else if (input.startsWith("r:")) {
-      searchQuery = { response: { $regex: input.slice(2), $options: "i" } };
+    const regex = { $regex: query.slice(2).trim(), $options: "i" };
+    const pft = (prefix: string) =>
+      query.toLocaleLowerCase().startsWith(prefix + ":");
+
+    // Check the prefix of the query
+    if (pft("t")) {
+      searchQuery = { tags: { $elemMatch: regex } };
+    } else if (pft("c")) {
+      searchQuery = { caption: regex };
+    } else if (pft("p")) {
+      searchQuery = { prompt: regex };
+    } else if (pft("r")) {
+      searchQuery = { response: regex };
     } else {
       // Default search across all fields
       searchQuery = {
         $or: [
-          { caption: { $regex: input, $options: "i" } },
-          { prompt: { $regex: input, $options: "i" } },
-          { response: { $regex: input, $options: "i" } },
-          { tags: { $regex: input, $options: "i" } },
+          { caption: { $regex: query, $options: "i" } },
+          { prompt: { $regex: query, $options: "i" } },
+          { response: { $regex: query, $options: "i" } },
+          { tags: { $regex: query, $options: "i" } },
         ],
       };
     }
 
     const searchUserQuery = {
       $or: [
-        { username: { $regex: input, $options: "i" } },
-        { name: { $regex: input, $options: "i" } },
+        { username: { $regex: query, $options: "i" } },
+        { name: { $regex: query, $options: "i" } },
       ],
     };
 

@@ -27,6 +27,7 @@ export default function SearchComponent() {
 
   const queryTab = searchParams.get("tab");
   const router = useRouter();
+  console.log(query);
 
   // router.push(`?tab=posts`);
   const handleSearchSubmit = async (e: React.FormEvent) => {

@@ -641,6 +641,7 @@ export function PostTagsDialog({
   open: boolean;
   setOpen: SetAction<boolean>;
 }) {
+  const router = useRouter();
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -660,7 +661,12 @@ export function PostTagsDialog({
           {tags.length ? (
             <div className="flex flex-wrap gap-2">
               {tags.map((tag: string, index) => (
-                <Badge key={index} variant="secondary">
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  onClick={() => router.push(`/search?q=t:${tag}`)}
+                  role="button"
+                >
                   #{tag}
                 </Badge>
               ))}
