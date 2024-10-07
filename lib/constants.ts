@@ -1,3 +1,5 @@
+import { FormValues } from "@/components/form";
+
 export const promptory_types = [
   "text-to-text",
   "text-to-image",
@@ -16,3 +18,13 @@ export const promptory_types = [
   "audio-to-video",
   "audio-to-audio",
 ];
+
+export const defaultValues: FormValues = {
+  caption: "",
+  model_url: "",
+  chat_link: "",
+  prompt: "",
+  response: "",
+  promptory_type: promptory_types[0],
+  tags: "",
+};

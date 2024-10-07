@@ -41,3 +41,15 @@ export const handlePostShare = async (post: TPost) => {
 
 export const st = (t: Types.ObjectId[]) =>
   t?.map((i) => i.toString() as string);
+
+export const updatePostValues = (post: TPost) => {
+  return {
+    caption: post.caption,
+    model_url: post.model_url,
+    chat_link: post.chat_link,
+    prompt: post.prompt,
+    response: post.response,
+    promptory_type: post.promptory_type,
+    tags: post.tags.join(),
+  };
+};
