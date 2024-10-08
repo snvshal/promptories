@@ -38,7 +38,7 @@ export default function SearchComponent() {
       setEmptyQueryError("Search query cannot be empty");
       return;
     }
-    router.push(`?q=${searchQuery}&tab=posts`);
+    router.push(`?q=${searchQuery}&tab=${queryTab}`);
   };
 
   const handleTabChange = (value: string) =>
