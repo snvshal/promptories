@@ -1,16 +1,16 @@
 "use server";
 
 import { connectToDatabase } from "@/utils/db";
-import { Post } from "@/models/post.model"; // Mongoose model
+import { Post } from "@/models/post.model";
 import { ps } from "@/utils/ps";
 import { User } from "@/models/user.model";
 
-export async function searchPosts(query: string) {
+export async function searchPosts(query: string, category: string) {
   try {
     await connectToDatabase();
 
-    const searchQuery = await filterSearchQuery(query);
-    const searchUsersQuery = await defaultSearch(query, "users");
+    const searchQuery = await filterSearchQuery(query, category);
+    const searchUsersQuery = await userSearchQuery(query, category);
 
     const posts = await Post.find(searchQuery).populate("user");
     const users = await User.find(searchUsersQuery);
@@ -21,45 +21,41 @@ export async function searchPosts(query: string) {
   }
 }
 
-export async function filterSearchQuery(query: string) {
-  const trimmedQuery = query.trim();
+export async function filterSearchQuery(query: string, category: string) {
+  const regex = { $regex: query, $options: "i" };
 
-  // Ensure the query is long enough to check for prefix and colon
-  if (trimmedQuery.length < 3 || trimmedQuery.charAt(1) !== ":") {
-    return defaultSearch(trimmedQuery, "posts");
-  }
-
-  const regex = { $regex: trimmedQuery.slice(2).trim(), $options: "i" };
-  const prefix = trimmedQuery.charAt(0).toLowerCase(); // First character as prefix
-
-  // Define a mapping for prefixes
-  const prefixMap: Record<string, object> = {
-    t: { tags: { $elemMatch: regex } },
-    c: { caption: regex },
-    p: { prompt: regex },
-    r: { response: regex },
+  const categoryMap: Record<string, object> = {
+    tags: { tags: { $elemMatch: regex } },
+    caption: { caption: regex },
+    prompt: { prompt: regex },
+    response: { response: regex },
   };
 
-  // Return the corresponding search query or default search if prefix is invalid
-  return prefixMap[prefix] || defaultSearch(trimmedQuery, "posts");
+  return categoryMap[category] || defaultSearch(query);
 }
 
 // Default search across all fields
-export async function defaultSearch(query: string, qt: "posts" | "users") {
+export async function defaultSearch(query: string) {
+  const regex = { $regex: query, $options: "i" };
+
+  return {
+    $or: [
+      { caption: regex },
+      { prompt: regex },
+      { response: regex },
+      { tags: { $elemMatch: regex } },
+    ],
+  };
+}
+
+export async function userSearchQuery(query: string, category: string) {
   const regex = { $regex: query.trim(), $options: "i" };
 
-  if (qt === "users") {
-    return {
-      $or: [{ username: regex }, { name: regex }],
-    };
+  if (category === "username") {
+    return { username: regex };
   } else {
     return {
-      $or: [
-        { caption: regex },
-        { prompt: regex },
-        { response: regex },
-        { tags: { $elemMatch: regex } },
-      ],
+      $or: [{ username: regex }, { name: regex }],
     };
   }
 }

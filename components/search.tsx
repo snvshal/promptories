@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search as SearchIcon } from "lucide-react";
+import { Filter, Search as SearchIcon } from "lucide-react";
 import { NavigateBackHeader } from "./post";
 import { searchPosts } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
@@ -15,19 +15,40 @@ import { addFollower } from "@/actions/addFollower";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { SetAction } from "@/types/generics.type";
+import { Label } from "./ui/label";
 
 export default function SearchComponent() {
   const searchParams = useSearchParams();
+
   const query = searchParams.get("q");
+  const queryTab = searchParams.get("tab");
+  const category = searchParams.get("category");
 
   const [searchQuery, setSearchQuery] = useState(query ?? "");
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [open, setOpen] = useState(false); // Search Filter Dialog State
 
-  const queryTab = searchParams.get("tab");
   const router = useRouter();
-  console.log(query);
+  console.log(searchParams);
 
   // router.push(`?tab=posts`);
   const handleSearchSubmit = async (e: React.FormEvent) => {
@@ -38,16 +59,20 @@ export default function SearchComponent() {
       setEmptyQueryError("Search query cannot be empty");
       return;
     }
-    router.push(`?q=${searchQuery}&tab=${queryTab}`);
+    router.push(
+      `?q=${searchQuery}&category=${selectedCategory}&tab=${queryTab ?? "posts"}`,
+    );
   };
 
   const handleTabChange = (value: string) =>
-    router.push(`?q=${query}&tab=${value}`);
+    router.push(`?q=${query}&category=${category}&tab=${value}`);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const { posts, users } = await searchPosts(query as string);
+        const { posts, users }: { posts: TPost[]; users: TUser[] } =
+          await searchPosts(query as string, category as string);
+
         setMatchedPosts(posts);
         setMatchedUsers(users);
         // setTab(queryTab as "posts" | "users");
@@ -60,7 +85,7 @@ export default function SearchComponent() {
     if (query?.trim()) {
       fetchSearchResults();
     }
-  }, [query, queryTab]);
+  }, [query]);
 
   return (
     <div className="min-h-screen">
@@ -73,18 +98,25 @@ export default function SearchComponent() {
             </CardTitle>
           </CardHeader>
           <CardContent className="max-md:p-4 max-md:pt-0">
-            <form onSubmit={handleSearchSubmit} className="flex space-x-2">
-              <Input
-                type="text"
-                placeholder="Search for posts, users, or tags..."
-                value={searchQuery as string}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
-              />
-              <Button type="submit">
-                <SearchIcon className="mr-2 h-4 w-4" />
-                Search
-              </Button>
+            <form onSubmit={handleSearchSubmit}>
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Search for posts, users, or tags..."
+                  value={searchQuery as string}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1"
+                />
+                <Button type="submit">
+                  <SearchIcon className="mr-2 h-4 w-4" />
+                  Search
+                </Button>
+                <SearchFilterDialog
+                  open={open}
+                  setOpen={setOpen}
+                  setSelectedCategory={setSelectedCategory}
+                />
+              </div>
             </form>
             {emptyQueryError && (
               <p className="mt-1 text-sm text-red-500">{emptyQueryError}</p>
@@ -255,5 +287,74 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
         </Card>
       ))}
     </>
+  );
+}
+
+export function SearchFilterDialog({
+  open,
+  setOpen,
+  setSelectedCategory,
+}: {
+  open: boolean;
+  setOpen: SetAction<boolean>;
+  setSelectedCategory: SetAction<string>;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="outline">
+          <Filter className="mr-2 h-4 w-4" />
+          <span className="max-sm:hidden">Filters</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Search Filters</DialogTitle>
+          <DialogDescription>
+            Refine your search results using the filters below.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <Label className="text-sm font-medium">Category</Label>
+            <Select onValueChange={setSelectedCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="caption">Captions</SelectItem>
+                <SelectItem value="prompt">Prompts</SelectItem>
+                <SelectItem value="response">Responses</SelectItem>
+                <SelectItem value="tags">Tags</SelectItem>
+                <SelectItem value="username">Users</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="text-sm font-medium">Date Range</label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select date range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="thisWeek">This Week</SelectItem>
+                <SelectItem value="thisMonth">This Month</SelectItem>
+                <SelectItem value="thisYear">This Year</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {/* <div className="flex items-center space-x-2">
+                <Checkbox id="onlyAvailable" />
+                <label
+                  htmlFor="onlyAvailable"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Only show available items
+                </label>
+              </div> */}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
