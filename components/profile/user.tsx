@@ -18,9 +18,10 @@ import { NavigateBackHeader } from "../post";
 import { addFollower } from "@/actions/addFollower";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { objId } from "@/utils/ps";
+import { st } from "@/utils/ps";
 import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import { SetAction } from "@/types/generics.type";
 
 export default function UserProfileComponent({
   profileUser,
@@ -135,83 +136,64 @@ export function ProfileUserContent({
   profileUser: TUser;
   postCount: number;
 }) {
-  const { data: session } = useSession();
-  const user = session?.user;
-  const isAdmin = profileUser._id?.toString() === user?.id;
+  const [followers, setFollowers] = useState(profileUser?.following.length);
 
-  const initialFollowState = profileUser.followers.includes(objId(user?.id))
-    ? "Following"
-    : "Follow";
-
-  const [follow, setFollow] = useState<"Follow" | "Following">(
-    initialFollowState,
-  );
-
-  const handleAddFollower = async () => {
-    try {
-      const updatedState = await addFollower(profileUser._id as string);
-      setFollow(updatedState as "Follow" | "Following");
-    } catch (error) {
-      console.error("Error updating follower state:", error);
-    }
-  };
   return (
     <Card className="mid-width-card-content md:mb-4">
       <CardContent className="pt-6">
-        <div className="flex flex-col items-center text-center">
-          <Avatar className="mb-4 h-24 w-24">
+        <div className="flex w-full justify-end space-x-4">
+          <ProfileOptionButton
+            profileUser={profileUser}
+            setFollowers={setFollowers}
+          />
+        </div>
+        <div className="sm:flex-start flex max-sm:flex-col">
+          <Avatar className="mb-4 size-32 self-start sm:mr-8 md:size-48">
             <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
             <AvatarFallback>{profileUser?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
-          <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
-          <p className="text-muted-foreground">&#64;{profileUser?.username}</p>
-          <p className="mt-2">{profileUser?.bio}</p>
-          <div className="mt-4 flex items-center space-x-4">
-            {profileUser.social_links?.github && (
-              <Link
-                href={profileUser.social_links?.github as string}
-                className="text-muted-foreground hover:text-primary"
-              >
-                <GitHubLogoIcon className="h-5 w-5" />
-              </Link>
-            )}
-            {profileUser.social_links?.twitter && (
-              <Link
-                href={profileUser.social_links?.twitter as string}
-                className="text-muted-foreground hover:text-primary"
-              >
-                <TwitterLogoIcon className="h-5 w-5" />
-              </Link>
-            )}
+          <div className="flex grow flex-col items-start">
+            <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
+            <p className="text-muted-foreground">
+              &#64;{profileUser?.username}
+            </p>
+            <p className="mt-2">{profileUser?.bio}</p>
+            <div className="mt-4 flex items-center space-x-4">
+              {profileUser.social_links?.github && (
+                <Link
+                  href={profileUser.social_links?.github as string}
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  <GitHubLogoIcon className="h-5 w-5" />
+                </Link>
+              )}
+              {profileUser.social_links?.twitter && (
+                <Link
+                  href={profileUser.social_links?.twitter as string}
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  <TwitterLogoIcon className="h-5 w-5" />
+                </Link>
+              )}
 
-            {/* <Link href="#" className="text-muted-foreground hover:text-primary">
+              {/* <Link href="#" className="text-muted-foreground hover:text-primary">
               <LinkIcon className="h-5 w-5" />
             </Link> */}
-          </div>
-          <div className="mt-4 flex justify-center space-x-4">
-            <div>
-              <p className="font-semibold">{postCount}</p>
-              <p className="text-muted-foreground">Posts</p>
             </div>
-
-            <div>
-              <p className="font-semibold">{profileUser?.following.length}</p>
-              <p className="text-muted-foreground">Following</p>
+            <div className="mt-4 flex gap-4">
+              <div className="flex gap-1">
+                <p className="font-semibold">{postCount}</p>
+                <p className="text-muted-foreground">Posts</p>
+              </div>
+              <div className="flex gap-1">
+                <p className="font-semibold">{profileUser?.following.length}</p>
+                <p className="text-muted-foreground">Following</p>
+              </div>
+              <div className="flex gap-1">
+                <p className="font-semibold">{followers}</p>
+                <p className="text-muted-foreground">Followers</p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold">{profileUser?.followers.length}</p>
-              <p className="text-muted-foreground">Followers</p>
-            </div>
-          </div>
-          <div className="mt-6 flex space-x-4">
-            {!isAdmin && (
-              <Button
-                variant={follow === "Follow" ? "default" : "secondary"}
-                onClick={handleAddFollower}
-              >
-                {follow}
-              </Button>
-            )}
           </div>
         </div>
       </CardContent>
@@ -253,4 +235,68 @@ export function UserNotFound() {
       </div>
     </div>
   );
+}
+
+export function ProfileOptionButton({
+  profileUser,
+  setFollowers,
+}: {
+  profileUser: TUser;
+  setFollowers: SetAction<number>;
+}) {
+  const { data: session, update } = useSession();
+  const user = session?.user;
+  const router = useRouter();
+
+  const isAdmin = profileUser._id?.toString() === user?.id;
+
+  const [follow, setFollow] = useState<"Follow" | "Following">();
+
+  useEffect(() => {
+    setFollow(
+      st(profileUser.followers).includes(user?.id as string)
+        ? "Following"
+        : "Follow",
+    );
+    console.log(follow);
+  }, [profileUser.followers, user?.id, follow]);
+
+  const handleAddFollower = async () => {
+    try {
+      const { updatedState, following } = await addFollower(
+        profileUser._id as string,
+      );
+      setFollow(updatedState as "Follow" | "Following");
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          following: [...following],
+        },
+      });
+      setFollowers((f) => (follow === "Follow" ? f + 1 : Math.max(f - 1, 0)));
+    } catch (error) {
+      console.error("Error updating follower state:", error);
+    }
+  };
+
+  if (isAdmin) {
+    return (
+      <Button
+        variant="outline"
+        onClick={() => router.push("/settings/profile")}
+      >
+        Edit Profile
+      </Button>
+    );
+  } else {
+    return (
+      <Button
+        variant={follow === "Follow" ? "default" : "secondary"}
+        onClick={handleAddFollower}
+      >
+        {follow}
+      </Button>
+    );
+  }
 }
