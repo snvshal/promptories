@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Search as SearchIcon } from "lucide-react";
+import { Check, CheckCircle, Filter, Search as SearchIcon } from "lucide-react";
 import { NavigateBackHeader } from "./post";
-import { searchPosts } from "@/actions/searchQuery";
+import { search } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
 import { PostsComponent } from "./home";
 import { addFollower } from "@/actions/addFollower";
@@ -33,24 +33,32 @@ import {
 import { SetAction } from "@/types/generics.type";
 import { Label } from "./ui/label";
 
+export type Categories =
+  | "default"
+  | "response"
+  | "prompt"
+  | "caption"
+  | "user"
+  | "tags";
+
 export default function SearchComponent() {
   const searchParams = useSearchParams();
 
   const query = searchParams.get("q");
   const queryTab = searchParams.get("tab");
   const category = searchParams.get("category");
+  const dateRange = searchParams.get("dateRange");
 
   const [searchQuery, setSearchQuery] = useState(query ?? "");
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("default");
+  const [selectedDateRange, setSelectedDateRange] = useState("default");
   const [open, setOpen] = useState(false); // Search Filter Dialog State
 
   const router = useRouter();
-  console.log(searchParams);
 
-  // router.push(`?tab=posts`);
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -59,24 +67,27 @@ export default function SearchComponent() {
       setEmptyQueryError("Search query cannot be empty");
       return;
     }
-    router.push(
-      `?q=${searchQuery}&category=${selectedCategory}&tab=${queryTab ?? "posts"}`,
-    );
+    const searchUrl = `?q=${searchQuery}&category=${selectedCategory}&tab=${queryTab ?? "posts"}&dateRange=${selectedDateRange}`;
+    router.push(searchUrl);
   };
 
-  const handleTabChange = (value: string) =>
-    router.push(`?q=${query}&category=${category}&tab=${value}`);
+  const handleTabChange = (value: string) => {
+    const changeTabUrl = `?q=${query}&category=${category}&tab=${value}&dateRange=${dateRange}`;
+    router.push(changeTabUrl);
+  };
 
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
         const { posts, users }: { posts: TPost[]; users: TUser[] } =
-          await searchPosts(query as string, category as string);
+          await search(
+            query?.trim() as string,
+            category as string,
+            dateRange as string,
+          );
 
         setMatchedPosts(posts);
         setMatchedUsers(users);
-        // setTab(queryTab as "posts" | "users");
-        console.log("Searching for:", query);
       } catch (error) {
         console.error("Error fetching search results:", error);
       }
@@ -85,7 +96,7 @@ export default function SearchComponent() {
     if (query?.trim()) {
       fetchSearchResults();
     }
-  }, [query]);
+  }, [query, category, dateRange]);
 
   return (
     <div className="min-h-screen">
@@ -108,13 +119,16 @@ export default function SearchComponent() {
                   className="flex-1"
                 />
                 <Button type="submit">
-                  <SearchIcon className="mr-2 h-4 w-4" />
-                  Search
+                  <SearchIcon className="h-4 w-4" />
+                  <span className="ml-2 max-sm:hidden">Search</span>
                 </Button>
                 <SearchFilterDialog
                   open={open}
                   setOpen={setOpen}
+                  selectedCategory={selectedCategory}
                   setSelectedCategory={setSelectedCategory}
+                  dateRange={selectedDateRange}
+                  setDateRange={setSelectedDateRange}
                 />
               </div>
             </form>
@@ -293,18 +307,24 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 export function SearchFilterDialog({
   open,
   setOpen,
+  selectedCategory,
   setSelectedCategory,
+  dateRange,
+  setDateRange,
 }: {
   open: boolean;
   setOpen: SetAction<boolean>;
+  selectedCategory: string;
   setSelectedCategory: SetAction<string>;
+  dateRange: string;
+  setDateRange: SetAction<string>;
 }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="button" variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          <span className="max-sm:hidden">Filters</span>
+          <Filter className="h-4 w-4" />
+          <span className="ml-2 max-sm:hidden">Filters</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -317,11 +337,15 @@ export function SearchFilterDialog({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div>
             <Label className="text-sm font-medium">Category</Label>
-            <Select onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="default">Default</SelectItem>
                 <SelectItem value="caption">Captions</SelectItem>
                 <SelectItem value="prompt">Prompts</SelectItem>
                 <SelectItem value="response">Responses</SelectItem>
@@ -331,12 +355,13 @@ export function SearchFilterDialog({
             </Select>
           </div>
           <div>
-            <label className="text-sm font-medium">Date Range</label>
-            <Select>
+            <Label className="text-sm font-medium">Date Range</Label>
+            <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select date range" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="default">Default</SelectItem>
                 <SelectItem value="today">Today</SelectItem>
                 <SelectItem value="thisWeek">This Week</SelectItem>
                 <SelectItem value="thisMonth">This Month</SelectItem>
@@ -344,16 +369,11 @@ export function SearchFilterDialog({
               </SelectContent>
             </Select>
           </div>
-          {/* <div className="flex items-center space-x-2">
-                <Checkbox id="onlyAvailable" />
-                <label
-                  htmlFor="onlyAvailable"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Only show available items
-                </label>
-              </div> */}
         </div>
+        <Button type="button" onClick={() => setOpen(false)}>
+          <CheckCircle className="mr-2 h-4 w-4" />
+          <span>Done</span>
+        </Button>
       </DialogContent>
     </Dialog>
   );
