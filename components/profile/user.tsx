@@ -142,12 +142,10 @@ export function ProfileUserContent({
     <Card className="mid-width-card-content md:mb-4">
       <CardContent className="pt-6">
         <div className="flex w-full justify-end space-x-4">
-          <Suspense fallback={<Loading />}>
-            <ProfileOptionButton
-              profileUser={profileUser}
-              setFollowers={setFollowers}
-            />
-          </Suspense>
+          <ProfileOptionButton
+            profileUser={profileUser}
+            setFollowers={setFollowers}
+          />
         </div>
         <div className="sm:flex-start flex max-sm:flex-col">
           <Avatar className="mb-4 size-32 self-start sm:mr-8 md:size-48">
@@ -239,20 +237,6 @@ export function UserNotFound() {
   );
 }
 
-export function ArtistPage() {
-  // Usage example
-
-  const post = executeAfterDelay();
-  return (
-    <>
-      <h1>{"Post:"}</h1>
-      <Suspense fallback={<Loading />}>
-        <p>{post}</p>
-      </Suspense>
-    </>
-  );
-}
-
 export function ProfileOptionButton({
   profileUser,
   setFollowers,
@@ -265,8 +249,6 @@ export function ProfileOptionButton({
   const router = useRouter();
 
   const isAdmin = profileUser._id?.toString() === user?.id;
-
-  // const initialFollowState =
 
   const [follow, setFollow] = useState<"Follow" | "Following">();
 
@@ -317,19 +299,4 @@ export function ProfileOptionButton({
       </Button>
     );
   }
-}
-
-function Loading() {
-  return <h2>🌀 Loading...</h2>;
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function executeAfterDelay() {
-  console.log("Waiting for 2 seconds...");
-  await delay(2000); // Wait for 2000 milliseconds (2 seconds)
-  console.log("2 seconds have passed!");
-  return "post";
 }
