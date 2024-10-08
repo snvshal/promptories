@@ -9,45 +9,57 @@ export async function searchPosts(query: string) {
   try {
     await connectToDatabase();
 
-    let searchQuery = {};
-
-    const regex = { $regex: query.slice(2).trim(), $options: "i" };
-    const pft = (prefix: string) =>
-      query.toLocaleLowerCase().startsWith(prefix + ":");
-
-    // Check the prefix of the query
-    if (pft("t")) {
-      searchQuery = { tags: { $elemMatch: regex } };
-    } else if (pft("c")) {
-      searchQuery = { caption: regex };
-    } else if (pft("p")) {
-      searchQuery = { prompt: regex };
-    } else if (pft("r")) {
-      searchQuery = { response: regex };
-    } else {
-      // Default search across all fields
-      searchQuery = {
-        $or: [
-          { caption: { $regex: query, $options: "i" } },
-          { prompt: { $regex: query, $options: "i" } },
-          { response: { $regex: query, $options: "i" } },
-          { tags: { $regex: query, $options: "i" } },
-        ],
-      };
-    }
-
-    const searchUserQuery = {
-      $or: [
-        { username: { $regex: query, $options: "i" } },
-        { name: { $regex: query, $options: "i" } },
-      ],
-    };
+    const searchQuery = await filterSearchQuery(query);
+    const searchUsersQuery = await defaultSearch(query, "users");
 
     const posts = await Post.find(searchQuery).populate("user");
-    const users = await User.find(searchUserQuery);
+    const users = await User.find(searchUsersQuery);
 
     return ps({ posts, users });
   } catch (error) {
     console.error(error);
+  }
+}
+
+export async function filterSearchQuery(query: string) {
+  const trimmedQuery = query.trim();
+
+  // Ensure the query is long enough to check for prefix and colon
+  if (trimmedQuery.length < 3 || trimmedQuery.charAt(1) !== ":") {
+    return defaultSearch(trimmedQuery, "posts");
+  }
+
+  const regex = { $regex: trimmedQuery.slice(2).trim(), $options: "i" };
+  const prefix = trimmedQuery.charAt(0).toLowerCase(); // First character as prefix
+
+  // Define a mapping for prefixes
+  const prefixMap: Record<string, object> = {
+    t: { tags: { $elemMatch: regex } },
+    c: { caption: regex },
+    p: { prompt: regex },
+    r: { response: regex },
+  };
+
+  // Return the corresponding search query or default search if prefix is invalid
+  return prefixMap[prefix] || defaultSearch(trimmedQuery, "posts");
+}
+
+// Default search across all fields
+export async function defaultSearch(query: string, qt: "posts" | "users") {
+  const regex = { $regex: query.trim(), $options: "i" };
+
+  if (qt === "users") {
+    return {
+      $or: [{ username: regex }, { name: regex }],
+    };
+  } else {
+    return {
+      $or: [
+        { caption: regex },
+        { prompt: regex },
+        { response: regex },
+        { tags: { $elemMatch: regex } },
+      ],
+    };
   }
 }
