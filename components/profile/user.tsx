@@ -16,9 +16,9 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { User2 } from "lucide-react";
 import { NavigateBackHeader } from "../post";
 import { addFollower } from "@/actions/addFollower";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { objId, st } from "@/utils/ps";
+import { st } from "@/utils/ps";
 import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { SetAction } from "@/types/generics.type";
@@ -259,7 +259,7 @@ export function ProfileOptionButton({
         : "Follow",
     );
     console.log(follow);
-  }, [profileUser.followers, user?.id]);
+  }, [profileUser.followers, user?.id, follow]);
 
   const handleAddFollower = async () => {
     try {
