@@ -32,10 +32,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { PostType, tsa, UserOptions } from "./post";
+import { PostType, UserOptions } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
-import { objId } from "@/utils/ps";
+import { objId, st } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { SetAction } from "@/types/generics.type";
 import { toast } from "@/hooks/use-toast";
@@ -163,20 +163,23 @@ export const LikeButton = ({ post }: { post: TPost }) => {
 
   useEffect(() => {
     if (user?.id) {
-      const hasLikedInitial = tsa(post.likes).includes(user.id as string);
+      const hasLikedInitial = st(post.likes).includes(user.id as string);
       setHasLiked(hasLikedInitial);
     }
   }, [user, post.likes]);
 
   const handleLikeClick = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      // Optimistically update state
+      setHasLiked(!hasLiked);
+      setLikes(hasLiked ? likes - 1 : likes + 1);
 
-    // Optimistically update state
-    setHasLiked(!hasLiked);
-    setLikes(hasLiked ? likes - 1 : likes + 1);
-
-    // Server action to handle like/unlike
-    await handleLikePost(post._id as string);
+      // Server action to handle like/unlike
+      await handleLikePost(post._id as string, user?.id as string);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -207,7 +210,7 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 
   useEffect(() => {
     if (user?.id) {
-      const initialBookmarks = tsa(post.bookmarks).includes(user.id as string);
+      const initialBookmarks = st(post.bookmarks).includes(user.id as string);
       setHasBookmarked(initialBookmarks);
     }
   }, [user, post.bookmarks]);

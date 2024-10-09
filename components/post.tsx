@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { handleDeletePost } from "@/actions/handlePostActions";
-import { handlePostShare } from "@/utils/ps";
+import { handlePostShare, st } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
 import { SetAction } from "@/types/generics.type";
@@ -159,8 +159,8 @@ export function PostReplies({
   );
 }
 
-export const tsa = (a: Types.ObjectId[]) =>
-  a.map((i) => i.toString() as string);
+// export const tsa = (a: Types.ObjectId[]) =>
+//   a.map((i) => i.toString() as string);
 
 export function PostRepliesContent({
   post,
@@ -180,7 +180,7 @@ export function PostRepliesContent({
     if (user && replies?.length) {
       const hasLikedInitial: Record<string, boolean> = {};
       replies.forEach((reply: TReplies) => {
-        hasLikedInitial[reply._id?.toString() as string] = tsa(
+        hasLikedInitial[reply._id?.toString() as string] = st(
           reply.likes as Types.ObjectId[],
         ).includes(user?.id);
       });
