@@ -4,9 +4,11 @@ import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model";
 import { Types } from "mongoose";
 import { currentUser } from "@/utils/get-user";
+import { Notification } from "@/models/notification.model";
+import { User } from "@/models/user.model";
 
 // Server action to like or unlike a post
-export async function handleLikePost(postId: string) {
+export async function handleLikePost(postId: string, actorId: string) {
   try {
     await connectToDatabase();
 
@@ -36,10 +38,33 @@ export async function handleLikePost(postId: string) {
     // Save the post without validating the replies array
     await post.save({ validateModifiedOnly: true });
 
+    await saveNotification(actorId, post.promptory_id);
     // return post;
   } catch (error) {
     console.error("Error toggling like:", error);
-    throw new Error("Failed to like/unlike the post.");
+    // throw new Error("Failed to like/unlike the post.");
+  }
+}
+
+export async function saveNotification(actorId: string, promptory_id: number) {
+  try {
+    await connectToDatabase();
+
+    const user = await currentUser();
+    const actor = await User.findById(actorId);
+
+    const newNotification = Notification.create({
+      type: "like",
+      user: user,
+      actor: actor,
+      content: "liked your post.",
+      location: `/${user?.username}/promptories/${promptory_id}`,
+      read: false,
+    });
+
+    return newNotification;
+  } catch (error) {
+    console.error("Error Notification like:", error);
   }
 }
 

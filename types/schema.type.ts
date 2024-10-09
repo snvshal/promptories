@@ -61,3 +61,12 @@ export type SessionUser = {
   followers: string[];
   following: string[];
 };
+
+export type TNotification = Document & {
+  type: "like" | "comment" | "follow" | "mention";
+  user: Types.ObjectId | TUser;
+  actor: Types.ObjectId | TUser;
+  content: string;
+  location: string;
+  read: boolean;
+};
