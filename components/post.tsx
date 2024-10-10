@@ -363,9 +363,9 @@ export function PostOptions({ post }: { post: TPost }) {
 
   const handleDeletePostClick = async () => {
     try {
-      const element = document.querySelector(
-        `[data-key="${post._id as string}"]`,
-      );
+      const data_key = post._id?.toString() as string;
+
+      const element = document.querySelector(`[data-key="${data_key}"]`);
 
       if (element) {
         await handleDeletePost(post._id as string);
@@ -419,7 +419,9 @@ export function PostOptions({ post }: { post: TPost }) {
         {authorized && (
           <DropdownMenuItem
             onClick={() =>
-              router.push(`/${pu(post).username}/promptories/${post._id}/edit`)
+              router.push(
+                `/${pu(post).username}/promptories/${post._id as string}/edit`,
+              )
             }
             className="cursor-pointer"
           >
@@ -503,7 +505,7 @@ export function PostType({
   const router = useRouter();
 
   const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post._id}`);
+    router.push(`/${pu(post).username}/promptories/${post._id as string}`);
 
   return (
     <Card className="mid-width-card-content">

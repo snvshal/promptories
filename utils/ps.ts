@@ -40,3 +40,19 @@ export const updatePostValues = (post: TPost) => {
     tags: post.tags.join(),
   };
 };
+
+// export const dataKey = (post: TPost) => {
+//   // const timestamp = new Date(post.createdAt?.toString() as string).getTime();
+//   // const randomKey = Math.floor(Math.random() * 10e10).toString(36);
+//   const usernameCode = pu(post)
+//     .username.split("")
+//     .map((char) => char.charCodeAt(0).toString(36)) // Convert each char code to base-36
+//     .join(""); // Join the base-36 values into a single string
+//   const postId = post._id
+//     ?.toString()
+//     .split("")
+//     .map((char) => char.charCodeAt(0).toString(36)) // Convert each char code to base-36
+//     .join("");
+
+//   return `${usernameCode}-${postId}`;
+// };

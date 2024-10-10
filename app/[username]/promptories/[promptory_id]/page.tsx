@@ -6,9 +6,9 @@ import { ps } from "@/utils/ps";
 export default async function PromptoriesPage({
   params,
 }: {
-  params: { postId: string };
+  params: { promptory_id: string };
 }) {
-  const post = await getPostById(params.postId);
+  const post = await getPostById(params.promptory_id);
 
   if (!post) {
     return (

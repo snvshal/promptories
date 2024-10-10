@@ -6,9 +6,9 @@ import { ps, updatePostValues } from "@/utils/ps";
 export default async function UpdatePromptory({
   params,
 }: {
-  params: { postId: string };
+  params: { promptory_id: string };
 }) {
-  const post = await getPostById(params.postId);
+  const post = await getPostById(params.promptory_id);
   const postValues = updatePostValues(post as TPost);
   return (
     <PostForm
