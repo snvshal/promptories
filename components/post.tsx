@@ -355,7 +355,7 @@ export function PostReplyOptions({
   );
 }
 
-export function PostOptions({ post }: { post: TPost }) {
+export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -363,12 +363,12 @@ export function PostOptions({ post }: { post: TPost }) {
 
   const handleDeletePostClick = async () => {
     try {
-      const element = document.querySelector(
-        `[data-key="${post._id as string}"]`,
-      );
+      const data_key = post._id?.toString() as string;
+      const element = document.querySelector(`[data-key="${data_key}"]`);
 
       if (element) {
         await handleDeletePost(post._id as string);
+        tp && router.push("/home");
         element.remove();
       }
 
@@ -420,7 +420,7 @@ export function PostOptions({ post }: { post: TPost }) {
           <DropdownMenuItem
             onClick={() =>
               router.push(
-                `/${pu(post).username}/promptories/${post.promptory_id}/edit`,
+                `/${pu(post).username}/promptories/${post._id as string}/edit`,
               )
             }
             className="cursor-pointer"
@@ -505,10 +505,13 @@ export function PostType({
   const router = useRouter();
 
   const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
+    router.push(`/${pu(post).username}/promptories/${post._id as string}`);
 
   return (
-    <Card className="mid-width-card-content">
+    <Card
+      className="mid-width-card-content"
+      data-key={post._id?.toString() as string}
+    >
       <CardHeader
         className={`${type === "post" && "mb-4"} pb-0 max-md:p-4 max-md:pb-0`}
       >
@@ -526,7 +529,7 @@ export function PostType({
               <div
                 className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex-start`}
               >
-                <p className="font-semibold">{pu(post).name}</p>
+                <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
                   className={`text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
                 >
@@ -540,7 +543,7 @@ export function PostType({
               </p>
             )}
           </div>
-          <PostOptions post={post} />
+          <PostOptions post={post} tp={type === "post" ? true : false} />
         </div>
       </CardHeader>
       <CardContent

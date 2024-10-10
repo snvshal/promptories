@@ -3,6 +3,7 @@
 import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model";
 import { currentUser } from "@/utils/get-user";
+import { ps } from "@/utils/ps";
 
 export type FPost = {
   caption: string;
@@ -19,9 +20,8 @@ export async function savePostForm(data: FPost) {
     await connectToDatabase();
     const user = await currentUser();
 
-    await Post.create({
+    const post = await Post.create({
       user: user,
-      promptory_id: Date.now(),
       caption: data.caption,
       model_url: data.model_url,
       chat_link: data.chat_link,
@@ -30,6 +30,8 @@ export async function savePostForm(data: FPost) {
       promptory_type: data.promptory_type,
       tags: await parseTags(data.tags as string),
     });
+
+    return ps(post);
   } catch (error) {
     console.error("Error saving post:", error);
   }

@@ -4,11 +4,6 @@ import { TPost } from "@/types/schema.type";
 
 const PostSchema = new Schema<TPost>(
   {
-    promptory_id: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
