@@ -146,9 +146,7 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
   return (
     <>
       {posts.map((post, index) => (
-        <div key={index} data-key={post._id?.toString() as string}>
-          <PostType post={post} type="posts" />
-        </div>
+        <PostType key={index} post={post} type="posts" />
       ))}
     </>
   );

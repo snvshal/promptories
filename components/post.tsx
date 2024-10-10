@@ -355,7 +355,7 @@ export function PostReplyOptions({
   );
 }
 
-export function PostOptions({ post }: { post: TPost }) {
+export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -364,11 +364,11 @@ export function PostOptions({ post }: { post: TPost }) {
   const handleDeletePostClick = async () => {
     try {
       const data_key = post._id?.toString() as string;
-
       const element = document.querySelector(`[data-key="${data_key}"]`);
 
       if (element) {
         await handleDeletePost(post._id as string);
+        tp && router.push("/home");
         element.remove();
       }
 
@@ -508,7 +508,10 @@ export function PostType({
     router.push(`/${pu(post).username}/promptories/${post._id as string}`);
 
   return (
-    <Card className="mid-width-card-content">
+    <Card
+      className="mid-width-card-content"
+      data-key={post._id?.toString() as string}
+    >
       <CardHeader
         className={`${type === "post" && "mb-4"} pb-0 max-md:p-4 max-md:pb-0`}
       >
@@ -540,7 +543,7 @@ export function PostType({
               </p>
             )}
           </div>
-          <PostOptions post={post} />
+          <PostOptions post={post} tp={type === "post" ? true : false} />
         </div>
       </CardHeader>
       <CardContent
