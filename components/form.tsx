@@ -22,6 +22,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { pu } from "./home";
 import { PostFormProps } from "@/types/props.type";
+import { ToastAction } from "./ui/toast";
+import { TPost } from "@/types/schema.type";
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
@@ -56,20 +58,31 @@ export default function PostForm({
 
   const router = useRouter();
 
+  const postRoute = (post: TPost) =>
+    router.push(`/${pu(post).username}/promptories/${post._id as string}`);
+
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
       if (operationType === "POST") {
-        await savePostForm(data); // Call the server action
+        const post: TPost = await savePostForm(data); // Call the server action
 
         router.push("/home");
         toast({
           description: "Your post has been sent.",
+          action: (
+            <ToastAction
+              onClick={() => postRoute(post)}
+              altText="Goto schedule to undo"
+            >
+              View
+            </ToastAction>
+          ),
         });
       } else if (operationType === "PATCH" && post) {
         await updatePostForm(data, post._id as string); // Call the server action
 
-        router.push(`/${pu(post).username}/promptories/${post._id as string}`);
+        postRoute(post);
         toast({
           description: "Your post has been updated.",
         });
@@ -84,6 +97,8 @@ export default function PostForm({
         description: "There was a problem sending your post.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
