@@ -77,7 +77,11 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
               </div>
             </form>
 
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push("/notifications")}
+            >
               <Bell className="h-5 w-5" />
             </Button>
             <UserOptions />
@@ -372,32 +376,41 @@ export function Navbar() {
 
 export function NavLinks() {
   const pathname = usePathname();
+  const router = useRouter();
   return (
     <>
-      <Link
-        href="/home"
-        className={`${pathname === "/home" ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      <Button
+        size={"icon"}
+        onClick={() => router.push("/home")}
+        variant={pathname === "/home" ? "secondary" : "ghost"}
+        className="size-10 rounded-lg p-2"
       >
         <Home className="h-6 w-6" />
-      </Link>
-      <Link
-        href="/search"
-        className={`${pathname.startsWith("/search") ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      </Button>
+      <Button
+        size={"icon"}
+        variant={pathname.startsWith("/search") ? "secondary" : "ghost"}
+        onClick={() => router.push("/search")}
+        className="size-10 rounded-lg p-2"
       >
         <Search className="h-6 w-6" />
-      </Link>
-      <Link
-        href="/settings/profile"
-        className={`${pathname.startsWith("/settings") ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      </Button>
+      <Button
+        size={"icon"}
+        variant={pathname.startsWith("/settings") ? "secondary" : "ghost"}
+        onClick={() => router.push("/settings/profile")}
+        className="size-10 rounded-lg p-2"
       >
         <Settings className="h-6 w-6" />
-      </Link>
-      <Link
-        href="/notifications"
-        className={`${pathname === "/notifications" ? "bg-accent" : "bg-background"} size-10 rounded-lg p-2 hover:bg-accent`}
+      </Button>
+      <Button
+        size={"icon"}
+        onClick={() => router.push("/notifications")}
+        variant={pathname === "/notifications" ? "secondary" : "ghost"}
+        className="size-10 rounded-lg p-2"
       >
         <Bell className="h-6 w-6" />
-      </Link>
+      </Button>
     </>
   );
 }
@@ -406,18 +419,21 @@ export function UserProfileLink() {
   const { data: session } = useSession();
   const user = session?.user;
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <div className="flex-center">
-      <Link
-        href={`/${user?.username}`}
+      <Button
+        size={"icon"}
+        variant={"ghost"}
+        onClick={() => router.push(`/${user?.username}`)}
         className={`${pathname.slice(1) === user?.username ? "outline outline-offset-2 outline-muted-foreground" : "outline-none"} rounded-full`}
       >
         <Avatar className="cursor-pointer">
           <AvatarImage src={user?.image} alt={user?.username} />
           <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
         </Avatar>
-      </Link>
+      </Button>
     </div>
   );
 }
