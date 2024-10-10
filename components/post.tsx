@@ -419,9 +419,7 @@ export function PostOptions({ post }: { post: TPost }) {
         {authorized && (
           <DropdownMenuItem
             onClick={() =>
-              router.push(
-                `/${pu(post).username}/promptories/${post.promptory_id}/edit`,
-              )
+              router.push(`/${pu(post).username}/promptories/${post._id}/edit`)
             }
             className="cursor-pointer"
           >
@@ -505,7 +503,7 @@ export function PostType({
   const router = useRouter();
 
   const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
+    router.push(`/${pu(post).username}/promptories/${post._id}`);
 
   return (
     <Card className="mid-width-card-content">

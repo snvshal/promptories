@@ -29,24 +29,15 @@ export const getPostsByUsername = async (username: string) => {
   }
 };
 
-export const getPostByPromptoryId = async (
-  username: string,
-  promptory_id: string,
-) => {
+export const getPostById = async (postId: string) => {
   try {
     await connectToDatabase();
 
-    const user = await getUserByUsername(username);
-    if (!user) return null;
-
-    const pp = await Post.find({ promptory_id })
+    const post = await Post.findById(postId)
       .populate("user")
       .populate("replies.user");
 
-    if (!pp) return null;
-
-    const post = pp.find((post) => post.user.equals(user?._id));
-    if (!post) throw new Error("Post not found!");
+    if (!post) return null;
 
     return post as TPost;
   } catch (error) {

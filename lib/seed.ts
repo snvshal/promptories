@@ -103,7 +103,6 @@ export const users = [
 
 export const posts = [
   {
-    promptory_id: 1727362858906,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "Exploring the potential of AI in education.",
     model_url: "https://example.com/model1",
@@ -117,7 +116,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858907,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "Advancements in AI and machine learning.",
     model_url: "https://example.com/model2",
@@ -131,7 +129,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858908,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "AI in healthcare: Revolutionizing diagnostics.",
     model_url: "https://example.com/model3",
@@ -145,7 +142,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858909,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "Exploring the future of smart cities.",
     model_url: "https://example.com/model4",
@@ -159,7 +155,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858910,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "How AI is transforming the workforce.",
     model_url: "https://example.com/model5",
@@ -173,7 +168,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858911,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "AI and creativity: Can machines be creative?",
     model_url: "https://example.com/model6",
@@ -187,7 +181,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858912,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "Autonomous vehicles and the future of transportation.",
     model_url: "https://example.com/model7",
@@ -201,7 +194,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858914,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "AI and privacy: Striking the right balance.",
     model_url: "https://example.com/model8",
@@ -215,7 +207,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 1727362858915,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "AI and ethics: The moral dilemmas of automation.",
     model_url: "https://example.com/model9",
@@ -229,7 +220,6 @@ export const posts = [
     views: [],
   },
   {
-    promptory_id: 10,
     user: "66f298b3e3d3563b1f3969ed",
     caption: "AI in the creative industry: Opportunities and challenges.",
     model_url: "https://example.com/model10",

@@ -1,7 +1,6 @@
 import { Types, Document } from "mongoose";
 
 export type TPost = Document & {
-  promptory_id: number;
   user: Types.ObjectId | TUser;
   caption: string;
   model_url: string;

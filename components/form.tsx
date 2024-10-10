@@ -69,7 +69,7 @@ export default function PostForm({
       } else if (operationType === "PATCH" && post) {
         await updatePostForm(data, post._id as string); // Call the server action
 
-        router.push(`/${pu(post).username}/promptories/${post.promptory_id}`);
+        router.push(`/${pu(post).username}/promptories/${post._id as string}`);
         toast({
           description: "Your post has been updated.",
         });

@@ -21,7 +21,6 @@ export async function savePostForm(data: FPost) {
 
     await Post.create({
       user: user,
-      promptory_id: Date.now(),
       caption: data.caption,
       model_url: data.model_url,
       chat_link: data.chat_link,

@@ -38,7 +38,7 @@ export async function handleLikePost(postId: string, actorId: string) {
     // Save the post without validating the replies array
     await post.save({ validateModifiedOnly: true });
 
-    await saveNotification(actorId, post.promptory_id);
+    await saveNotification(actorId, post._id);
     // return post;
   } catch (error) {
     console.error("Error toggling like:", error);
@@ -46,7 +46,7 @@ export async function handleLikePost(postId: string, actorId: string) {
   }
 }
 
-export async function saveNotification(actorId: string, promptory_id: number) {
+export async function saveNotification(actorId: string, postId: number) {
   try {
     await connectToDatabase();
 
@@ -58,7 +58,7 @@ export async function saveNotification(actorId: string, promptory_id: number) {
       user: user,
       actor: actor,
       content: "liked your post.",
-      location: `/${user?.username}/promptories/${promptory_id}`,
+      location: `/${user?.username}/promptories/${postId}`,
       read: false,
     });
 
