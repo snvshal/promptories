@@ -526,7 +526,7 @@ export function PostType({
               <div
                 className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex-start`}
               >
-                <p className="font-semibold">{pu(post).name}</p>
+                <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
                   className={`text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
                 >
