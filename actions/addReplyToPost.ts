@@ -5,6 +5,7 @@ import { Post } from "@/models/post.model";
 import { currentUser } from "@/utils/get-user";
 import { ps } from "@/utils/ps";
 import { Types } from "mongoose";
+import { commentNotification } from "./notificationActions";
 
 // Server action to add a reply to a post
 export async function addReplyToPost(postId: string, replyText: string) {
@@ -36,6 +37,8 @@ export async function addReplyToPost(postId: string, replyText: string) {
       },
       { new: true }, // Return the updated post
     ).populate("replies.user"); // Populate the 'user' field in replies
+
+    await commentNotification(updatedPost);
 
     return ps(updatedPost);
   } catch (error) {
