@@ -4,11 +4,10 @@ import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model";
 import { Types } from "mongoose";
 import { currentUser } from "@/utils/get-user";
-import { Notification } from "@/models/notification.model";
-import { User } from "@/models/user.model";
+import { likeNotification } from "./notificationActions";
 
 // Server action to like or unlike a post
-export async function handleLikePost(postId: string, actorId: string) {
+export async function handleLikePost(postId: string) {
   try {
     await connectToDatabase();
 
@@ -20,7 +19,7 @@ export async function handleLikePost(postId: string, actorId: string) {
     const user = await currentUser();
 
     // Find the post
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate("user");
 
     if (!post) {
       throw new Error("Post not found!");
@@ -33,38 +32,18 @@ export async function handleLikePost(postId: string, actorId: string) {
       post.likes.pull(user?._id);
     } else {
       post.likes.push(user?._id);
+
+      // Send notification to user
+      await likeNotification(post);
     }
 
     // Save the post without validating the replies array
     await post.save({ validateModifiedOnly: true });
 
-    await saveNotification(actorId, post._id);
     // return post;
   } catch (error) {
     console.error("Error toggling like:", error);
     // throw new Error("Failed to like/unlike the post.");
-  }
-}
-
-export async function saveNotification(actorId: string, postId: number) {
-  try {
-    await connectToDatabase();
-
-    const user = await currentUser();
-    const actor = await User.findById(actorId);
-
-    const newNotification = Notification.create({
-      type: "like",
-      user: user,
-      actor: actor,
-      content: "liked your post.",
-      location: `/${user?.username}/promptories/${postId}`,
-      read: false,
-    });
-
-    return newNotification;
-  } catch (error) {
-    console.error("Error Notification like:", error);
   }
 }
 

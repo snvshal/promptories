@@ -140,7 +140,7 @@ export default function Notifications({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium hover:underline">
                         <span className="font-semibold">
                           {(notification.actor as TUser)?.name}
                         </span>{" "}
@@ -159,7 +159,7 @@ export default function Notifications({
               <TabsContent value="like" className="mt-4">
                 {filteredNotifications.map((notification) => (
                   <div
-                    key={notification.id}
+                    key={notification._id?.toString() as string}
                     className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
                   >
                     <Avatar>
@@ -191,7 +191,7 @@ export default function Notifications({
               <TabsContent value="comment" className="mt-4">
                 {filteredNotifications.map((notification) => (
                   <div
-                    key={notification.id}
+                    key={notification._id?.toString() as string}
                     className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
                   >
                     <Avatar>
@@ -223,7 +223,7 @@ export default function Notifications({
               <TabsContent value="follow" className="mt-4">
                 {filteredNotifications.map((notification) => (
                   <div
-                    key={notification.id}
+                    key={notification._id?.toString() as string}
                     className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
                   >
                     <Avatar>
