@@ -175,10 +175,10 @@ export const LikeButton = ({ post }: { post: TPost }) => {
     try {
       // Optimistically update state
       setHasLiked(!hasLiked);
-      setLikes(hasLiked ? likes - 1 : likes + 1);
+      setLikes(hasLiked ? Math.max(likes - 1, 0) : likes + 1);
 
       // Server action to handle like/unlike
-      await handleLikePost(post._id as string, user?.id as string);
+      await handleLikePost(post._id as string);
     } catch (error) {
       console.error(error);
     }
@@ -222,7 +222,7 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 
     // Optimistically update state
     setHasBookmarked(!hasBookmarked);
-    setBookmarks(hasBookmarked ? bookmarks - 1 : bookmarks + 1);
+    setBookmarks(hasBookmarked ? Math.max(bookmarks - 1, 0) : bookmarks + 1);
 
     // Server action to handle bookmark/unbookmark
     await handleBookmarkPost(post._id as string, user?.id as string);
@@ -372,22 +372,25 @@ export function Navbar() {
   );
 }
 
+export const iv = (status: boolean) => (status ? "secondary" : "ghost");
+
 export function NavLinks() {
   const pathname = usePathname();
   const router = useRouter();
+
   return (
     <>
       <Button
         size={"icon"}
         onClick={() => router.push("/home")}
-        variant={pathname === "/home" ? "secondary" : "ghost"}
+        variant={iv(pathname === "/home")}
         className="size-10 rounded-lg p-2"
       >
         <Home className="h-6 w-6" />
       </Button>
       <Button
         size={"icon"}
-        variant={pathname.startsWith("/search") ? "secondary" : "ghost"}
+        variant={iv(pathname.startsWith("/search"))}
         onClick={() => router.push("/search")}
         className="size-10 rounded-lg p-2"
       >
@@ -395,7 +398,7 @@ export function NavLinks() {
       </Button>
       <Button
         size={"icon"}
-        variant={pathname.startsWith("/settings") ? "secondary" : "ghost"}
+        variant={iv(pathname.startsWith("/settings"))}
         onClick={() => router.push("/settings/profile")}
         className="size-10 rounded-lg p-2"
       >
@@ -404,7 +407,7 @@ export function NavLinks() {
       <Button
         size={"icon"}
         onClick={() => router.push("/notifications")}
-        variant={pathname === "/notifications" ? "secondary" : "ghost"}
+        variant={iv(pathname === "/notifications")}
         className="size-10 rounded-lg p-2"
       >
         <Bell className="h-6 w-6" />
