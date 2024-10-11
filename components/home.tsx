@@ -36,6 +36,7 @@ import { objId, st } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { SetAction } from "@/types/generics.type";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "./ui/badge";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -405,8 +406,9 @@ export function NavLinks() {
         size={"icon"}
         onClick={() => router.push("/notifications")}
         variant={iv(pathname === "/notifications")}
-        className="size-10 rounded-lg p-2"
+        className="relative size-10 rounded-lg p-2"
       >
+        <Badge className="absolute right-1 top-1 size-2 p-0"></Badge>
         <Bell className="h-6 w-6" />
       </Button>
     </>

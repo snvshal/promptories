@@ -527,7 +527,7 @@ export function PostType({
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div
-                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex-start`}
+                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-start justify-start`}
               >
                 <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
