@@ -23,10 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import {
-  isUsernameUnique,
-  updateUsername,
-} from "@/actions/handleProfileActions";
+import { isUsernameUnique, updateUsername } from "@/actions/profileActions";
 import { useSession } from "next-auth/react";
 
 const usernameSchema = z.object({

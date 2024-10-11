@@ -18,10 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
-import {
-  handleLikePost,
-  handleBookmarkPost,
-} from "@/actions/handlePostActions";
+import { handleLikePost, handleBookmarkPost } from "@/actions/postActions";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Dialog,
