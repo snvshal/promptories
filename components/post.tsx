@@ -40,7 +40,7 @@ import { TimeAgo } from "./time-ago";
 import { TPost, TReplies } from "@/types/schema.type";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { Separator } from "./ui/separator";
-import { deleteReply, handleLikeReply } from "@/actions/handleReplyActions";
+import { deleteReply, handleLikeReply } from "@/actions/replyActions";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,7 +48,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { handleDeletePost } from "@/actions/handlePostActions";
+import { handleDeletePost } from "@/actions/postActions";
 import { handlePostShare, st } from "@/utils/ps";
 import { useSession } from "next-auth/react";
 import { Types } from "mongoose";
@@ -527,7 +527,7 @@ export function PostType({
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div
-                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex-start`}
+                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-start justify-start`}
               >
                 <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
