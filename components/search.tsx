@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Filter, Search as SearchIcon } from "lucide-react";
+import { CheckCircle, Filter, Search as SearchIcon, User } from "lucide-react";
 import { NavigateBackHeader } from "./post";
 import { search } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { SetAction } from "@/types/generics.type";
 import { Label } from "./ui/label";
+import { FollowButton } from "./profile/user";
 
 export type Categories =
   | "default"
@@ -168,86 +169,6 @@ export default function SearchComponent() {
 }
 
 export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
-  const { data: session, update } = useSession();
-  const currentUser = session?.user;
-
-  const router = useRouter();
-
-  // Follow state for each user stored in an object (ID as key, follow status as value)
-  const [followStates, setFollowStates] = useState<
-    Record<string, "Follow" | "Following">
-  >({});
-
-  const [followers, setFollowers] = useState<Record<string, number>>({});
-
-  // Function to initialize follow state for all matched users
-  useEffect(() => {
-    if (currentUser && matchedUsers?.length) {
-      const initialStates: Record<string, "Follow" | "Following"> = {};
-      matchedUsers.forEach((profileUser: TUser) => {
-        initialStates[profileUser._id?.toString() as string] =
-          currentUser.following?.includes(profileUser._id?.toString() as string)
-            ? "Following"
-            : "Follow";
-      });
-      setFollowStates(initialStates); // Set initial follow states
-    }
-  }, [matchedUsers, currentUser]);
-
-  // Function to initialize follow state for all matched users
-  useEffect(() => {
-    if (currentUser && matchedUsers?.length) {
-      const initialStates: Record<string, number> = {};
-      matchedUsers.forEach((profileUser: TUser) => {
-        initialStates[profileUser._id?.toString() as string] =
-          profileUser.followers.length;
-      });
-      setFollowers(initialStates); // Set initial follow states
-    }
-  }, [matchedUsers, currentUser]);
-
-  // Handle follow/unfollow logic for a specific user
-  const handleFollowToggle = async (profileUser: TUser) => {
-    try {
-      const { updatedState, following } = await addFollower(
-        profileUser._id?.toString() as string,
-      );
-
-      // Update follow state for the specific profile user
-      setFollowStates((prevStates) => ({
-        ...prevStates,
-        [profileUser._id?.toString() as string]: updatedState as
-          | "Follow"
-          | "Following",
-      }));
-
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          following: [...following],
-        },
-      });
-
-      setFollowers((prevFollowers) => {
-        const userId = profileUser._id?.toString() as string;
-        const currentFollowerCount = prevFollowers[userId] ?? 0; // Default to 0 if undefined
-
-        const isUnfollowing = updatedState === "Follow";
-        const newFollowerCount = isUnfollowing
-          ? Math.max(currentFollowerCount - 1, 0) // Avoid negative follower count
-          : currentFollowerCount + 1;
-
-        return {
-          ...prevFollowers,
-          [userId]: newFollowerCount,
-        };
-      });
-    } catch (error) {
-      console.error("Error updating follower state:", error);
-    }
-  };
-
   if (!matchedUsers.length) {
     return (
       <div className="flex-center w-full p-4 max-md:pt-10">
@@ -258,49 +179,52 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 
   return (
     <>
-      {matchedUsers?.map((user) => (
-        <Card key={user._id?.toString()} className="mid-width-card-content">
-          <CardContent className="flex items-center space-x-4 py-4">
-            <Avatar
-              role="button"
-              className="h-16 w-16"
-              onClick={() => router.push(`/${user.username}`)}
-            >
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-
-            <Link href={`/${user.username}`} className="flex-1">
-              <h3 className="text-lg font-semibold">{user.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                &#64;{user.username}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">{user.bio}</p>
-              <div className="mt-2 flex space-x-4">
-                <p className="text-sm text-muted-foreground">
-                  {followers[user._id?.toString() as string]} followers
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {/* {user.posts.length} posts */}
-                </p>
-              </div>
-            </Link>
-            {!(user._id?.toString() === currentUser?.id) && (
-              <Button
-                variant={
-                  followStates[user._id?.toString() as string] === "Follow"
-                    ? "default"
-                    : "secondary"
-                }
-                onClick={() => handleFollowToggle(user)}
-              >
-                {followStates[user._id?.toString() as string]}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+      {matchedUsers?.map((MatchedUser) => (
+        <UserProfileCard
+          key={MatchedUser._id?.toString()}
+          profileUser={MatchedUser}
+        />
       ))}
     </>
+  );
+}
+
+export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
+  const router = useRouter();
+  const [followers, setFollowers] = useState(profileUser.followers.length ?? 0);
+
+  return (
+    <Card className="mid-width-card-content">
+      <CardContent className="flex items-center space-x-4 py-4">
+        <Avatar
+          role="button"
+          className="h-16 w-16"
+          onClick={() => router.push(`/${profileUser.username}`)}
+        >
+          <AvatarImage src={profileUser.avatar} alt={profileUser.name} />
+          <AvatarFallback>{profileUser.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+
+        <Link href={`/${profileUser.username}`} className="flex-1">
+          <h3 className="text-lg font-semibold">{profileUser.name}</h3>
+          <p className="text-sm text-muted-foreground">
+            &#64;{profileUser.username}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {profileUser.bio}
+          </p>
+          <div className="mt-2 flex space-x-4">
+            <p className="text-sm text-muted-foreground">
+              {followers} followers
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {/* {user.posts.length} posts */}
+            </p>
+          </div>
+        </Link>
+        <FollowButton profileUser={profileUser} setFollowers={setFollowers} />
+      </CardContent>
+    </Card>
   );
 }
 
