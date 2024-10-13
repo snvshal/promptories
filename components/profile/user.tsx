@@ -141,7 +141,7 @@ export function ProfileUserContent({
 
   return (
     <Card className="mid-width-card-content md:mb-4">
-      <CardContent className="pt-6 max-sm:px-4 max-sm:pb-4">
+      <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
         <div className="flex w-full justify-end space-x-4">
           <ProfileOptionButton
             profileUser={profileUser}
@@ -149,7 +149,7 @@ export function ProfileUserContent({
           />
         </div>
         <div className="sm:flex-start flex max-sm:flex-col">
-          <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-6 md:size-48">
+          <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 md:mr-4 md:size-40">
             <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
             <AvatarFallback>{profileUser?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
