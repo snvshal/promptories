@@ -22,6 +22,7 @@ import { st } from "@/utils/ps";
 import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { SetAction } from "@/types/generics.type";
+import { Types } from "mongoose";
 
 export default function UserProfileComponent({
   profileUser,
@@ -140,7 +141,7 @@ export function ProfileUserContent({
 
   return (
     <Card className="mid-width-card-content md:mb-4">
-      <CardContent className="pt-6 max-sm:px-4 max-sm:pb-4">
+      <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
         <div className="flex w-full justify-end space-x-4">
           <ProfileOptionButton
             profileUser={profileUser}
@@ -148,7 +149,7 @@ export function ProfileUserContent({
           />
         </div>
         <div className="sm:flex-start flex max-sm:flex-col">
-          <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-6 md:size-48">
+          <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 md:mr-4 md:size-40">
             <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
             <AvatarFallback>{profileUser?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
@@ -244,41 +245,11 @@ export function ProfileOptionButton({
   profileUser: TUser;
   setFollowers: SetAction<number>;
 }) {
-  const { data: session, update } = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
   const router = useRouter();
 
   const isAdmin = profileUser._id?.toString() === user?.id;
-
-  const [follow, setFollow] = useState<"Follow" | "Following">();
-
-  useEffect(() => {
-    setFollow(
-      st(profileUser.followers).includes(user?.id as string)
-        ? "Following"
-        : "Follow",
-    );
-    console.log(follow);
-  }, [profileUser.followers, user?.id, follow]);
-
-  const handleAddFollower = async () => {
-    try {
-      const { updatedState, following } = await addFollower(
-        profileUser._id as string,
-      );
-      setFollow(updatedState as "Follow" | "Following");
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          following: [...following],
-        },
-      });
-      setFollowers((f) => (follow === "Follow" ? f + 1 : Math.max(f - 1, 0)));
-    } catch (error) {
-      console.error("Error updating follower state:", error);
-    }
-  };
 
   if (isAdmin) {
     return (
@@ -291,12 +262,65 @@ export function ProfileOptionButton({
     );
   } else {
     return (
-      <Button
-        variant={follow === "Follow" ? "default" : "secondary"}
-        onClick={handleAddFollower}
-      >
-        {follow}
-      </Button>
+      <FollowButton profileUser={profileUser} setFollowers={setFollowers} />
     );
   }
+}
+
+export function FollowButton({
+  profileUser,
+  setFollowers,
+}: {
+  profileUser: TUser;
+  setFollowers: SetAction<number>;
+}) {
+  const { data: session, update } = useSession();
+  const user = session?.user;
+
+  const isAdmin = profileUser._id?.toString() === user?.id;
+  const [follow, setFollow] = useState<"Follow" | "Following">();
+
+  useEffect(() => {
+    setFollow(
+      st(profileUser.followers).includes(user?.id as string)
+        ? "Following"
+        : "Follow",
+    );
+  }, [profileUser.followers, user?.id]);
+
+  const handleAddFollower = async () => {
+    try {
+      type AFRV = {
+        updatedState: "Follow" | "Following";
+        following: Types.ObjectId[];
+      };
+      const { updatedState, following }: AFRV = await addFollower(
+        profileUser._id as string,
+      );
+
+      setFollowers((f) => (follow === "Follow" ? f + 1 : Math.max(f - 1, 0)));
+
+      setFollow(updatedState);
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          following: [...following],
+        },
+      });
+    } catch (error) {
+      console.error("Error updating follower state:", error);
+    }
+  };
+
+  if (isAdmin) return;
+
+  return (
+    <Button
+      variant={follow === "Follow" ? "default" : "secondary"}
+      onClick={handleAddFollower}
+    >
+      {follow}
+    </Button>
+  );
 }
