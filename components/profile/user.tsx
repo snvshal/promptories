@@ -286,7 +286,6 @@ export function FollowButton({
         ? "Following"
         : "Follow",
     );
-    console.log(follow);
   }, [profileUser.followers, user?.id]);
 
   const handleAddFollower = async () => {

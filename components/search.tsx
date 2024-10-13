@@ -6,15 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Filter, Search as SearchIcon, User } from "lucide-react";
+import { CheckCircle, Filter, Search as SearchIcon } from "lucide-react";
 import { NavigateBackHeader } from "./post";
 import { search } from "@/actions/searchQuery";
 import { TPost, TUser } from "@/types/schema.type";
 import { PostsComponent } from "./home";
-import { addFollower } from "@/actions/addFollower";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import {
   Select,
   SelectContent,
