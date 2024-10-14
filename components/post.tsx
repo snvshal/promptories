@@ -667,7 +667,7 @@ export function PostTagsDialog({
                 <Badge
                   key={index}
                   variant="secondary"
-                  onClick={() => router.push(`/search?q=t:${tag}`)}
+                  onClick={() => router.push(`/search?q=${tag}&category=tags`)}
                   role="button"
                 >
                   #{tag}
