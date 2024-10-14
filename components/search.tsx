@@ -32,7 +32,7 @@ import { SetAction } from "@/types/generics.type";
 import { Label } from "./ui/label";
 import { FollowButton } from "./profile/user";
 
-export type Categories =
+export type SearchCategories =
   | "default"
   | "response"
   | "prompt"
@@ -52,8 +52,12 @@ export default function SearchComponent() {
   const [emptyQueryError, setEmptyQueryError] = useState("");
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
   const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("default");
-  const [selectedDateRange, setSelectedDateRange] = useState("default");
+  const [selectedCategory, setSelectedCategory] = useState(
+    category ?? "default",
+  );
+  const [selectedDateRange, setSelectedDateRange] = useState(
+    dateRange ?? "default",
+  );
   const [open, setOpen] = useState(false); // Search Filter Dialog State
 
   const router = useRouter();
@@ -268,11 +272,11 @@ export function SearchFilterDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="caption">Captions</SelectItem>
-                <SelectItem value="prompt">Prompts</SelectItem>
-                <SelectItem value="response">Responses</SelectItem>
+                <SelectItem value="caption">Caption</SelectItem>
+                <SelectItem value="prompt">Prompt</SelectItem>
+                <SelectItem value="response">Response</SelectItem>
                 <SelectItem value="tags">Tags</SelectItem>
-                <SelectItem value="username">Users</SelectItem>
+                <SelectItem value="username">User</SelectItem>
               </SelectContent>
             </Select>
           </div>

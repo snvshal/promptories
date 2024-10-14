@@ -1,4 +1,4 @@
-import Notifications from "@/components/notifications";
+import Notifications from "@/components/notification";
 import { Notification } from "@/models/notification.model";
 import { TNotification } from "@/types/schema.type";
 import { currentUser } from "@/utils/get-user";

@@ -645,6 +645,11 @@ export function PostTagsDialog({
   setOpen: SetAction<boolean>;
 }) {
   const router = useRouter();
+
+  const handleTagClick = (tag: string) => {
+    setOpen(false);
+    router.push(`/search?q=${tag}&category=tags`);
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -667,7 +672,7 @@ export function PostTagsDialog({
                 <Badge
                   key={index}
                   variant="secondary"
-                  onClick={() => router.push(`/search?q=t:${tag}`)}
+                  onClick={() => handleTagClick(tag)}
                   role="button"
                 >
                   #{tag}

@@ -68,4 +68,6 @@ export type TNotification = Document & {
   content: string;
   location: string;
   read: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
