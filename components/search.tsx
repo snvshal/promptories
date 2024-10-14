@@ -32,7 +32,7 @@ import { SetAction } from "@/types/generics.type";
 import { Label } from "./ui/label";
 import { FollowButton } from "./profile/user";
 
-export type Categories =
+export type SearchCategories =
   | "default"
   | "response"
   | "prompt"
