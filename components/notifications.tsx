@@ -8,6 +8,7 @@ import { Heart, MessageCircle, UserPlus, Bell } from "lucide-react";
 import { NavigateBackHeader } from "./post";
 import { TNotification, TUser } from "@/types/schema.type";
 import { useRouter } from "next/navigation";
+import { TimeAgo } from "./time-ago";
 
 type Notification = {
   id: number;
@@ -82,19 +83,6 @@ export default function Notifications({
   //     },
   //   ];
 
-  const getIcon = (type: Notification["type"]) => {
-    switch (type) {
-      case "like":
-        return <Heart className="h-4 w-4 text-red-500" />;
-      case "comment":
-        return <MessageCircle className="h-4 w-4 text-blue-500" />;
-      case "follow":
-        return <UserPlus className="h-4 w-4 text-green-500" />;
-      case "mention":
-        return <Bell className="h-4 w-4 text-yellow-500" />;
-    }
-  };
-
   const filteredNotifications = notifications.filter(
     (notification) => activeTab === "all" || notification.type === activeTab,
   );
@@ -122,140 +110,71 @@ export default function Notifications({
                 <TabsTrigger value="comment">Comments</TabsTrigger>
                 <TabsTrigger value="follow">Follows</TabsTrigger>
               </TabsList>
-              <TabsContent value="all" className="mt-4">
-                {filteredNotifications.map((notification) => (
-                  <div
-                    role="button"
-                    key={notification._id?.toString() as string}
-                    onClick={() => router.push(notification.location)}
-                    className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
-                  >
-                    <Avatar>
-                      <AvatarImage
-                        src={(notification.actor as TUser)?.avatar}
-                        alt={(notification.actor as TUser)?.name}
-                      />
-                      <AvatarFallback>
-                        {(notification.actor as TUser)?.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium hover:underline">
-                        <span className="font-semibold">
-                          {(notification.actor as TUser)?.name}
-                        </span>{" "}
-                        {notification.content}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {/* {new Date(notification.timestamp).toLocaleString()} */}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {getIcon(notification.type)}
-                    </div>
-                  </div>
-                ))}
-              </TabsContent>
-              <TabsContent value="like" className="mt-4">
-                {filteredNotifications.map((notification) => (
-                  <div
-                    key={notification._id?.toString() as string}
-                    className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
-                  >
-                    <Avatar>
-                      <AvatarImage
-                        src={(notification.actor as TUser)?.avatar}
-                        alt={(notification.actor as TUser)?.name}
-                      />
-                      <AvatarFallback>
-                        {(notification.actor as TUser)?.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        <span className="font-semibold">
-                          {(notification.actor as TUser)?.name}
-                        </span>{" "}
-                        {notification.content}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {/* {new Date(notification.timestamp).toLocaleString()} */}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {getIcon(notification.type)}
-                    </div>
-                  </div>
-                ))}
-              </TabsContent>
-              <TabsContent value="comment" className="mt-4">
-                {filteredNotifications.map((notification) => (
-                  <div
-                    key={notification._id?.toString() as string}
-                    className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
-                  >
-                    <Avatar>
-                      <AvatarImage
-                        src={(notification.actor as TUser)?.avatar}
-                        alt={(notification.actor as TUser)?.name}
-                      />
-                      <AvatarFallback>
-                        {(notification.actor as TUser)?.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        <span className="font-semibold">
-                          {(notification.actor as TUser)?.name}
-                        </span>{" "}
-                        {notification.content}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {/* {new Date(notification.timestamp).toLocaleString()} */}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {getIcon(notification.type)}
-                    </div>
-                  </div>
-                ))}
-              </TabsContent>
-              <TabsContent value="follow" className="mt-4">
-                {filteredNotifications.map((notification) => (
-                  <div
-                    key={notification._id?.toString() as string}
-                    className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
-                  >
-                    <Avatar>
-                      <AvatarImage
-                        src={(notification.actor as TUser)?.avatar}
-                        alt={(notification.actor as TUser)?.name}
-                      />
-                      <AvatarFallback>
-                        {(notification.actor as TUser)?.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        <span className="font-semibold">
-                          {(notification.actor as TUser)?.name}
-                        </span>{" "}
-                        {notification.content}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {/* {new Date(notification.timestamp).toLocaleString()} */}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {getIcon(notification.type)}
-                    </div>
-                  </div>
-                ))}
-              </TabsContent>
+              <NotificationTabsContent
+                filteredNotifications={filteredNotifications}
+                tabValue={activeTab}
+              />
             </Tabs>
           </CardContent>
         </Card>
       </main>
     </div>
+  );
+}
+
+export function NotificationTabsContent({
+  filteredNotifications,
+  tabValue,
+}: {
+  filteredNotifications: TNotification[];
+  tabValue: string;
+}) {
+  const router = useRouter();
+
+  const getIcon = (type: Notification["type"]) => {
+    switch (type) {
+      case "like":
+        return <Heart className="h-4 w-4 text-red-500" />;
+      case "comment":
+        return <MessageCircle className="h-4 w-4 text-blue-500" />;
+      case "follow":
+        return <UserPlus className="h-4 w-4 text-green-500" />;
+      case "mention":
+        return <Bell className="h-4 w-4 text-yellow-500" />;
+    }
+  };
+  return (
+    <TabsContent value={tabValue} className="mt-4">
+      {filteredNotifications.map((notification) => (
+        <div
+          role="button"
+          key={notification._id?.toString() as string}
+          onClick={() => router.push(notification.location)}
+          className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
+        >
+          <Avatar>
+            <AvatarImage
+              src={(notification.actor as TUser)?.avatar}
+              alt={(notification.actor as TUser)?.name}
+            />
+            <AvatarFallback>
+              {(notification.actor as TUser)?.name?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <p className="text-sm hover:underline">
+              <span className="font-semibold">
+                {(notification.actor as TUser)?.name}
+              </span>{" "}
+              {notification.content}
+            </p>
+            <p className="text-xs text-gray-500">
+              <TimeAgo timestamp={notification.createdAt as Date} />
+            </p>
+          </div>
+          <div className="flex-shrink-0">{getIcon(notification.type)}</div>
+        </div>
+      ))}
+    </TabsContent>
   );
 }
