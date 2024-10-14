@@ -5,6 +5,7 @@ import { connectToDatabase } from "@/utils/db";
 import { currentUser } from "@/utils/get-user";
 import { ps, st } from "@/utils/ps";
 import { Types } from "mongoose";
+import { followNotification } from "./notificationActions";
 
 export async function addFollower(userId: string) {
   try {
@@ -31,6 +32,9 @@ export async function addFollower(userId: string) {
       // Add follower
       profileUser.followers.push(user._id);
       user.following.push(profileUser._id);
+
+      // Follow notification
+      await followNotification(profileUser);
     } else {
       // Remove follower
       profileUser.followers = profileUser.followers.filter(

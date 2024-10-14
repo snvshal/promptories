@@ -3,8 +3,9 @@ import { TPost } from "@/types/schema.type";
 import { Types } from "mongoose";
 
 export const ps = (obj: object) => JSON.parse(JSON.stringify(obj));
+export const st = (t: Types.ObjectId[]) => t?.map((i) => i.toString());
 
-export const objId = (id: string | undefined) =>
+export const objId = (id: string | undefined | unknown) =>
   new Types.ObjectId(id as string);
 
 export const handlePostShare = async (post: TPost) => {
@@ -26,9 +27,6 @@ export const handlePostShare = async (post: TPost) => {
   }
 };
 
-export const st = (t: Types.ObjectId[]) =>
-  t?.map((i) => i.toString() as string);
-
 export const updatePostValues = (post: TPost) => {
   return {
     caption: post.caption,
@@ -40,19 +38,3 @@ export const updatePostValues = (post: TPost) => {
     tags: post.tags.join(),
   };
 };
-
-// export const dataKey = (post: TPost) => {
-//   // const timestamp = new Date(post.createdAt?.toString() as string).getTime();
-//   // const randomKey = Math.floor(Math.random() * 10e10).toString(36);
-//   const usernameCode = pu(post)
-//     .username.split("")
-//     .map((char) => char.charCodeAt(0).toString(36)) // Convert each char code to base-36
-//     .join(""); // Join the base-36 values into a single string
-//   const postId = post._id
-//     ?.toString()
-//     .split("")
-//     .map((char) => char.charCodeAt(0).toString(36)) // Convert each char code to base-36
-//     .join("");
-
-//   return `${usernameCode}-${postId}`;
-// };
