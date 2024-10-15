@@ -34,6 +34,7 @@ import {
   il,
   LikeButton,
   PostReplyDialog,
+  PostViews,
   pu,
 } from "./home";
 import { TimeAgo } from "./time-ago";
@@ -501,7 +502,6 @@ export function PostType({
   type: "post" | "posts";
 }) {
   const [open, setOpen] = useState(false);
-
   const router = useRouter();
 
   const postClick = (post: TPost) =>
@@ -573,6 +573,7 @@ export function PostType({
           <LikeButton post={post} />
           <PostReplyDialog post={post} />
           <BookmarkButton post={post} />
+          <PostViews post={post} />
         </div>
         <div>
           {post.tags.length > 0 && (

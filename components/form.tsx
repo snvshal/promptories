@@ -145,7 +145,7 @@ export default function PostForm({
             )}
             <p className="mt-1 text-sm text-gray-500">
               Enter full url of the website where we can try it. (e.g.,
-              https://chatgpt.com)
+              https://example.com)
             </p>
           </div>
 
@@ -252,7 +252,7 @@ export default function PostForm({
               )}
             />
             <p className="mt-1 text-sm text-gray-500">
-              Enter tags separated by commas (e.g., tag1, tag2, tag3)
+              Enter tags separated by space (e.g., tag1 tag2 tag3)
             </p>
             {errors.tags && (
               <p className="mt-1 text-sm text-red-500">

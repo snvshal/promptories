@@ -2,7 +2,6 @@
 
 import { connectToDatabase } from "@/utils/db";
 import { Post } from "@/models/post.model";
-import { Types } from "mongoose";
 import { currentUser } from "@/utils/get-user";
 import { likeNotification } from "./notificationActions";
 
@@ -11,23 +10,13 @@ export async function handleLikePost(postId: string) {
   try {
     await connectToDatabase();
 
-    // Check if postId and userId are valid ObjectIds
-    if (!Types.ObjectId.isValid(postId)) {
-      throw new Error("Invalid post or user ID!");
-    }
+    const post = await Post.findById(postId).populate("user");
+    if (!post) throw new Error("Post not found!");
 
     const user = await currentUser();
 
-    // Find the post
-    const post = await Post.findById(postId).populate("user");
-
-    if (!post) {
-      throw new Error("Post not found!");
-    }
-
     const isLiked = post.likes.includes(user?._id);
 
-    // If already liked, remove the like; otherwise, add it
     if (isLiked) {
       post.likes.pull(user?._id);
     } else {
@@ -39,52 +28,34 @@ export async function handleLikePost(postId: string) {
 
     // Save the post without validating the replies array
     await post.save({ validateModifiedOnly: true });
-
-    // return post;
   } catch (error) {
     console.error("Error toggling like:", error);
-    // throw new Error("Failed to like/unlike the post.");
   }
 }
 
 // Function to handle bookmark/unbookmark for a post
-export async function handleBookmarkPost(postId: string, userId: string) {
+export async function handleBookmarkPost(postId: string) {
   try {
     await connectToDatabase();
 
-    // Validate ObjectIds
-    if (!Types.ObjectId.isValid(postId) || !Types.ObjectId.isValid(userId)) {
-      throw new Error("Invalid post or user ID!");
-    }
-
-    const userObjectId = new Types.ObjectId(userId);
-
-    // Find the post by ID
     const post = await Post.findById(postId);
+    if (!post) throw new Error("Post not found!");
 
-    if (!post) {
-      throw new Error("Post not found!");
-    }
+    const user = await currentUser();
 
     // Check if the user has already bookmarked the post
-    const hasBookmarked = post.bookmarks.includes(userObjectId);
+    const hasBookmarked = post.bookmarks.includes(user?._id);
 
     if (hasBookmarked) {
-      // If already bookmarked, remove the user from bookmarks (unbookmark)
-      post.bookmarks.pull(userObjectId);
+      post.bookmarks.pull(user?._id);
     } else {
-      // If not bookmarked, add the user to bookmarks
-      post.bookmarks.push(userObjectId);
+      post.bookmarks.push(user?._id);
     }
 
     // Save the post with the updated bookmarks
     await post.save();
-
-    // Return the updated number of bookmarks for the UI
-    // return post.bookmarks.length;
   } catch (error) {
     console.error("Error adding bookmarks:", error);
-    throw new Error("Failed to add bookmarks.");
   }
 }
 
@@ -92,29 +63,35 @@ export async function handleDeletePost(postId: string) {
   try {
     await connectToDatabase();
 
+    const post = await Post.findById(postId);
+    if (!post) throw new Error("Post not found!");
+
     const user = await currentUser();
 
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const post = await Post.findById(postId);
-    if (!post) {
-      throw new Error("Post not found!");
-    }
-
-    // Check if the user is the owner of the post
-    if (post.user.toString() !== user._id?.toString()) {
+    if (!post.user.equals(user?._id))
       throw new Error("Not authorized to delete this post.");
-    }
 
-    // await post.remove(); // Delete the post
     await Post.findByIdAndDelete(post._id);
-
-    console.log("Post deleted successfully!");
-    // return { success: true };
   } catch (error) {
     console.error("Error deleting post:", error);
-    throw new Error("Failed to delete the post.");
+  }
+}
+
+export async function handlePostView(postId: string) {
+  try {
+    await connectToDatabase();
+
+    const post = await Post.findById(postId);
+    if (!post) throw new Error("Post not found!");
+
+    const user = await currentUser();
+
+    if (post.views.includes(user?._id)) return;
+
+    post.views.push(user);
+
+    await post.save();
+  } catch (error) {
+    console.error("Error saving post view:", error);
   }
 }

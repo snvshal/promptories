@@ -6,6 +6,8 @@ import { ps } from "@/utils/ps";
 
 export default async function NotificationsPage() {
   const user = await currentUser();
-  const notifications = await Notification.find({ user }).populate("actor");
+  const notifications = await Notification.find({ user })
+    .populate("actor")
+    .sort({ createdAt: -1 });
   return <Notifications notifications={ps(notifications as TNotification[])} />;
 }
