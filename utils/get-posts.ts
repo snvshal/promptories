@@ -8,7 +8,9 @@ export const getPosts = async () => {
     await connectToDatabase();
     // await seedDatabase();
 
-    const posts: TPost[] = await Post.find({}).populate("user");
+    const posts: TPost[] = await Post.find({})
+      .populate("user")
+      .sort({ createdAt: -1 });
 
     return posts as TPost[];
   } catch (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,10 +15,15 @@ import {
   Feather,
   Home,
   Settings,
+  ChartNoAxesColumn,
 } from "lucide-react";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
-import { handleLikePost, handleBookmarkPost } from "@/actions/postActions";
+import {
+  handleLikePost,
+  handleBookmarkPost,
+  handlePostView,
+} from "@/actions/postActions";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Dialog,
@@ -37,7 +42,6 @@ import { useSession } from "next-auth/react";
 import { SetAction } from "@/types/generics.type";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "./ui/badge";
-import { cookies } from "next/headers";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -65,7 +69,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
           <div className="flex items-center space-x-4 max-md:hidden">
             <form onSubmit={SubmitQuery}>
               <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4" />
+                <Search className="absolute left-2 top-2.5 size-4" />
                 <Input
                   type="search"
                   placeholder="Search prompts..."
@@ -179,7 +183,7 @@ export const LikeButton = ({ post }: { post: TPost }) => {
       // Server action to handle like/unlike
       await handleLikePost(post._id as string);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to save post like");
     }
   };
 
@@ -189,7 +193,7 @@ export const LikeButton = ({ post }: { post: TPost }) => {
         <Heart
           style={{ color: il(hasLiked) }}
           fill={il(hasLiked)}
-          className={`mr-2 h-4 w-4`}
+          className="mr-2 size-4"
         />
         {likes}
       </Button>
@@ -218,22 +222,25 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 
   const handleBookmarkClick = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      // Optimistically update state
+      setHasBookmarked(!hasBookmarked);
+      setBookmarks(hasBookmarked ? Math.max(bookmarks - 1, 0) : bookmarks + 1);
 
-    // Optimistically update state
-    setHasBookmarked(!hasBookmarked);
-    setBookmarks(hasBookmarked ? Math.max(bookmarks - 1, 0) : bookmarks + 1);
-
-    // Server action to handle bookmark/unbookmark
-    await handleBookmarkPost(post._id as string, user?.id as string);
+      // Server action to handle bookmark/unbookmark
+      await handleBookmarkPost(post._id as string);
+    } catch (error) {
+      console.error("Failed to save post bookmark");
+    }
   };
 
   return (
     <form onSubmit={handleBookmarkClick}>
-      <Button variant="ghost" size="sm" aria-label="Bookmark Post ">
+      <Button variant="ghost" size="sm" aria-label="Bookmark Post">
         <Bookmark
           style={{ color: ib(hasBookmarked) }}
-          className={`mr-2 h-4 w-4`}
           fill={ib(hasBookmarked)}
+          className="mr-2 size-4"
         />
         {bookmarks}
       </Button>
@@ -295,7 +302,7 @@ export function PostReplyDialog({
           children
         ) : (
           <Button variant="ghost" size="sm" aria-label="Reply to Post">
-            <MessageCircle className="mr-2 h-4 w-4" />
+            <MessageCircle className="mr-2 size-4" />
             {repliesCount}
           </Button>
         )}
@@ -328,7 +335,7 @@ export function PostReplyDialog({
             )}
           </div>
           <Button className="w-full" aria-label="Submit Reply">
-            <Send className="mr-2 h-4 w-4" />
+            <Send className="mr-2 size-4" />
             Submit Reply
           </Button>
         </form>
@@ -386,7 +393,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         variant={iv(pathname === "/home")}
         className="size-10 rounded-lg p-2"
       >
-        <Home className="h-6 w-6" />
+        <Home className="size-6" />
       </Button>
       <Button
         size={"icon"}
@@ -394,7 +401,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         onClick={() => router.push("/search")}
         className="size-10 rounded-lg p-2"
       >
-        <Search className="h-6 w-6" />
+        <Search className="size-6" />
       </Button>
       <Button
         size={"icon"}
@@ -402,7 +409,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         onClick={() => router.push("/settings/profile")}
         className="size-10 rounded-lg p-2"
       >
-        <Settings className="h-6 w-6" />
+        <Settings className="size-6" />
       </Button>
       <Button
         size={"icon"}
@@ -415,7 +422,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
             {/* {notificationCount <= 10 ? notificationCount : "10+"} */}
           </Badge>
         )}
-        <Bell className="h-6 w-6" />
+        <Bell className="size-6" />
       </Button>
     </>
   );
@@ -441,5 +448,50 @@ export function UserProfileLink() {
         </Avatar>
       </Button>
     </div>
+  );
+}
+
+export function PostViews({ post }: { post: TPost }) {
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  const postRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const currentRef = postRef.current;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(async (entry) => {
+          if (
+            entry.isIntersecting &&
+            entry.intersectionRatio === 1 &&
+            !st(post.views).includes(user?.id as string)
+          ) {
+            try {
+              await handlePostView(post._id as string);
+            } catch (error) {
+              console.error("Post views not saved");
+            }
+          }
+        });
+      },
+      {
+        threshold: 1.0, // Trigger when 100% of the element is in view
+      },
+    );
+
+    if (currentRef) observer.observe(currentRef);
+
+    return () => {
+      if (currentRef) observer.unobserve(currentRef);
+    };
+  }, [post._id, post.views, user?.id]);
+  return (
+    <Button ref={postRef} variant={"ghost"} size={"sm"} aria-label="Post Views">
+      <ChartNoAxesColumn className="mr-2 size-4" />
+      {post.views.length < 1 ? "" : post.views.length}
+      {/* {post.views.length} */}
+    </Button>
   );
 }

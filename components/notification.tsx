@@ -88,6 +88,8 @@ export function NotificationContent({
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const currentRef = notificationRef.current;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(async (entry) => {
@@ -97,14 +99,11 @@ export function NotificationContent({
             entry.intersectionRatio === 1 &&
             !notification.read
           ) {
-            console.log("read");
             try {
               await markAsReadNotification(notification._id as string);
             } catch (error) {
-              console.error("Error:", error);
+              console.error("notification not saved");
             } // Mark notification as seen
-          } else {
-            console.log("unread");
           }
         });
       },
@@ -113,14 +112,10 @@ export function NotificationContent({
       },
     );
 
-    if (notificationRef.current) {
-      observer.observe(notificationRef.current);
-    }
+    if (currentRef) observer.observe(currentRef);
 
     return () => {
-      if (notificationRef.current) {
-        observer.unobserve(notificationRef.current);
-      }
+      if (currentRef) observer.unobserve(currentRef);
     };
   }, [notification._id, notification.read]);
 

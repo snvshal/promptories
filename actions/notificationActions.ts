@@ -90,22 +90,13 @@ export async function followNotification(user: TUser) {
 
 export async function markAsReadNotification(notificationId: string) {
   try {
-    console.log(notificationId);
+    const notification = await Notification.findById(notificationId);
+    if (!notification)
+      throw new Error("Notification not found or not authorized!");
 
-    // Find the notification and update the `read` status to true
-    const notification = await Notification.findByIdAndUpdate(
-      notificationId, // Ensure the notification belongs to the user
-      { read: true }, // Set the `read` status to true
-      { new: true }, // Return the updated document
-    );
+    notification.read = true;
 
-    console.log(notification);
-
-    if (!notification) {
-      throw new Error("Notification not found or not authorized");
-    }
-
-    // return notification;
+    await notification.save();
   } catch (error) {
     console.error("Error marking notification as read:", error);
   }
