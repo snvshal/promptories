@@ -40,7 +40,7 @@ export async function likeNotification(post: TPost) {
       "like",
       objId(post.user),
       objId(actor._id),
-      "liked your post.",
+      "liked your post",
       location,
     );
   } catch (error) {
@@ -60,7 +60,7 @@ export async function commentNotification(post: TPost) {
       "comment",
       objId(post.user),
       objId(actor._id),
-      "commented on your post.",
+      "commented on your post",
       location,
     );
   } catch (error) {
@@ -75,7 +75,7 @@ export async function followNotification(user: TUser) {
 
     if (!actor || objId(actor._id).equals(objId(user._id))) return;
 
-    const location = `/${user?.username}`;
+    const location = `/${actor?.username}`;
     return await createNotification(
       "follow",
       objId(user._id),
@@ -85,5 +85,28 @@ export async function followNotification(user: TUser) {
     );
   } catch (error) {
     console.error("Error Notification follow:", error);
+  }
+}
+
+export async function markAsReadNotification(notificationId: string) {
+  try {
+    console.log(notificationId);
+
+    // Find the notification and update the `read` status to true
+    const notification = await Notification.findByIdAndUpdate(
+      notificationId, // Ensure the notification belongs to the user
+      { read: true }, // Set the `read` status to true
+      { new: true }, // Return the updated document
+    );
+
+    console.log(notification);
+
+    if (!notification) {
+      throw new Error("Notification not found or not authorized");
+    }
+
+    // return notification;
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
   }
 }

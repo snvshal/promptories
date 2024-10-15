@@ -7,6 +7,8 @@ import { Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import { Toaster } from "@/components/ui/toaster";
 import { Navbar } from "@/components/home";
+import { Notification } from "@/models/notification.model";
+import { currentUser } from "@/utils/get-user";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,6 +33,9 @@ export default async function RootLayout({
 }>) {
   const session: Session | null = await getServerSession();
 
+  const user = await currentUser();
+  const notifications = await Notification.find({ user, read: false });
+
   return (
     <html lang="en">
       <body
@@ -46,7 +51,7 @@ export default async function RootLayout({
             {children}
           </ThemeProvider>
           <Toaster />
-          <Navbar />
+          <Navbar notificationCount={notifications.length} />
         </AuthSessionProvider>
       </body>
     </html>

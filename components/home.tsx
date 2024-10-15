@@ -37,6 +37,7 @@ import { useSession } from "next-auth/react";
 import { SetAction } from "@/types/generics.type";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "./ui/badge";
+import { cookies } from "next/headers";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -349,7 +350,7 @@ export function ComposePromptoryButton() {
   );
 }
 
-export function Navbar() {
+export function Navbar({ notificationCount }: { notificationCount: number }) {
   const { status } = useSession();
 
   if (status === "unauthenticated") return null;
@@ -358,12 +359,12 @@ export function Navbar() {
     <nav className="fixed bottom-0 left-0 z-50 h-[var(--navbar-height)] border-t border-border bg-background max-sm:right-0 sm:top-0 sm:h-dvh sm:w-[var(--navbar-height)] sm:border-r md:hidden">
       <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
         <div className="flex h-full w-full flex-col items-center justify-start gap-4">
-          <NavLinks />
+          <NavLinks notificationCount={notificationCount} />
         </div>
         <UserProfileLink />
       </div>
       <div className="flex h-full items-center justify-around sm:hidden">
-        <NavLinks />
+        <NavLinks notificationCount={notificationCount} />
         <UserProfileLink />
       </div>
     </nav>
@@ -372,10 +373,11 @@ export function Navbar() {
 
 export const iv = (status: boolean) => (status ? "secondary" : "ghost");
 
-export function NavLinks() {
+export function NavLinks({ notificationCount }: { notificationCount: number }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  console.log(notificationCount);
   return (
     <>
       <Button
@@ -408,7 +410,11 @@ export function NavLinks() {
         variant={iv(pathname === "/notifications")}
         className="relative size-10 rounded-lg p-2"
       >
-        <Badge className="absolute right-1 top-1 size-2 p-0"></Badge>
+        {notificationCount > 0 && (
+          <Badge className="flex-center absolute right-1 top-1 size-2 p-0">
+            {/* {notificationCount <= 10 ? notificationCount : "10+"} */}
+          </Badge>
+        )}
         <Bell className="h-6 w-6" />
       </Button>
     </>
