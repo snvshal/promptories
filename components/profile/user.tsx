@@ -222,8 +222,7 @@ export function UserNotFound() {
               </CardHeader>
               <div className="pb-3">
                 <p>
-                  We couldn&#39;t find a user with the username &#34;{username}
-                  &#34;.
+                  We couldn&#39;t find a user with the username &#64;{username}.
                 </p>
               </div>
               <CardFooter>

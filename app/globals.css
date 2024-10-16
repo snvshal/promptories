@@ -68,6 +68,10 @@
   }
 }
 
+html {
+  @apply overflow-hidden;
+}
+
 .bbn {
   @apply box-border border;
 }
@@ -97,13 +101,17 @@
 }
 
 .mid-width-card-content {
-  @apply w-full max-md:rounded-none max-md:border-0 max-md:border-b md:mb-8;
+  @apply mb-0 w-full rounded-none border-b border-t-0;
 }
 
-.main-content {
-  @apply bottom-navbar container mx-auto box-border max-w-4xl py-8 max-md:pt-0 md:px-6 lg:px-8;
-}
+/* .main-content {
+  @apply bottom-navbar container mx-auto box-border max-w-4xl py-8;
+} */
 
 .compose-button {
   @apply fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 sm:bottom-10;
+}
+
+.nav-button {
+  @apply h-10 w-10 gap-4 rounded-lg py-2 sm:px-2 md:flex md:w-full md:items-center md:justify-start md:px-3;
 }
