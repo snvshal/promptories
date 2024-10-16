@@ -1,8 +1,7 @@
 "use client";
 
-import { FormEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
@@ -35,7 +34,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { PostType, UserOptions } from "./post";
+import { PostType } from "./post";
 import { Textarea } from "./ui/textarea";
 import { addReplyToPost } from "@/actions/addReplyToPost";
 import { objId, st } from "@/utils/ps";
@@ -47,49 +46,15 @@ import { Badge } from "./ui/badge";
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
 export function HomePageComponent({ posts }: { posts: TPost[] }) {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const router = useRouter();
-
-  const SubmitQuery = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!searchQuery.trim()) return null;
-
-    router.push(`/search?q=${searchQuery}`);
-  };
   return (
     <div className="min-h-screen w-full">
       <DynamicHeader>
-        <div className="mx-auto flex max-w-7xl items-center justify-between py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
             <h1 className="mr-8 text-2xl font-bold text-blue-600">
               Promptories
             </h1>
           </div>
-          {/* <div className="flex items-center space-x-4 max-md:hidden">
-            <form onSubmit={SubmitQuery}>
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 size-4" />
-                <Input
-                  type="search"
-                  placeholder="Search prompts..."
-                  className="w-64 pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </form>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push("/notifications")}
-            >
-              <Bell className="h-5 w-5" />
-            </Button>
-            <UserOptions />
-          </div> */}
         </div>
       </DynamicHeader>
       <main className="main-content">
