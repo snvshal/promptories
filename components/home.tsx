@@ -190,7 +190,12 @@ export const LikeButton = ({ post }: { post: TPost }) => {
 
   return (
     <form onSubmit={handleLikeClick}>
-      <Button variant="ghost" size="sm" aria-label="Like Post">
+      <Button
+        variant="ghost"
+        size="sm"
+        aria-label="Like Post"
+        className="text-muted-foreground"
+      >
         <Heart
           style={{ color: il(hasLiked) }}
           fill={il(hasLiked)}
@@ -237,7 +242,12 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 
   return (
     <form onSubmit={handleBookmarkClick}>
-      <Button variant="ghost" size="sm" aria-label="Bookmark Post">
+      <Button
+        variant="ghost"
+        size="sm"
+        aria-label="Bookmark Post"
+        className="text-muted-foreground"
+      >
         <Bookmark
           style={{ color: ib(hasBookmarked) }}
           fill={ib(hasBookmarked)}
@@ -302,7 +312,12 @@ export function PostReplyDialog({
         {children ? (
           children
         ) : (
-          <Button variant="ghost" size="sm" aria-label="Reply to Post">
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label="Reply to Post"
+            className="text-muted-foreground"
+          >
             <MessageCircle className="mr-2 size-4" />
             {repliesCount}
           </Button>
@@ -511,7 +526,13 @@ export function PostViews({ post }: { post: TPost }) {
     };
   }, [post._id, post.views, user?.id]);
   return (
-    <Button ref={postRef} variant={"ghost"} size={"sm"} aria-label="Post Views">
+    <Button
+      ref={postRef}
+      variant="ghost"
+      size="sm"
+      aria-label="Post Views"
+      className="text-muted-foreground"
+    >
       <ChartNoAxesColumn className="mr-2 size-4" />
       {post.views.length < 1 ? "" : post.views.length}
       {/* {post.views.length} */}

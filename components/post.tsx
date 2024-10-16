@@ -123,10 +123,10 @@ export function PostReplies({
   };
   return (
     <Card className="mid-width-card-content">
-      <CardHeader className="max-md:p-4">
+      <CardHeader className="p-4">
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
-      <CardContent className="max-md:px-4">
+      <CardContent className="px-4">
         <form onSubmit={handleReplySubmit} className="w-full">
           <div className="flex space-x-2">
             <Input
@@ -513,13 +513,13 @@ export function PostType({
       data-key={post._id?.toString() as string}
     >
       <CardHeader
-        className={`${type === "post" && "mb-4"} pb-0 max-md:p-4 max-md:pb-0`}
+        className={`${type === "post" && "mb-4"} p-4 pb-0 max-md:pb-0`}
       >
         <div className="flex-between">
           <div className="flex-start space-x-4">
             <Link
               href={`/${pu(post).username}`}
-              className="flex-start space-x-4"
+              className="flex-start space-x-2"
               prefetch={false}
             >
               <Avatar>
@@ -549,7 +549,7 @@ export function PostType({
       <CardContent
         role={type === "posts" ? "button" : undefined}
         onClick={type === "posts" ? () => postClick(post) : undefined}
-        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} border-0 max-md:pb-4 max-md:pr-4`}
+        className={`${type === "post" ? "pl-4" : "pl-16"} border-0 pb-2 pr-4`}
       >
         <div className="relative mb-4 overflow-hidden">
           <PostContentType type={type} content={post.caption} />
@@ -567,9 +567,9 @@ export function PostType({
       </CardContent>
       {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
       <CardFooter
-        className={`${type === "post" ? "pl-6 max-md:pl-4" : "pl-[4.5rem] md:pl-20"} flex justify-between max-md:pb-4 max-md:pr-4`}
+        className={`${type === "post" ? "pl-4" : "pl-16"} flex justify-between pb-2 pr-4`}
       >
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 max-sm:space-x-0">
           <LikeButton post={post} />
           <PostReplyDialog post={post} />
           <BookmarkButton post={post} />
@@ -584,9 +584,9 @@ export function PostType({
             size="sm"
             onClick={() => handlePostShare(post)}
             aria-label="Share Post"
+            className="p-2 text-muted-foreground"
           >
-            <Share2 className="h-4 w-4" />
-            <span className="ml-2 max-md:hidden">Share</span>
+            <Share2 className="size-4" />
           </Button>
         </div>
       </CardFooter>
@@ -620,7 +620,7 @@ export function PostContentType({
 
 export function PostTime({ createdAt }: { createdAt: Date }) {
   return (
-    <div className="flex-start mb-4 ml-4 mr-4 border-b pb-4 text-muted-foreground md:ml-6 md:mr-6">
+    <div className="flex-start mb-2 ml-4 mr-4 border-b pb-2 text-muted-foreground">
       {new Date(createdAt as Date).toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
@@ -654,9 +654,14 @@ export function PostTagsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label="View Tags">
-          <Tag className="h-4 w-4" />
-          <span className="ml-2 max-md:hidden">View Tags</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-label="View Tags"
+          className="p-2 text-muted-foreground"
+        >
+          <Tag className="size-4" />
+          <span className="sr-only">View Tags</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
