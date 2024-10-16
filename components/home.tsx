@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,6 +16,7 @@ import {
   Home,
   Settings,
   ChartNoAxesColumn,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { TPost, TReplies, TUser } from "@/types/schema.type";
@@ -58,15 +59,15 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
     router.push(`/search?q=${searchQuery}`);
   };
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <DynamicHeader>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between py-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
             <h1 className="mr-8 text-2xl font-bold text-blue-600">
               Promptories
             </h1>
           </div>
-          <div className="flex items-center space-x-4 max-md:hidden">
+          {/* <div className="flex items-center space-x-4 max-md:hidden">
             <form onSubmit={SubmitQuery}>
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 size-4" />
@@ -88,7 +89,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
               <Bell className="h-5 w-5" />
             </Button>
             <UserOptions />
-          </div>
+          </div> */}
         </div>
       </DynamicHeader>
       <main className="main-content">
@@ -357,24 +358,35 @@ export function ComposePromptoryButton() {
   );
 }
 
-export function Navbar({ notificationCount }: { notificationCount: number }) {
+export function Sidebar({
+  notificationCount,
+  children,
+}: {
+  notificationCount: number;
+  children: ReactNode;
+}) {
   const { status } = useSession();
 
   if (status === "unauthenticated") return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 z-50 h-[var(--navbar-height)] border-t border-border bg-background max-sm:right-0 sm:top-0 sm:h-dvh sm:w-[var(--navbar-height)] sm:border-r md:hidden">
-      <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
-        <div className="flex h-full w-full flex-col items-center justify-start gap-4">
-          <NavLinks notificationCount={notificationCount} />
+    <div className="flex h-screen w-full overflow-hidden max-sm:flex-col-reverse">
+      <nav className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-dvh sm:w-16 sm:border-r md:w-60">
+        <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
+          <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
+            <NavLinks notificationCount={notificationCount} />
+          </div>
+          <UserProfileLink />
         </div>
-        <UserProfileLink />
+        <div className="flex h-full items-center justify-around sm:hidden">
+          <NavLinks notificationCount={notificationCount} />
+          <UserProfileLink />
+        </div>
+      </nav>
+      <div className="h-full overflow-auto sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
+        {children}
       </div>
-      <div className="flex h-full items-center justify-around sm:hidden">
-        <NavLinks notificationCount={notificationCount} />
-        <UserProfileLink />
-      </div>
-    </nav>
+    </div>
   );
 }
 
@@ -384,38 +396,31 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  console.log(notificationCount);
   return (
     <>
       <Button
         size={"icon"}
         onClick={() => router.push("/home")}
         variant={iv(pathname === "/home")}
-        className="size-10 rounded-lg p-2"
+        className="nav-button"
       >
         <Home className="size-6" />
+        <span className="text-base max-md:hidden">Home</span>
       </Button>
       <Button
         size={"icon"}
         variant={iv(pathname.startsWith("/search"))}
         onClick={() => router.push("/search")}
-        className="size-10 rounded-lg p-2"
+        className="nav-button"
       >
         <Search className="size-6" />
-      </Button>
-      <Button
-        size={"icon"}
-        variant={iv(pathname.startsWith("/settings"))}
-        onClick={() => router.push("/settings/profile")}
-        className="size-10 rounded-lg p-2"
-      >
-        <Settings className="size-6" />
+        <span className="text-base max-md:hidden">Search</span>
       </Button>
       <Button
         size={"icon"}
         onClick={() => router.push("/notifications")}
         variant={iv(pathname === "/notifications")}
-        className="relative size-10 rounded-lg p-2"
+        className="nav-button relative"
       >
         {notificationCount > 0 && (
           <Badge className="flex-center absolute right-1 top-1 size-2 p-0">
@@ -423,6 +428,16 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
           </Badge>
         )}
         <Bell className="size-6" />
+        <span className="text-base max-md:hidden">Notifications</span>
+      </Button>
+      <Button
+        size={"icon"}
+        variant={iv(pathname.startsWith("/settings"))}
+        onClick={() => router.push("/settings/profile")}
+        className="nav-button"
+      >
+        <Settings className="size-6" />
+        <span className="text-base max-md:hidden">Settings</span>
       </Button>
     </>
   );
@@ -435,17 +450,25 @@ export function UserProfileLink() {
   const router = useRouter();
 
   return (
-    <div className="flex-center">
+    <div className="sm:px-2 md:px-4">
       <Button
         size={"icon"}
-        variant={"ghost"}
+        variant={iv(pathname.slice(1) === user?.username)}
         onClick={() => router.push(`/${user?.username}`)}
-        className={`${pathname.slice(1) === user?.username ? "outline outline-offset-2 outline-muted-foreground" : "outline-none"} rounded-full`}
+        className="size-10 gap-4 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
       >
-        <Avatar className="cursor-pointer">
+        <Avatar className="cursor-pointer max-sm:size-8">
           <AvatarImage src={user?.image} alt={user?.username} />
-          <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+          <AvatarFallback>
+            <User />
+          </AvatarFallback>
         </Avatar>
+        <span className="flex flex-col items-start max-md:hidden">
+          <span className="text-base">{user?.name}</span>
+          <span className="font-normal text-muted-foreground">
+            &#64;{user?.username}
+          </span>
+        </span>
       </Button>
     </div>
   );

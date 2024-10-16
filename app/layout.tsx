@@ -6,7 +6,7 @@ import { AuthSessionProvider } from "@/components/session-provider";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import { Toaster } from "@/components/ui/toaster";
-import { Navbar } from "@/components/home";
+import { Sidebar } from "@/components/home";
 import { Notification } from "@/models/notification.model";
 import { currentUser } from "@/utils/get-user";
 
@@ -48,10 +48,11 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <Sidebar notificationCount={notifications.length}>
+              {children}
+            </Sidebar>
           </ThemeProvider>
           <Toaster />
-          <Navbar notificationCount={notifications.length} />
         </AuthSessionProvider>
       </body>
     </html>
