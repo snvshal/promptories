@@ -7,7 +7,7 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="w-full">
       <NavigateBackHeader page="Settings" />
       <main className="main-content">
         <div className="p-4">
@@ -15,6 +15,6 @@ export default function SettingsLayout({
           {children}
         </div>
       </main>
-    </>
+    </div>
   );
 }

@@ -25,7 +25,7 @@ export default function Notifications({
   notifications.map((i) => console.log(i.read));
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <NavigateBackHeader page="Notifications" />
 
       <main className="main-content">

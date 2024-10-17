@@ -69,7 +69,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <NavigateBackHeader page="Post" />
       <main className="main-content">
         <PostType post={post} type="post" />
