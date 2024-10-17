@@ -511,19 +511,19 @@ export function PostType({
       <CardHeader
         className={`${type === "post" && "mb-4"} p-4 pb-0 max-md:pb-0`}
       >
-        <div className="flex-between">
+        <div className={`${type === "posts" && "h-5"} flex-between`}>
           <div className="flex-start space-x-4">
             <Link
               href={`/${pu(post).username}`}
               className="flex-start space-x-2"
               prefetch={false}
             >
-              <Avatar>
+              <Avatar className={`${type === "posts" && "mt-5"}`}>
                 <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div
-                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-center justify-start`}
+                className={`${type === "post" ? "flex-col items-start gap-0" : "items-center gap-1"} flex justify-start`}
               >
                 <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
