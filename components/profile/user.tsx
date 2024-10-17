@@ -70,7 +70,7 @@ export default function UserProfileComponent({
   };
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page={profileUser.name} />
 
       <main className="main-content">
         <ProfileUserContent
@@ -206,7 +206,7 @@ export function UserNotFound() {
   const { username } = useParams();
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page="User not found" />
       <div className="main-content">
         <Card className="mid-width-card-content max-md:border-0">
           <CardContent className="pt-6">
