@@ -42,6 +42,7 @@ import { useSession } from "next-auth/react";
 import { SetAction } from "@/types/generics.type";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "./ui/badge";
+import { promptory_types } from "@/lib/constants";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -363,7 +364,7 @@ export function Sidebar({
           <UserProfileLink />
         </div>
       </nav>
-      <div className="h-full overflow-auto sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
+      <div className="flex size-full overflow-auto sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
         {children}
       </div>
     </div>
@@ -524,5 +525,20 @@ export function PostViews({ post }: { post: TPost }) {
       {post.views.length < 1 ? "" : post.views.length}
       {/* {post.views.length} */}
     </Button>
+  );
+}
+
+export function SidePanel() {
+  return (
+    <div className="border-box sticky top-0 h-screen w-72 overflow-auto border-l max-lg:hidden">
+      <div className="flex-start flex-col p-2">
+        <p className="w-full border-b">Side Panel</p>
+        {promptory_types.map((type, index) => (
+          <Link key={index} href={"/"} className="w-full">
+            {type}
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }

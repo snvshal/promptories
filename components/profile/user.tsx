@@ -69,7 +69,7 @@ export default function UserProfileComponent({
     router.push(`?tab=${tab}`);
   };
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <NavigateBackHeader page={profileUser.name} />
 
       <main className="main-content">

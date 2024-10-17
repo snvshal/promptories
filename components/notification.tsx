@@ -25,7 +25,7 @@ export default function Notifications({
   notifications.map((i) => console.log(i.read));
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <NavigateBackHeader page="Notifications" />
 
       <main className="main-content">
@@ -120,7 +120,7 @@ export function NotificationContent({
       role="button"
       key={notification._id?.toString() as string}
       onClick={() => router.push(notification.location)}
-      className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
+      className={`flex items-center space-x-4 py-4 pr-2 ${notification.read ? "opacity-50" : ""}`}
     >
       <Avatar>
         <AvatarImage

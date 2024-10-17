@@ -69,7 +69,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <NavigateBackHeader page="Post" />
       <main className="main-content">
         <PostType post={post} type="post" />
@@ -220,7 +220,7 @@ export function PostRepliesContent({
   return (
     <div className="space-y-4">
       {replies.map((reply, index) => (
-        <div key={index} className="flex space-x-4">
+        <div key={index} className="flex space-x-2">
           <Link href={`/${pu(reply).username}`} prefetch={false}>
             <Avatar className="mt-1 h-8 w-8">
               <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
@@ -511,19 +511,19 @@ export function PostType({
       <CardHeader
         className={`${type === "post" && "mb-4"} p-4 pb-0 max-md:pb-0`}
       >
-        <div className="flex-between">
+        <div className={`${type === "posts" && "h-5"} flex-between`}>
           <div className="flex-start space-x-4">
             <Link
               href={`/${pu(post).username}`}
               className="flex-start space-x-2"
               prefetch={false}
             >
-              <Avatar>
+              <Avatar className={`${type === "posts" && "mt-5"}`}>
                 <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div
-                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-center justify-start`}
+                className={`${type === "post" ? "flex-col items-start gap-0" : "items-center gap-1"} flex justify-start`}
               >
                 <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p

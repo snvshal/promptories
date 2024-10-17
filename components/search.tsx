@@ -102,7 +102,7 @@ export default function SearchComponent() {
   }, [query, category, dateRange]);
 
   return (
-    <div className="min-h-screen">
+    <div className="w-full">
       <NavigateBackHeader page="Search" />
       <main className="main-content">
         <Card className="mid-width-card-content">

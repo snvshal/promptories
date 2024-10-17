@@ -6,7 +6,7 @@ import { AuthSessionProvider } from "@/components/session-provider";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import { Toaster } from "@/components/ui/toaster";
-import { Sidebar } from "@/components/home";
+import { Sidebar, SidePanel } from "@/components/home";
 import { Notification } from "@/models/notification.model";
 import { currentUser } from "@/utils/get-user";
 
@@ -50,6 +50,7 @@ export default async function RootLayout({
           >
             <Sidebar notificationCount={notifications.length}>
               {children}
+              <SidePanel />
             </Sidebar>
           </ThemeProvider>
           <Toaster />
