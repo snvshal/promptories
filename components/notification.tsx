@@ -26,16 +26,11 @@ export default function Notifications({
 
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page="Notifications" />
 
-      <main className="p-4">
-        <Card>
-          <CardHeader className="p-4">
-            <CardTitle className="text-xl font-semibold">
-              Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
+      <main className="main-content">
+        <Card className="mid-width-card-content">
+          <CardContent className="p-4">
             <Tabs
               defaultValue="all"
               className="w-full"

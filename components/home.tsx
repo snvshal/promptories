@@ -94,7 +94,7 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
 
   return (
     <header
-      className={`sticky top-0 z-10 z-50 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out sm:pl-16 ${
+      className={`sticky top-0 z-10 z-50 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       } shadow`}
     >

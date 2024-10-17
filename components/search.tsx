@@ -103,15 +103,10 @@ export default function SearchComponent() {
 
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page="Search" />
       <main className="main-content">
         <Card className="mid-width-card-content">
-          <CardHeader className="p-4">
-            <CardTitle className="text-xl font-semibold">
-              Search Promptories
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4">
             <form onSubmit={handleSearchSubmit}>
               <div className="flex gap-2">
                 <Input
