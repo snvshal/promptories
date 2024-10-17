@@ -528,15 +528,13 @@ export function PostViews({ post }: { post: TPost }) {
   );
 }
 
-const ptyp = ["text-to-text", "text-to-me"];
-
 export function SidePanel() {
   return (
     <div className="border-box sticky top-0 h-screen w-72 overflow-auto border-l max-lg:hidden">
       <div className="flex-start flex-col p-2">
         <p className="w-full border-b">Side Panel</p>
-        {promptory_types.map((type) => (
-          <Link href={"/"} className="w-full">
+        {promptory_types.map((type, index) => (
+          <Link key={index} href={"/"} className="w-full">
             {type}
           </Link>
         ))}
