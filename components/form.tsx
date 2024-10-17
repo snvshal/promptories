@@ -104,11 +104,10 @@ export default function PostForm({
 
   return (
     <>
-      <NavigateBackHeader />
-      <main className="main-content">
-        <h1 className="mb-4 text-3xl font-bold max-md:p-4 max-md:pb-0">
-          Create New Post
-        </h1>
+      <NavigateBackHeader
+        page={operationType === "POST" ? "Create Promptory" : "Edit Promptory"}
+      />
+      <main className="main-content p-4">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-6 max-md:p-4"

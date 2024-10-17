@@ -8,10 +8,9 @@ export default function SettingsLayout({
 }) {
   return (
     <>
-      <NavigateBackHeader />
+      <NavigateBackHeader page="Settings" />
       <main className="main-content">
-        <div className="max-md:p-4">
-          <h1 className="mb-6 text-3xl font-bold">Settings</h1>
+        <div className="p-4">
           <SettingsTabs />
           {children}
         </div>

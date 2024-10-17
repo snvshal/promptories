@@ -70,7 +70,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
 
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page="Post" />
       <main className="main-content">
         <PostType post={post} type="post" />
         <PostReplies
@@ -280,18 +280,14 @@ export function PostRepliesContent({
   );
 }
 
-export function NavigateBackHeader() {
+export function NavigateBackHeader({ page }: { page: string }) {
   return (
     <DynamicHeader>
-      <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 md:px-6 lg:px-8">
-        <Link
-          href="/home"
-          className="flex items-center text-blue-600 hover:text-blue-800"
-        >
-          <ArrowLeft className="mr-2 h-5 w-5" />
-          <span className="font-semibold">Back to Home</span>
+      <div className="mx-auto flex max-w-4xl items-center justify-between p-4">
+        <Link href="/home" className="flex-start">
+          <ArrowLeft className="mr-6 size-6" />
+          <h1 className="text-xl font-bold">{page}</h1>
         </Link>
-        <h1 className="text-2xl font-bold text-blue-600">Promptories</h1>
       </div>
     </DynamicHeader>
   );
@@ -527,11 +523,11 @@ export function PostType({
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div
-                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-start justify-start`}
+                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-center justify-start`}
               >
                 <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
-                  className={`text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
+                  className={`text-sm text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
                 >
                   &#64;{pu(post).username}
                 </p>
@@ -539,7 +535,7 @@ export function PostType({
             </Link>
             {type === "posts" && (
               <p className="text-sm text-muted-foreground">
-                &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+                &#183; <TimeAgo timestamp={post.createdAt as Date} />
               </p>
             )}
           </div>

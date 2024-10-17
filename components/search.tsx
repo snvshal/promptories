@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle, Filter, Search as SearchIcon } from "lucide-react";
@@ -103,15 +103,10 @@ export default function SearchComponent() {
 
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page="Search" />
       <main className="main-content">
-        <Card className="mid-width-card-content md:mb-4">
-          <CardHeader className="max-md:p-4">
-            <CardTitle className="text-xl font-semibold">
-              Search Promptories
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="max-md:p-4 max-md:pt-0">
+        <Card className="mid-width-card-content">
+          <CardContent className="p-4">
             <form onSubmit={handleSearchSubmit}>
               <div className="flex gap-2">
                 <Input
@@ -147,7 +142,7 @@ export default function SearchComponent() {
             onValueChange={handleTabChange}
             className="w-full"
           >
-            <div className="max-md:border-b max-md:p-4 md:mb-4">
+            <div className="border-b p-4">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="posts">Posts</TabsTrigger>
                 <TabsTrigger value="users">Users</TabsTrigger>
@@ -197,10 +192,10 @@ export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
 
   return (
     <Card className="mid-width-card-content">
-      <CardContent className="flex items-center space-x-4 py-4">
+      <CardContent className="flex items-center space-x-4 p-4">
         <Avatar
           role="button"
-          className="h-16 w-16"
+          className="size-16 self-start"
           onClick={() => router.push(`/${profileUser.username}`)}
         >
           <AvatarImage src={profileUser.avatar} alt={profileUser.name} />

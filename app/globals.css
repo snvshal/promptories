@@ -101,7 +101,7 @@ html {
 }
 
 .mid-width-card-content {
-  @apply mb-0 w-full rounded-none border-b border-t-0;
+  @apply mb-0 w-full rounded-none border-x-0 border-b border-t-0;
 }
 
 /* .main-content {
@@ -109,7 +109,7 @@ html {
 } */
 
 .compose-button {
-  @apply fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 sm:bottom-10;
+  @apply fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 sm:bottom-10 sm:hidden;
 }
 
 .nav-button {

@@ -70,7 +70,7 @@ export default function UserProfileComponent({
   };
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page={profileUser.name} />
 
       <main className="main-content">
         <ProfileUserContent
@@ -79,7 +79,7 @@ export default function UserProfileComponent({
         />
 
         <Tabs defaultValue={tab} className="w-full">
-          <div className="max-md:border-b max-md:p-4 md:mb-4">
+          <div className="border-b p-4">
             <TabsList
               className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} `}
             >
@@ -140,7 +140,7 @@ export function ProfileUserContent({
   const [followers, setFollowers] = useState(profileUser?.following.length);
 
   return (
-    <Card className="mid-width-card-content md:mb-4">
+    <Card className="mid-width-card-content">
       <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
         <div className="flex w-full justify-end space-x-4">
           <ProfileOptionButton
@@ -206,7 +206,7 @@ export function UserNotFound() {
   const { username } = useParams();
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page="User not found" />
       <div className="main-content">
         <Card className="mid-width-card-content max-md:border-0">
           <CardContent className="pt-6">

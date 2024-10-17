@@ -49,7 +49,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
   return (
     <div className="min-h-screen w-full">
       <DynamicHeader>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between p-4">
           <div className="flex items-center">
             <h1 className="mr-8 text-2xl font-bold text-blue-600">
               Promptories
@@ -94,7 +94,7 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
 
   return (
     <header
-      className={`sticky top-0 z-10 z-50 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out sm:pl-16 ${
+      className={`sticky top-0 z-10 z-50 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       } shadow`}
     >
@@ -371,6 +371,7 @@ export function Sidebar({
 }
 
 export const iv = (status: boolean) => (status ? "secondary" : "ghost");
+export const fw = (status: boolean) => (status ? "font-bold" : "font-medium");
 
 export function NavLinks({ notificationCount }: { notificationCount: number }) {
   const pathname = usePathname();
@@ -385,7 +386,9 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         className="nav-button"
       >
         <Home className="size-6" />
-        <span className="text-base max-md:hidden">Home</span>
+        <span className={`${fw(pathname === "/home")} text-base max-md:hidden`}>
+          Home
+        </span>
       </Button>
       <Button
         size={"icon"}
@@ -394,7 +397,11 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         className="nav-button"
       >
         <Search className="size-6" />
-        <span className="text-base max-md:hidden">Search</span>
+        <span
+          className={`${fw(pathname.startsWith("/search"))} text-base max-md:hidden`}
+        >
+          Search
+        </span>
       </Button>
       <Button
         size={"icon"}
@@ -408,7 +415,11 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
           </Badge>
         )}
         <Bell className="size-6" />
-        <span className="text-base max-md:hidden">Notifications</span>
+        <span
+          className={`${fw(pathname === "/notifications")} text-base max-md:hidden`}
+        >
+          Notifications
+        </span>
       </Button>
       <Button
         size={"icon"}
@@ -417,7 +428,11 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         className="nav-button"
       >
         <Settings className="size-6" />
-        <span className="text-base max-md:hidden">Settings</span>
+        <span
+          className={`${fw(pathname.startsWith("/settings"))} text-base max-md:hidden`}
+        >
+          Settings
+        </span>
       </Button>
     </>
   );
@@ -430,14 +445,21 @@ export function UserProfileLink() {
   const router = useRouter();
 
   return (
-    <div className="sm:px-2 md:px-4">
+    <div className="flex flex-col gap-2 sm:px-2 md:px-4">
+      <Button
+        onClick={() => router.push("/compose/promptory")}
+        className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11"
+      >
+        <Feather className="size-5 text-base md:hidden" />
+        <span className="text-base text-lg max-md:hidden">Post</span>
+      </Button>
       <Button
         size={"icon"}
         variant={iv(pathname.slice(1) === user?.username)}
         onClick={() => router.push(`/${user?.username}`)}
         className="size-10 gap-4 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
       >
-        <Avatar className="cursor-pointer max-sm:size-8">
+        <Avatar className="max-sm:size-8">
           <AvatarImage src={user?.image} alt={user?.username} />
           <AvatarFallback>
             <User />

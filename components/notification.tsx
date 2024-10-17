@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, MessageCircle, UserPlus, Bell } from "lucide-react";
@@ -26,16 +26,11 @@ export default function Notifications({
 
   return (
     <div className="min-h-screen">
-      <NavigateBackHeader />
+      <NavigateBackHeader page="Notifications" />
 
       <main className="main-content">
-        <Card className="mid-width-card-content w-full">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card className="mid-width-card-content">
+          <CardContent className="p-4">
             <Tabs
               defaultValue="all"
               className="w-full"
