@@ -120,7 +120,7 @@ export function NotificationContent({
       role="button"
       key={notification._id?.toString() as string}
       onClick={() => router.push(notification.location)}
-      className={`flex items-center space-x-4 py-4 ${notification.read ? "opacity-50" : ""}`}
+      className={`flex items-center space-x-4 py-4 pr-2 ${notification.read ? "opacity-50" : ""}`}
     >
       <Avatar>
         <AvatarImage
