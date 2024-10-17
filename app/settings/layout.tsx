@@ -10,7 +10,7 @@ export default function SettingsLayout({
     <>
       <NavigateBackHeader />
       <main className="main-content">
-        <div className="max-md:p-4">
+        <div className="p-4">
           <h1 className="mb-6 text-3xl font-bold">Settings</h1>
           <SettingsTabs />
           {children}

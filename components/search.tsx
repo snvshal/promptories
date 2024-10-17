@@ -105,13 +105,13 @@ export default function SearchComponent() {
     <div className="min-h-screen">
       <NavigateBackHeader />
       <main className="main-content">
-        <Card className="mid-width-card-content md:mb-4">
-          <CardHeader className="max-md:p-4">
+        <Card className="mid-width-card-content">
+          <CardHeader className="p-4">
             <CardTitle className="text-xl font-semibold">
               Search Promptories
             </CardTitle>
           </CardHeader>
-          <CardContent className="max-md:p-4 max-md:pt-0">
+          <CardContent className="p-4 pt-0">
             <form onSubmit={handleSearchSubmit}>
               <div className="flex gap-2">
                 <Input
@@ -147,7 +147,7 @@ export default function SearchComponent() {
             onValueChange={handleTabChange}
             className="w-full"
           >
-            <div className="max-md:border-b max-md:p-4 md:mb-4">
+            <div className="border-b p-4">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="posts">Posts</TabsTrigger>
                 <TabsTrigger value="users">Users</TabsTrigger>
@@ -197,10 +197,10 @@ export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
 
   return (
     <Card className="mid-width-card-content">
-      <CardContent className="flex items-center space-x-4 py-4">
+      <CardContent className="flex items-center space-x-4 p-4">
         <Avatar
           role="button"
-          className="h-16 w-16"
+          className="size-16 self-start"
           onClick={() => router.push(`/${profileUser.username}`)}
         >
           <AvatarImage src={profileUser.avatar} alt={profileUser.name} />

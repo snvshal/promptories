@@ -101,7 +101,7 @@ html {
 }
 
 .mid-width-card-content {
-  @apply mb-0 w-full rounded-none border-b border-t-0;
+  @apply mb-0 w-full rounded-none border-x-0 border-b border-t-0;
 }
 
 /* .main-content {
