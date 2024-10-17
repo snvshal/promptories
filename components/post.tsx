@@ -220,7 +220,7 @@ export function PostRepliesContent({
   return (
     <div className="space-y-4">
       {replies.map((reply, index) => (
-        <div key={index} className="flex space-x-4">
+        <div key={index} className="flex space-x-2">
           <Link href={`/${pu(reply).username}`} prefetch={false}>
             <Avatar className="mt-1 h-8 w-8">
               <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
