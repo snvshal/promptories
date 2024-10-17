@@ -447,7 +447,6 @@ export function UserProfileLink() {
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-4">
       <Button
-        // size={"icon"}
         onClick={() => router.push("/compose/promptory")}
         className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11"
       >

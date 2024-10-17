@@ -523,11 +523,11 @@ export function PostType({
                 <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div
-                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-start justify-start`}
+                className={`${type === "post" ? "flex-col gap-0" : "gap-1"} flex items-center justify-start`}
               >
                 <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
-                  className={`text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
+                  className={`text-sm text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
                 >
                   &#64;{pu(post).username}
                 </p>
@@ -535,7 +535,7 @@ export function PostType({
             </Link>
             {type === "posts" && (
               <p className="text-sm text-muted-foreground">
-                &#8226; <TimeAgo timestamp={post.createdAt as Date} />
+                &#183; <TimeAgo timestamp={post.createdAt as Date} />
               </p>
             )}
           </div>
