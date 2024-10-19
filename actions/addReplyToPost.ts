@@ -30,7 +30,7 @@ export async function addReplyToPost(postId: string, replyText: string) {
         $push: {
           replies: {
             user: user,
-            reply: replyText,
+            reply: replyText.trim(),
             timestamp: new Date(),
           },
         },

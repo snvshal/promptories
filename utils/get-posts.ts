@@ -2,11 +2,12 @@ import { Post } from "@/models/post.model";
 import { connectToDatabase } from "./db";
 import { TPost, TUser } from "@/types/schema.type";
 import { User } from "@/models/user.model";
+import { seedPostDatabase } from "@/lib/seed";
 
 export const getPosts = async () => {
   try {
     await connectToDatabase();
-    // await seedDatabase();
+    // await seedPostDatabase();
 
     const posts: TPost[] = await Post.find({})
       .populate("user")
