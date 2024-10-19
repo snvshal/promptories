@@ -12,32 +12,26 @@ const PostSchema = new Schema<TPost>(
     caption: {
       type: String,
       required: true,
-      trim: true,
     },
     model_url: {
       type: String,
       required: true,
-      trim: true,
     },
     chat_link: {
       type: String,
-      trim: true,
     },
     prompt: {
       type: String,
       required: true,
-      trim: true,
     },
     response: {
       type: String,
       required: true,
-      trim: true,
     },
     promptory_type: {
       type: String,
       enum: promptory_types,
       required: true,
-      trim: true,
     },
     replies: [
       {
@@ -45,7 +39,6 @@ const PostSchema = new Schema<TPost>(
         reply: { type: String },
         likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
         timestamp: { type: Date, default: Date.now },
-        trim: true,
       },
     ],
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
