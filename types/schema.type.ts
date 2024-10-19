@@ -28,6 +28,7 @@ export type TUser = Document & {
     twitter?: string;
     github?: string;
   };
+  posts: Types.ObjectId[];
   followers: Types.ObjectId[];
   following: Types.ObjectId[];
 };

@@ -22,11 +22,11 @@ export async function savePostForm(data: FPost) {
 
     const post = await Post.create({
       user: user,
-      caption: data.caption,
-      model_url: data.model_url,
-      chat_link: data.chat_link,
-      prompt: data.prompt,
-      response: data.response,
+      caption: data.caption.trim(),
+      model_url: data.model_url.trim(),
+      chat_link: data.chat_link?.trim(),
+      prompt: data.prompt.trim(),
+      response: data.response.trim(),
       promptory_type: data.promptory_type,
       tags: await parseTags(data.tags as string),
     });
@@ -49,11 +49,11 @@ export async function updatePostForm(data: FPost, postId: string) {
     if (!post.user.equals(user?._id))
       throw new Error("Not authorized to delete this post.");
 
-    post.caption = data.caption;
-    post.model_url = data.model_url;
-    post.chat_link = data.chat_link;
-    post.prompt = data.prompt;
-    post.response = data.response;
+    post.caption = data.caption.trim();
+    post.model_url = data.model_url.trim();
+    post.chat_link = data.chat_link?.trim();
+    post.prompt = data.prompt.trim();
+    post.response = data.response.trim();
     post.promptory_type = data.promptory_type;
     post.tags = await parseTags(data.tags as string);
 
