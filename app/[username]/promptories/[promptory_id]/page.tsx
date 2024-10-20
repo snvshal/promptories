@@ -12,7 +12,7 @@ export default async function PromptoriesPage({
 
   if (!post) {
     return (
-      <main className="main-content">
+      <main className="main-content flex size-full overflow-auto sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
         <div className="flex-center mt-40 w-full">
           <p>Post not found!</p>
         </div>

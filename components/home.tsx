@@ -43,6 +43,7 @@ import { SetAction } from "@/types/generics.type";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "./ui/badge";
 import { promptory_types } from "@/lib/constants";
+import { ScrollArea } from "./ui/scroll-area";
 
 export const pu = (post: TPost | TReplies) => post.user as TUser;
 
@@ -95,7 +96,7 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
 
   return (
     <header
-      className={`sticky top-0 z-10 z-50 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out ${
+      className={`sticky top-0 z-20 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       } shadow`}
     >
@@ -351,21 +352,29 @@ export function Sidebar({
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="flex h-screen w-full overflow-hidden max-sm:flex-col-reverse">
-      <nav className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-dvh sm:w-16 sm:border-r md:w-60">
-        <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
-          <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
-            <NavLinks notificationCount={notificationCount} />
+    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
+      <aside className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-dvh sm:w-16 sm:border-r md:w-60">
+        <nav className="h-full">
+          <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
+            <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
+              <NavLinks notificationCount={notificationCount} />
+            </div>
+            <UserProfileLink />
           </div>
-          <UserProfileLink />
+          <div className="flex h-full items-center justify-around sm:hidden">
+            <NavLinks notificationCount={notificationCount} />
+            <UserProfileLink />
+          </div>
+        </nav>
+      </aside>
+
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex">
+          <div className="flex-1 border-r sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
+            {children}
+          </div>
+          <SidePanel />
         </div>
-        <div className="flex h-full items-center justify-around sm:hidden">
-          <NavLinks notificationCount={notificationCount} />
-          <UserProfileLink />
-        </div>
-      </nav>
-      <div className="flex size-full overflow-auto sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
-        {children}
       </div>
     </div>
   );
@@ -530,15 +539,23 @@ export function PostViews({ post }: { post: TPost }) {
 
 export function SidePanel() {
   return (
-    <div className="border-box sticky top-0 h-screen w-72 overflow-auto border-l max-lg:hidden">
-      <div className="flex-start flex-col p-2">
-        <p className="w-full border-b">Side Panel</p>
-        {promptory_types.map((type, index) => (
-          <Link key={index} href={"/"} className="w-full">
-            {type}
-          </Link>
-        ))}
+    <aside className="w-64 p-4">
+      <h2 className="sticky top-4 mb-4 text-lg font-semibold">Side Panel</h2>
+      <div className="sticky top-16 max-h-[calc(100vh-74px)] overflow-y-auto">
+        <ScrollArea className="h-[calc(100vh-74px)] rounded-md border">
+          <div className="mr-2 flex flex-col gap-2 p-2">
+            {promptory_types.map((type, index) => (
+              <Link
+                key={index}
+                href={"/"}
+                className="w-full rounded-md border p-1 text-center"
+              >
+                {type}
+              </Link>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
-    </div>
+    </aside>
   );
 }
