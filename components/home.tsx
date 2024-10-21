@@ -349,7 +349,7 @@ export function Sidebar({
 }) {
   const { status } = useSession();
 
-  if (status === "unauthenticated") return null;
+  if (status === "unauthenticated") return children;
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
