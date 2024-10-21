@@ -455,19 +455,22 @@ export function UserProfileLink() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col gap-2 sm:px-2 md:px-4">
-      <Button
-        onClick={() => router.push("/compose/promptory")}
-        className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11"
-      >
-        <Feather className="size-5 text-base md:hidden" />
-        <span className="text-base text-lg max-md:hidden">Post</span>
-      </Button>
+    <div className="flex flex-col gap-2 sm:px-2 md:px-5">
+      <div className="pr-4">
+        <Button
+          onClick={() => router.push("/compose/promptory")}
+          className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11"
+        >
+          <Feather className="size-5 text-base md:hidden" />
+          <span className="text-base text-lg max-md:hidden">Post</span>
+        </Button>
+      </div>
+
       <Button
         size={"icon"}
         variant={iv(pathname.slice(1) === user?.username)}
         onClick={() => router.push(`/${user?.username}`)}
-        className="size-10 gap-4 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
+        className="size-10 gap-2 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
       >
         <Avatar className="max-sm:size-8">
           <AvatarImage src={user?.image} alt={user?.username} />
