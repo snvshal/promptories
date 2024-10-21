@@ -3,17 +3,7 @@
 import { connectToDatabase } from "@/utils/db";
 import { User } from "@/models/user.model";
 import { ProfileFormValues } from "@/components/settings/profile";
-
-const reservedUsernames = [
-  "admin",
-  "user",
-  "test",
-  "home",
-  "profile",
-  "settings",
-  "search",
-  "notifications",
-];
+import { reservedUsernames } from "@/lib/constants";
 
 export async function isUsernameUnique(
   username: string,

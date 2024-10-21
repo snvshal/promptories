@@ -114,28 +114,25 @@ export function NotificationContent({
     };
   }, [notification._id, notification.read]);
 
+  const nactor = notification.actor as TUser;
+
   return (
     <div
       ref={notificationRef}
-      role="button"
       key={notification._id?.toString() as string}
-      onClick={() => router.push(notification.location)}
       className={`flex items-center space-x-4 py-4 pr-2 ${notification.read ? "opacity-50" : ""}`}
     >
-      <Avatar>
-        <AvatarImage
-          src={(notification.actor as TUser)?.avatar}
-          alt={(notification.actor as TUser)?.name}
-        />
-        <AvatarFallback>
-          {(notification.actor as TUser)?.name?.charAt(0)}
-        </AvatarFallback>
+      <Avatar role="button" onClick={() => router.push(`/${nactor.username}`)}>
+        <AvatarImage src={nactor?.avatar} alt={nactor?.name} />
+        <AvatarFallback>{nactor?.name?.charAt(0)}</AvatarFallback>
       </Avatar>
-      <div className="flex-1">
+      <div
+        role="button"
+        className="flex-1"
+        onClick={() => router.push(notification.location)}
+      >
         <p className="text-sm hover:underline">
-          <span className="font-semibold">
-            {(notification.actor as TUser)?.name}
-          </span>{" "}
+          <span className="font-semibold">{nactor?.name}</span>{" "}
           {notification.content}
         </p>
         <p className="text-xs text-gray-500">
