@@ -539,7 +539,7 @@ export function PostViews({ post }: { post: TPost }) {
 
 export function SidePanel() {
   return (
-    <aside className="w-64 p-4">
+    <aside className="w-64 p-4 max-lg:hidden">
       <h2 className="sticky top-4 mb-4 text-lg font-semibold">Side Panel</h2>
       <div className="sticky top-16 max-h-[calc(100vh-74px)] overflow-y-auto">
         <ScrollArea className="h-[calc(100vh-74px)] rounded-md border">
