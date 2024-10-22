@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import {
   MessageCircle,
   Share2,
@@ -26,8 +26,8 @@ import {
   MessageSquareShare,
   Tag,
   Edit,
-} from "lucide-react";
-import Link from "next/link";
+} from "lucide-react"
+import Link from "next/link"
 import {
   BookmarkButton,
   DynamicHeader,
@@ -36,25 +36,25 @@ import {
   PostReplyDialog,
   PostViews,
   pu,
-} from "./home";
-import { TimeAgo } from "./time-ago";
-import { TPost, TReplies } from "@/types/schema.type";
-import { addReplyToPost } from "@/actions/addReplyToPost";
-import { Separator } from "./ui/separator";
-import { deleteReply, handleLikeReply } from "@/actions/replyActions";
+} from "./home"
+import { TimeAgo } from "./time-ago"
+import { TPost, TReplies } from "@/types/schema.type"
+import { addReplyToPost } from "@/actions/addReplyToPost"
+import { Separator } from "./ui/separator"
+import { deleteReply, handleLikeReply } from "@/actions/replyActions"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
-import { handleDeletePost } from "@/actions/postActions";
-import { handlePostShare, st } from "@/utils/ps";
-import { useSession } from "next-auth/react";
-import { Types } from "mongoose";
-import { SetAction } from "@/types/generics.type";
-import { ScrollArea } from "./ui/scroll-area";
+} from "@/components/ui/dropdown-menu"
+import { useRouter } from "next/navigation"
+import { handleDeletePost } from "@/actions/postActions"
+import { handlePostShare, st } from "@/utils/ps"
+import { useSession } from "next-auth/react"
+import { Types } from "mongoose"
+import { SetAction } from "@/types/generics.type"
+import { ScrollArea } from "./ui/scroll-area"
 import {
   Dialog,
   DialogContent,
@@ -62,11 +62,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { toast } from "@/hooks/use-toast";
+} from "@/components/ui/dialog"
+import { toast } from "@/hooks/use-toast"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
-  const [postReplies, setPostReplies] = useState(post.replies);
+  const [postReplies, setPostReplies] = useState(post.replies)
 
   return (
     <div className="min-h-screen w-full">
@@ -81,7 +81,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
       </main>
       <PromptoryReplyButton post={post} setPostReplies={setPostReplies} />
     </div>
-  );
+  )
 }
 
 export function PostReplies({
@@ -89,38 +89,38 @@ export function PostReplies({
   postReplies,
   setPostReplies,
 }: {
-  post: TPost;
-  postReplies: TReplies[];
-  setPostReplies: SetAction<TReplies[]>;
+  post: TPost
+  postReplies: TReplies[]
+  setPostReplies: SetAction<TReplies[]>
 }) {
-  const [replyText, setReplyText] = useState("");
-  const [emptyReplyError, setEmptyReplyError] = useState("");
+  const [replyText, setReplyText] = useState("")
+  const [emptyReplyError, setEmptyReplyError] = useState("")
 
   const handleReplySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!replyText) {
-      setEmptyReplyError("Reply is required!");
-      return;
+      setEmptyReplyError("Reply is required!")
+      return
     }
 
     try {
-      const updatedPost = await addReplyToPost(post._id as string, replyText);
-      setPostReplies(updatedPost.replies);
-      console.log("Reply submitted:", replyText);
-      setReplyText("");
+      const updatedPost = await addReplyToPost(post._id as string, replyText)
+      setPostReplies(updatedPost.replies)
+      console.log("Reply submitted:", replyText)
+      setReplyText("")
       // Here you would typically send the reply to your backend
       toast({
         description: "Your reply has been sent.",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem sending your reply.",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
   return (
     <Card className="mid-width-card-content">
       <CardHeader className="p-4">
@@ -135,8 +135,8 @@ export function PostReplies({
               placeholder="Write a reply..."
               value={replyText}
               onChange={(e) => {
-                setReplyText(e.target.value);
-                setEmptyReplyError("");
+                setReplyText(e.target.value)
+                setEmptyReplyError("")
               }}
               className="flex-1"
             />
@@ -157,49 +157,46 @@ export function PostReplies({
         />
       </CardContent>
     </Card>
-  );
+  )
 }
-
-// export const tsa = (a: Types.ObjectId[]) =>
-//   a.map((i) => i.toString() as string);
 
 export function PostRepliesContent({
   post,
   replies,
   setPostReplies,
 }: {
-  post: TPost;
-  replies: TReplies[];
-  setPostReplies: SetAction<TReplies[]>;
+  post: TPost
+  replies: TReplies[]
+  setPostReplies: SetAction<TReplies[]>
 }) {
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { data: session } = useSession()
+  const user = session?.user
 
-  const [hasLiked, setHasLiked] = useState<Record<string, boolean>>({});
+  const [hasLiked, setHasLiked] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     if (user && replies?.length) {
-      const hasLikedInitial: Record<string, boolean> = {};
+      const hasLikedInitial: Record<string, boolean> = {}
       replies.forEach((reply: TReplies) => {
         hasLikedInitial[reply._id?.toString() as string] = st(
           reply.likes as Types.ObjectId[],
-        ).includes(user?.id);
-      });
-      setHasLiked(hasLikedInitial);
+        ).includes(user?.id)
+      })
+      setHasLiked(hasLikedInitial)
     }
-  }, [user, replies]);
+  }, [user, replies])
 
   if (!replies.length) {
     return (
       <div className="space-y-4">
         <p className="text-muted-foreground">No replies here yet!</p>
       </div>
-    );
+    )
   }
 
   const handleLikeReplyClick = async (replyId: string) => {
     try {
-      const newLikes = await handleLikeReply(post._id as string, replyId);
+      const newLikes = await handleLikeReply(post._id as string, replyId)
 
       setPostReplies(
         replies.map((reply) =>
@@ -207,24 +204,26 @@ export function PostRepliesContent({
             ? { ...reply, likes: newLikes }
             : reply,
         ) as TReplies[],
-      );
+      )
 
       setHasLiked((prev) => {
-        return { ...prev, [replyId]: !prev[replyId] };
-      });
+        return { ...prev, [replyId]: !prev[replyId] }
+      })
     } catch (error) {
-      console.error("Error updating likes on the client:", error);
+      console.error("Error updating likes on the client:", error)
     }
-  };
+  }
 
   return (
     <div className="space-y-4">
       {replies.map((reply, index) => (
         <div key={index} className="flex space-x-2">
           <Link href={`/${pu(reply).username}`} prefetch={false}>
-            <Avatar className="mt-1 h-8 w-8">
+            <Avatar className="mt-1 size-8">
               <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
-              <AvatarFallback>{pu(reply).name?.charAt(0)}</AvatarFallback>
+              <AvatarFallback>
+                <User className="size-4" />
+              </AvatarFallback>
             </Avatar>
           </Link>
           <div className="flex-1">
@@ -277,7 +276,7 @@ export function PostRepliesContent({
         </div>
       ))}
     </div>
-  );
+  )
 }
 
 export function NavigateBackHeader({ page }: { page: string }) {
@@ -290,7 +289,7 @@ export function NavigateBackHeader({ page }: { page: string }) {
         </Link>
       </div>
     </DynamicHeader>
-  );
+  )
 }
 
 export function PostReplyOptions({
@@ -298,31 +297,31 @@ export function PostReplyOptions({
   reply,
   setPostReplies,
 }: {
-  postId: string;
-  reply: TReplies;
-  setPostReplies: SetAction<TReplies[]>;
+  postId: string
+  reply: TReplies
+  setPostReplies: SetAction<TReplies[]>
 }) {
-  const { data: session } = useSession();
+  const { data: session } = useSession()
 
-  const router = useRouter();
+  const router = useRouter()
 
   const handleDeleteReplyClick = async () => {
     try {
-      const newReplies = await deleteReply(postId, reply._id as string);
-      setPostReplies(newReplies as TReplies[]);
+      const newReplies = await deleteReply(postId, reply._id as string)
+      setPostReplies(newReplies as TReplies[])
       toast({
         description: "Your reply has been deleted.",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem deleting your reply.",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
-  const authorized = reply.user._id?.toString() === session?.user.id;
+  const authorized = reply.user._id?.toString() === session?.user.id
 
   return (
     <DropdownMenu>
@@ -349,39 +348,39 @@ export function PostReplyOptions({
         )}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
 
 export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { data: session } = useSession()
+  const user = session?.user
 
-  const router = useRouter();
+  const router = useRouter()
 
   const handleDeletePostClick = async () => {
     try {
-      const data_key = post._id?.toString() as string;
-      const element = document.querySelector(`[data-key="${data_key}"]`);
+      const data_key = post._id?.toString() as string
+      const element = document.querySelector(`[data-key="${data_key}"]`)
 
       if (element) {
-        await handleDeletePost(post._id as string);
-        tp && router.push("/home");
-        element.remove();
+        await handleDeletePost(post._id as string)
+        tp && router.push("/home")
+        element.remove()
       }
 
       toast({
         description: "Your post has been deleted.",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem deleting your post.",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
-  const authorized = post.user._id?.toString() === user?.id;
+  const authorized = post.user._id?.toString() === user?.id
 
   return (
     <DropdownMenu>
@@ -437,14 +436,14 @@ export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
         )}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
 
 export function UserOptions() {
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { data: session } = useSession()
+  const user = session?.user
 
-  const router = useRouter();
+  const router = useRouter()
 
   return (
     <DropdownMenu>
@@ -471,15 +470,15 @@ export function UserOptions() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
 
 export function PromptoryReplyButton({
   post,
   setPostReplies,
 }: {
-  post: TPost;
-  setPostReplies: SetAction<TReplies[]>;
+  post: TPost
+  setPostReplies: SetAction<TReplies[]>
 }) {
   return (
     <PostReplyDialog post={post} setPostReplies={setPostReplies}>
@@ -487,21 +486,21 @@ export function PromptoryReplyButton({
         <MessageCircle size={24} />
       </Button>
     </PostReplyDialog>
-  );
+  )
 }
 
 export function PostType({
   post,
   type,
 }: {
-  post: TPost;
-  type: "post" | "posts";
+  post: TPost
+  type: "post" | "posts"
 }) {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
 
   const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post._id as string}`);
+    router.push(`/${pu(post).username}/promptories/${post._id as string}`)
 
   return (
     <Card
@@ -587,18 +586,18 @@ export function PostType({
         </div>
       </CardFooter>
     </Card>
-  );
+  )
 }
 
 export function PostContentType({
   type,
   content,
 }: {
-  type: "post" | "posts";
-  content: string;
+  type: "post" | "posts"
+  content: string
 }) {
   if (type === "post") {
-    return <p className="whitespace-pre-wrap">{content}</p>;
+    return <p className="whitespace-pre-wrap">{content}</p>
   } else {
     return (
       <>
@@ -610,7 +609,7 @@ export function PostContentType({
           <button className="text-blue-500 hover:underline">Show more</button>
         )}
       </>
-    );
+    )
   }
 }
 
@@ -629,7 +628,7 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
         year: "numeric",
       })}
     </div>
-  );
+  )
 }
 
 export function PostTagsDialog({
@@ -637,16 +636,16 @@ export function PostTagsDialog({
   open,
   setOpen,
 }: {
-  tags: string[];
-  open: boolean;
-  setOpen: SetAction<boolean>;
+  tags: string[]
+  open: boolean
+  setOpen: SetAction<boolean>
 }) {
-  const router = useRouter();
+  const router = useRouter()
 
   const handleTagClick = (tag: string) => {
-    setOpen(false);
-    router.push(`/search?q=${tag}&category=tags`);
-  };
+    setOpen(false)
+    router.push(`/search?q=${tag}&category=tags`)
+  }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -689,5 +688,5 @@ export function PostTagsDialog({
         </ScrollArea>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
