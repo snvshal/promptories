@@ -1,24 +1,24 @@
-"use client";
+"use client"
 
-import { z } from "zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/hooks/use-toast";
-import { Label } from "@/components/ui/label";
-import { User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { updateUserData } from "@/actions/profileActions";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { z } from "zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { toast } from "@/hooks/use-toast"
+import { Label } from "@/components/ui/label"
+import { User } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { updateUserData } from "@/actions/profileActions"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -26,13 +26,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+} from "@/components/ui/form"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
-  // email: z.string().email(),
   bio: z.string().max(160).optional(),
   twitter: z
     .string()
@@ -54,45 +53,42 @@ const profileSchema = z.object({
     )
     .optional()
     .or(z.literal("")),
-});
+})
 
-export type ProfileFormValues = z.infer<typeof profileSchema>;
+export type ProfileFormValues = z.infer<typeof profileSchema>
 
 export default function ProfileSettings() {
-  const { data: session, update } = useSession();
-  const user = session?.user;
+  const { data: session, update } = useSession()
+  const user = session?.user
 
-  const [avatar, setAvatar] = useState("/placeholder.svg?height=100&width=100");
+  const [avatar, setAvatar] = useState(user?.image)
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.name as string,
-      // email: "",
       bio: user?.bio as string,
       twitter: user?.social_links?.twitter as string,
       github: user?.social_links?.github as string,
     },
-  });
+  })
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onloadend = () => {
-        setAvatar(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+        setAvatar(reader.result as string)
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
-  const router = useRouter();
+  const router = useRouter()
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      // Simulate API call
-      //   await new Promise((resolve) => setTimeout(resolve, 2000));
-      await updateUserData(user?.id as string, data);
+      await updateUserData(user?.id as string, data)
 
       await update({
         ...session,
@@ -105,22 +101,22 @@ export default function ProfileSettings() {
             github: data.github,
           },
         },
-      });
+      })
 
-      router.push(`/${user?.username}`);
+      router.push(`/${user?.username}`)
 
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem updating your profile.",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
   return (
     <Card>
       <CardHeader>
@@ -147,22 +143,6 @@ export default function ProfileSettings() {
                 />
               </div>
             </div>
-            {/* <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your username" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is your public display name. It must be unique.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
             <FormField
               control={form.control}
               name="name"
@@ -176,23 +156,6 @@ export default function ProfileSettings() {
                 </FormItem>
               )}
             />
-            {/* <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your email"
-                            type="email"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
             <FormField
               control={form.control}
               name="bio"
@@ -243,5 +206,5 @@ export default function ProfileSettings() {
         </Form>
       </CardContent>
     </Card>
-  );
+  )
 }
