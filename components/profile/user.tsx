@@ -1,28 +1,23 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-import { PostsComponent } from "../home";
-import { TPost, TUser } from "@/types/schema.type";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { User2 } from "lucide-react";
-import { NavigateBackHeader } from "../post";
-import { addFollower } from "@/actions/addFollower";
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { st } from "@/utils/ps";
-import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons";
-import Link from "next/link";
-import { SetAction } from "@/types/generics.type";
-import { Types } from "mongoose";
+import { PostsComponent } from "../home"
+import { TPost, TUser } from "@/types/schema.type"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { User } from "lucide-react"
+import { NavigateBackHeader } from "../post"
+import { addFollower } from "@/actions/addFollower"
+import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
+import { st } from "@/utils/ps"
+import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons"
+import Link from "next/link"
+import { SetAction } from "@/types/generics.type"
+import { Types } from "mongoose"
 
 export default function UserProfileComponent({
   profileUser,
@@ -30,21 +25,21 @@ export default function UserProfileComponent({
   likedPosts,
   bookmarkedPosts,
 }: {
-  profileUser: TUser;
-  posts: TPost[];
-  likedPosts: TPost[];
-  bookmarkedPosts: TPost[];
+  profileUser: TUser
+  posts: TPost[]
+  likedPosts: TPost[]
+  bookmarkedPosts: TPost[]
 }) {
-  const router = useRouter();
-  const { data: session } = useSession();
+  const router = useRouter()
+  const { data: session } = useSession()
 
-  const isAdmin = profileUser._id?.toString() === session?.user?.id;
+  const isAdmin = profileUser._id?.toString() === session?.user?.id
 
-  const searchParams = useSearchParams();
-  const query = searchParams.get("tab");
+  const searchParams = useSearchParams()
+  const query = searchParams.get("tab")
 
   // Define the Tab type based on isAdmin
-  type Tab = "posts" | "likes" | "saved";
+  type Tab = "posts" | "likes" | "saved"
 
   // Set initial tab based on query or default to "posts"
   const initialTab: Tab =
@@ -52,22 +47,22 @@ export default function UserProfileComponent({
       ? "posts"
       : query === "likes" || query === "saved"
         ? query
-        : "posts";
+        : "posts"
 
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [tab, setTab] = useState<Tab>(initialTab)
 
   useEffect(() => {
     if (query === "posts" || query === "likes" || query === "saved") {
-      setTab(query as Tab);
+      setTab(query as Tab)
     } else {
-      setTab("posts"); // Default to posts if query is invalid
+      setTab("posts") // Default to posts if query is invalid
     }
-  }, [query]); // Dependency array includes query
+  }, [query]) // Dependency array includes query
 
   const toggleTab = (tab: string) => {
-    setTab(tab as Tab);
-    router.push(`?tab=${tab}`);
-  };
+    setTab(tab as Tab)
+    router.push(`?tab=${tab}`)
+  }
   return (
     <div className="min-h-screen w-full">
       <NavigateBackHeader page={profileUser.name} />
@@ -127,17 +122,17 @@ export default function UserProfileComponent({
         </Tabs>
       </main>
     </div>
-  );
+  )
 }
 
 export function ProfileUserContent({
   profileUser,
   postCount,
 }: {
-  profileUser: TUser;
-  postCount: number;
+  profileUser: TUser
+  postCount: number
 }) {
-  const [followers, setFollowers] = useState(profileUser?.following.length);
+  const [followers, setFollowers] = useState(profileUser?.following.length)
 
   return (
     <Card className="mid-width-card-content">
@@ -151,7 +146,9 @@ export function ProfileUserContent({
         <div className="sm:flex-start flex max-sm:flex-col">
           <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 md:mr-4 md:size-40">
             <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
-            <AvatarFallback>{profileUser?.name?.charAt(0)}</AvatarFallback>
+            <AvatarFallback>
+              <User className="size-16 md:size-20" />
+            </AvatarFallback>
           </Avatar>
           <div className="flex grow flex-col items-start">
             <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
@@ -199,11 +196,11 @@ export function ProfileUserContent({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 export function UserNotFound() {
-  const { username } = useParams();
+  const { username } = useParams()
   return (
     <div className="min-h-screen">
       <NavigateBackHeader page="User not found" />
@@ -214,7 +211,7 @@ export function UserNotFound() {
               <Avatar className="mb-4 h-24 w-24">
                 <AvatarImage src={""} alt={"user not found!"} />
                 <AvatarFallback>
-                  <User2 size={48} />
+                  <User size={48} />
                 </AvatarFallback>
               </Avatar>
               <CardHeader className="text-2xl font-bold">
@@ -234,21 +231,21 @@ export function UserNotFound() {
         </Card>
       </div>
     </div>
-  );
+  )
 }
 
 export function ProfileOptionButton({
   profileUser,
   setFollowers,
 }: {
-  profileUser: TUser;
-  setFollowers: SetAction<number>;
+  profileUser: TUser
+  setFollowers: SetAction<number>
 }) {
-  const { data: session } = useSession();
-  const user = session?.user;
-  const router = useRouter();
+  const { data: session } = useSession()
+  const user = session?.user
+  const router = useRouter()
 
-  const isAdmin = profileUser._id?.toString() === user?.id;
+  const isAdmin = profileUser._id?.toString() === user?.id
 
   if (isAdmin) {
     return (
@@ -258,11 +255,11 @@ export function ProfileOptionButton({
       >
         Edit Profile
       </Button>
-    );
+    )
   } else {
     return (
       <FollowButton profileUser={profileUser} setFollowers={setFollowers} />
-    );
+    )
   }
 }
 
@@ -270,49 +267,49 @@ export function FollowButton({
   profileUser,
   setFollowers,
 }: {
-  profileUser: TUser;
-  setFollowers: SetAction<number>;
+  profileUser: TUser
+  setFollowers: SetAction<number>
 }) {
-  const { data: session, update } = useSession();
-  const user = session?.user;
+  const { data: session, update } = useSession()
+  const user = session?.user
 
-  const isAdmin = profileUser._id?.toString() === user?.id;
-  const [follow, setFollow] = useState<"Follow" | "Following">();
+  const isAdmin = profileUser._id?.toString() === user?.id
+  const [follow, setFollow] = useState<"Follow" | "Following">()
 
   useEffect(() => {
     setFollow(
       st(profileUser.followers).includes(user?.id as string)
         ? "Following"
         : "Follow",
-    );
-  }, [profileUser.followers, user?.id]);
+    )
+  }, [profileUser.followers, user?.id])
 
   const handleAddFollower = async () => {
     try {
       type AFRV = {
-        updatedState: "Follow" | "Following";
-        following: Types.ObjectId[];
-      };
+        updatedState: "Follow" | "Following"
+        following: Types.ObjectId[]
+      }
       const { updatedState, following }: AFRV = await addFollower(
         profileUser._id as string,
-      );
+      )
 
-      setFollowers((f) => (follow === "Follow" ? f + 1 : Math.max(f - 1, 0)));
+      setFollowers((f) => (follow === "Follow" ? f + 1 : Math.max(f - 1, 0)))
 
-      setFollow(updatedState);
+      setFollow(updatedState)
       await update({
         ...session,
         user: {
           ...session?.user,
           following: [...following],
         },
-      });
+      })
     } catch (error) {
-      console.error("Error updating follower state:", error);
+      console.error("Error updating follower state:", error)
     }
-  };
+  }
 
-  if (isAdmin) return;
+  if (isAdmin) return
 
   return (
     <Button
@@ -321,5 +318,5 @@ export function FollowButton({
     >
       {follow}
     </Button>
-  );
+  )
 }
