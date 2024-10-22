@@ -1,28 +1,28 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, MessageCircle, UserPlus, Bell } from "lucide-react";
-import { NavigateBackHeader } from "./post";
-import { TNotification, TUser } from "@/types/schema.type";
-import { useRouter } from "next/navigation";
-import { TimeAgo } from "./time-ago";
-import { markAsReadNotification } from "@/actions/notificationActions";
+import { useEffect, useRef, useState } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Heart, MessageCircle, UserPlus, Bell, User } from "lucide-react"
+import { NavigateBackHeader } from "./post"
+import { TNotification, TUser } from "@/types/schema.type"
+import { useRouter } from "next/navigation"
+import { TimeAgo } from "./time-ago"
+import { markAsReadNotification } from "@/actions/notificationActions"
 
 export default function Notifications({
   notifications,
 }: {
-  notifications: TNotification[];
+  notifications: TNotification[]
 }) {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("all")
 
   const filteredNotifications = notifications.filter(
     (notification) => activeTab === "all" || notification.type === activeTab,
-  );
+  )
 
-  notifications.map((i) => console.log(i.read));
+  notifications.map((i) => console.log(i.read))
 
   return (
     <div className="min-h-screen w-full">
@@ -51,15 +51,15 @@ export default function Notifications({
         </Card>
       </main>
     </div>
-  );
+  )
 }
 
 export function NotificationTabsContent({
   filteredNotifications,
   tabValue,
 }: {
-  filteredNotifications: TNotification[];
-  tabValue: string;
+  filteredNotifications: TNotification[]
+  tabValue: string
 }) {
   return (
     <TabsContent value={tabValue} className="mt-4">
@@ -70,20 +70,20 @@ export function NotificationTabsContent({
         />
       ))}
     </TabsContent>
-  );
+  )
 }
 
 export function NotificationContent({
   notification,
 }: {
-  notification: TNotification;
+  notification: TNotification
 }) {
-  const router = useRouter();
+  const router = useRouter()
 
-  const notificationRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const currentRef = notificationRef.current;
+    const currentRef = notificationRef.current
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -95,26 +95,26 @@ export function NotificationContent({
             !notification.read
           ) {
             try {
-              await markAsReadNotification(notification._id as string);
+              await markAsReadNotification(notification._id as string)
             } catch (error) {
-              console.error("notification not saved");
+              console.error("notification not saved")
             } // Mark notification as seen
           }
-        });
+        })
       },
       {
         threshold: 1.0, // Trigger when 100% of the element is in view
       },
-    );
+    )
 
-    if (currentRef) observer.observe(currentRef);
+    if (currentRef) observer.observe(currentRef)
 
     return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [notification._id, notification.read]);
+      if (currentRef) observer.unobserve(currentRef)
+    }
+  }, [notification._id, notification.read])
 
-  const nactor = notification.actor as TUser;
+  const nactor = notification.actor as TUser
 
   return (
     <div
@@ -124,7 +124,9 @@ export function NotificationContent({
     >
       <Avatar role="button" onClick={() => router.push(`/${nactor.username}`)}>
         <AvatarImage src={nactor?.avatar} alt={nactor?.name} />
-        <AvatarFallback>{nactor?.name?.charAt(0)}</AvatarFallback>
+        <AvatarFallback>
+          <User className="size-5" />
+        </AvatarFallback>
       </Avatar>
       <div
         role="button"
@@ -141,18 +143,18 @@ export function NotificationContent({
       </div>
       <div className="flex-shrink-0">{getIcon(notification.type)}</div>
     </div>
-  );
+  )
 }
 
 const getIcon = (type: TNotification["type"]) => {
   switch (type) {
     case "like":
-      return <Heart className="h-4 w-4 text-red-500" />;
+      return <Heart className="h-4 w-4 text-red-500" />
     case "comment":
-      return <MessageCircle className="h-4 w-4 text-blue-500" />;
+      return <MessageCircle className="h-4 w-4 text-blue-500" />
     case "follow":
-      return <UserPlus className="h-4 w-4 text-green-500" />;
+      return <UserPlus className="h-4 w-4 text-green-500" />
     case "mention":
-      return <Bell className="h-4 w-4 text-yellow-500" />;
+      return <Bell className="h-4 w-4 text-yellow-500" />
   }
-};
+}
