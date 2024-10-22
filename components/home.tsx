@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ReactNode, useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import {
   Bell,
@@ -16,15 +16,15 @@ import {
   Settings,
   ChartNoAxesColumn,
   User,
-} from "lucide-react";
-import Link from "next/link";
-import { TPost, TReplies, TUser } from "@/types/schema.type";
+} from "lucide-react"
+import Link from "next/link"
+import { TPost, TReplies, TUser } from "@/types/schema.type"
 import {
   handleLikePost,
   handleBookmarkPost,
   handlePostView,
-} from "@/actions/postActions";
-import { usePathname, useRouter } from "next/navigation";
+} from "@/actions/postActions"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Dialog,
   DialogContent,
@@ -32,20 +32,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 
-import { PostType } from "./post";
-import { Textarea } from "./ui/textarea";
-import { addReplyToPost } from "@/actions/addReplyToPost";
-import { objId, st } from "@/utils/ps";
-import { useSession } from "next-auth/react";
-import { SetAction } from "@/types/generics.type";
-import { toast } from "@/hooks/use-toast";
-import { Badge } from "./ui/badge";
-import { promptory_types } from "@/lib/constants";
-import { ScrollArea } from "./ui/scroll-area";
+import { PostType } from "./post"
+import { Textarea } from "./ui/textarea"
+import { addReplyToPost } from "@/actions/addReplyToPost"
+import { objId, st } from "@/utils/ps"
+import { useSession } from "next-auth/react"
+import { SetAction } from "@/types/generics.type"
+import { toast } from "@/hooks/use-toast"
+import { Badge } from "./ui/badge"
+import { promptory_types } from "@/lib/constants"
+import { ScrollArea } from "./ui/scroll-area"
 
-export const pu = (post: TPost | TReplies) => post.user as TUser;
+export const pu = (post: TPost | TReplies) => post.user as TUser
 
 export function HomePageComponent({ posts }: { posts: TPost[] }) {
   return (
@@ -64,35 +64,35 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
       </main>
       <ComposePromptoryButton />
     </div>
-  );
+  )
 }
 
 export function DynamicHeader({ children }: { children: React.ReactNode }) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollTop, setLastScrollTop] = useState(0);
+  const [isVisible, setIsVisible] = useState(true)
+  const [lastScrollTop, setLastScrollTop] = useState(0)
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const scrollDiff = Math.abs(scrollTop - lastScrollTop);
+      const scrollTop = window.scrollY
+      const scrollDiff = Math.abs(scrollTop - lastScrollTop)
 
       // Only change state if scroll difference exceeds 4rem (64px)
       if (scrollDiff > 64) {
         if (scrollTop > lastScrollTop) {
           // Scrolling down, hide the header
-          setIsVisible(false);
+          setIsVisible(false)
         } else {
           // Scrolling up, show the header
-          setIsVisible(true);
+          setIsVisible(true)
         }
 
-        setLastScrollTop(scrollTop);
+        setLastScrollTop(scrollTop)
       }
-    };
+    }
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollTop]);
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [lastScrollTop])
 
   return (
     <header
@@ -102,7 +102,7 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
     >
       {children}
     </header>
-  );
+  )
 }
 
 export function PostsComponent({ posts }: { posts: TPost[] }) {
@@ -111,7 +111,7 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
       <div className="flex-center w-full p-4 max-md:pt-10">
         <p>No posts here.</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -120,40 +120,40 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
         <PostType key={index} post={post} type="posts" />
       ))}
     </>
-  );
+  )
 }
 
-export const il = (hasLiked: boolean) => (hasLiked ? "#b91c1c" : "none");
+export const il = (hasLiked: boolean) => (hasLiked ? "#b91c1c" : "none")
 
 export const LikeButton = ({ post }: { post: TPost }) => {
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { data: session } = useSession()
+  const user = session?.user
 
-  const initialLikes = post.likes.length;
+  const initialLikes = post.likes.length
 
-  const [likes, setLikes] = useState(initialLikes);
-  const [hasLiked, setHasLiked] = useState<boolean>(false);
+  const [likes, setLikes] = useState(initialLikes)
+  const [hasLiked, setHasLiked] = useState<boolean>(false)
 
   useEffect(() => {
     if (user?.id) {
-      const hasLikedInitial = st(post.likes).includes(user.id as string);
-      setHasLiked(hasLikedInitial);
+      const hasLikedInitial = st(post.likes).includes(user.id as string)
+      setHasLiked(hasLikedInitial)
     }
-  }, [user, post.likes]);
+  }, [user, post.likes])
 
   const handleLikeClick = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
       // Optimistically update state
-      setHasLiked(!hasLiked);
-      setLikes(hasLiked ? Math.max(likes - 1, 0) : likes + 1);
+      setHasLiked(!hasLiked)
+      setLikes(hasLiked ? Math.max(likes - 1, 0) : likes + 1)
 
       // Server action to handle like/unlike
-      await handleLikePost(post._id as string);
+      await handleLikePost(post._id as string)
     } catch (error) {
-      console.error("Failed to save post like");
+      console.error("Failed to save post like")
     }
-  };
+  }
 
   return (
     <form onSubmit={handleLikeClick}>
@@ -171,41 +171,41 @@ export const LikeButton = ({ post }: { post: TPost }) => {
         {likes}
       </Button>
     </form>
-  );
-};
+  )
+}
 
-export const ib = (isSaved: boolean) => (isSaved ? "#3b82f6" : "none");
+export const ib = (isSaved: boolean) => (isSaved ? "#3b82f6" : "none")
 
 export const BookmarkButton = ({ post }: { post: TPost }) => {
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { data: session } = useSession()
+  const user = session?.user
 
-  const initialBookmarks = post.bookmarks.length;
-  const hasBookmarkedInitial = post.bookmarks.includes(objId(user?.id));
+  const initialBookmarks = post.bookmarks.length
+  const hasBookmarkedInitial = post.bookmarks.includes(objId(user?.id))
 
-  const [bookmarks, setBookmarks] = useState(initialBookmarks);
-  const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial);
+  const [bookmarks, setBookmarks] = useState(initialBookmarks)
+  const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial)
 
   useEffect(() => {
     if (user?.id) {
-      const initialBookmarks = st(post.bookmarks).includes(user.id as string);
-      setHasBookmarked(initialBookmarks);
+      const initialBookmarks = st(post.bookmarks).includes(user.id as string)
+      setHasBookmarked(initialBookmarks)
     }
-  }, [user, post.bookmarks]);
+  }, [user, post.bookmarks])
 
   const handleBookmarkClick = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
       // Optimistically update state
-      setHasBookmarked(!hasBookmarked);
-      setBookmarks(hasBookmarked ? Math.max(bookmarks - 1, 0) : bookmarks + 1);
+      setHasBookmarked(!hasBookmarked)
+      setBookmarks(hasBookmarked ? Math.max(bookmarks - 1, 0) : bookmarks + 1)
 
       // Server action to handle bookmark/unbookmark
-      await handleBookmarkPost(post._id as string);
+      await handleBookmarkPost(post._id as string)
     } catch (error) {
-      console.error("Failed to save post bookmark");
+      console.error("Failed to save post bookmark")
     }
-  };
+  }
 
   return (
     <form onSubmit={handleBookmarkClick}>
@@ -223,55 +223,55 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
         {bookmarks}
       </Button>
     </form>
-  );
-};
+  )
+}
 
 export function PostReplyDialog({
   post,
   children,
   setPostReplies,
 }: {
-  post: TPost;
-  children?: React.ReactNode;
-  setPostReplies?: SetAction<TReplies[]>;
+  post: TPost
+  children?: React.ReactNode
+  setPostReplies?: SetAction<TReplies[]>
 }) {
-  const [dialogState, setDialogState] = useState(false);
-  const [replyContent, setReplyContent] = useState("");
-  const [emptyReplyError, setEmptyReplyError] = useState("");
-  const [repliesCount, setRepliesCount] = useState(post.replies.length);
+  const [dialogState, setDialogState] = useState(false)
+  const [replyContent, setReplyContent] = useState("")
+  const [emptyReplyError, setEmptyReplyError] = useState("")
+  const [repliesCount, setRepliesCount] = useState(post.replies.length)
 
   const handleReplySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!replyContent) {
-      setEmptyReplyError("Reply is required!");
-      return;
+      setEmptyReplyError("Reply is required!")
+      return
     }
     try {
       const updatedPost: TPost = await addReplyToPost(
         post._id as string,
         replyContent,
-      );
+      )
 
-      console.log(updatedPost);
-      if (setPostReplies) setPostReplies(updatedPost.replies);
+      console.log(updatedPost)
+      if (setPostReplies) setPostReplies(updatedPost.replies)
 
-      setRepliesCount((prev) => prev + 1);
-      console.log("Reply submitted:", replyContent);
-      setReplyContent("");
-      setDialogState(false);
+      setRepliesCount((prev) => prev + 1)
+      console.log("Reply submitted:", replyContent)
+      setReplyContent("")
+      setDialogState(false)
       // Here you would typically send the reply to your backend
       toast({
         description: "Your reply has been sent.",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem sending your reply.",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
   return (
     <Dialog open={dialogState} onOpenChange={setDialogState}>
@@ -308,8 +308,8 @@ export function PostReplyDialog({
               placeholder="Type your reply here..."
               value={replyContent}
               onChange={(e) => {
-                setReplyContent(e.target.value);
-                setEmptyReplyError("");
+                setReplyContent(e.target.value)
+                setEmptyReplyError("")
               }}
               className="col-span-3"
             />
@@ -324,11 +324,11 @@ export function PostReplyDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
 export function ComposePromptoryButton() {
-  const router = useRouter();
+  const router = useRouter()
   return (
     <Button
       size={"icon"}
@@ -337,19 +337,19 @@ export function ComposePromptoryButton() {
     >
       <Feather size={24} />
     </Button>
-  );
+  )
 }
 
 export function Sidebar({
   notificationCount,
   children,
 }: {
-  notificationCount: number;
-  children: ReactNode;
+  notificationCount: number
+  children: ReactNode
 }) {
-  const { status } = useSession();
+  const { status } = useSession()
 
-  if (status === "unauthenticated") return children;
+  if (status === "unauthenticated") return children
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
@@ -370,22 +370,22 @@ export function Sidebar({
 
       <div className="flex-1 overflow-y-auto">
         <div className="flex">
-          <div className="flex-1 border-r sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
+          <div className="w-full flex-1 border-r sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
             {children}
           </div>
           <SidePanel />
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export const iv = (status: boolean) => (status ? "secondary" : "ghost");
-export const fw = (status: boolean) => (status ? "font-bold" : "font-medium");
+export const iv = (status: boolean) => (status ? "secondary" : "ghost")
+export const fw = (status: boolean) => (status ? "font-bold" : "font-medium")
 
 export function NavLinks({ notificationCount }: { notificationCount: number }) {
-  const pathname = usePathname();
-  const router = useRouter();
+  const pathname = usePathname()
+  const router = useRouter()
 
   return (
     <>
@@ -445,14 +445,14 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         </span>
       </Button>
     </>
-  );
+  )
 }
 
 export function UserProfileLink() {
-  const { data: session } = useSession();
-  const user = session?.user;
-  const pathname = usePathname();
-  const router = useRouter();
+  const { data: session } = useSession()
+  const user = session?.user
+  const pathname = usePathname()
+  const router = useRouter()
 
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
@@ -484,17 +484,17 @@ export function UserProfileLink() {
         </span>
       </Button>
     </div>
-  );
+  )
 }
 
 export function PostViews({ post }: { post: TPost }) {
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { data: session } = useSession()
+  const user = session?.user
 
-  const postRef = useRef<HTMLButtonElement>(null);
+  const postRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const currentRef = postRef.current;
+    const currentRef = postRef.current
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -505,24 +505,24 @@ export function PostViews({ post }: { post: TPost }) {
             !st(post.views).includes(user?.id as string)
           ) {
             try {
-              await handlePostView(post._id as string);
+              await handlePostView(post._id as string)
             } catch (error) {
-              console.error("Post views not saved");
+              console.error("Post views not saved")
             }
           }
-        });
+        })
       },
       {
         threshold: 1.0, // Trigger when 100% of the element is in view
       },
-    );
+    )
 
-    if (currentRef) observer.observe(currentRef);
+    if (currentRef) observer.observe(currentRef)
 
     return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [post._id, post.views, user?.id]);
+      if (currentRef) observer.unobserve(currentRef)
+    }
+  }, [post._id, post.views, user?.id])
   return (
     <Button
       ref={postRef}
@@ -535,7 +535,7 @@ export function PostViews({ post }: { post: TPost }) {
       {post.views.length < 1 ? "" : post.views.length}
       {/* {post.views.length} */}
     </Button>
-  );
+  )
 }
 
 export function SidePanel() {
@@ -558,5 +558,5 @@ export function SidePanel() {
         </ScrollArea>
       </div>
     </aside>
-  );
+  )
 }
