@@ -519,7 +519,9 @@ export function PostType({
             >
               <Avatar className={`${type === "posts" && "mt-5"}`}>
                 <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                <AvatarFallback>{pu(post).name?.charAt(0)}</AvatarFallback>
+                <AvatarFallback>
+                  <User className="size-5" />
+                </AvatarFallback>
               </Avatar>
               <div
                 className={`${type === "post" ? "flex-col items-start gap-0" : "items-center gap-1"} flex justify-start`}
