@@ -368,14 +368,14 @@ export function Sidebar({
         </nav>
       </aside>
 
-      <div className="flex-1 overflow-y-auto">
+      <aside className="flex-1 overflow-y-auto">
         <div className="flex">
           <div className="w-full flex-1 border-r sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
             {children}
           </div>
           <SidePanel />
         </div>
-      </div>
+      </aside>
     </div>
   )
 }
