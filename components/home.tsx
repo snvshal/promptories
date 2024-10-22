@@ -456,15 +456,13 @@ export function UserProfileLink() {
 
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
-      <div className="pr-4">
-        <Button
-          onClick={() => router.push("/compose/promptory")}
-          className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11"
-        >
-          <Feather className="size-5 text-base md:hidden" />
-          <span className="text-base text-lg max-md:hidden">Post</span>
-        </Button>
-      </div>
+      <Button
+        onClick={() => router.push("/compose/promptory")}
+        className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
+      >
+        <Feather className="size-5 text-base md:hidden" />
+        <span className="text-base text-lg max-md:hidden">Post</span>
+      </Button>
 
       <Button
         size={"icon"}
