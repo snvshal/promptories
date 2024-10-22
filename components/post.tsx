@@ -280,13 +280,15 @@ export function PostRepliesContent({
 }
 
 export function NavigateBackHeader({ page }: { page: string }) {
+  const router = useRouter()
+
   return (
     <DynamicHeader>
-      <div className="mx-auto flex max-w-4xl items-center justify-between p-4">
-        <Link href="/home" className="flex-start">
+      <div className="mx-auto flex max-w-4xl items-center justify-start p-4">
+        <button onClick={() => router.back()} className="flex-start">
           <ArrowLeft className="mr-6 size-6" />
-          <h1 className="text-xl font-bold">{page}</h1>
-        </Link>
+        </button>
+        <h1 className="text-xl font-bold">{page}</h1>
       </div>
     </DynamicHeader>
   )
