@@ -1,29 +1,29 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { promptory_types } from "@/lib/constants";
-import { savePostForm, updatePostForm } from "@/actions/postFormActions";
-import { NavigateBackHeader } from "./post";
-import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/use-toast";
-import { pu } from "./home";
-import { PostFormProps } from "@/types/props.type";
-import { ToastAction } from "./ui/toast";
-import { TPost } from "@/types/schema.type";
+} from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { promptory_types } from "@/lib/constants"
+import { savePostForm, updatePostForm } from "@/actions/postFormActions"
+import { NavigateBackHeader } from "./post"
+import { useRouter } from "next/navigation"
+import { toast } from "@/hooks/use-toast"
+import { pu } from "./home"
+import { PostFormProps } from "@/types/props.type"
+import { ToastAction } from "./ui/toast"
+import { TPost } from "@/types/schema.type"
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required"),
@@ -35,16 +35,16 @@ const formSchema = z.object({
     required_error: "Please select a promptory type",
   }),
   tags: z.string().optional(),
-});
+})
 
-export type FormValues = z.infer<typeof formSchema>;
+export type FormValues = z.infer<typeof formSchema>
 
 export default function PostForm({
   defaultValues,
   operationType,
   post,
 }: PostFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     control,
@@ -54,20 +54,20 @@ export default function PostForm({
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
-  });
+  })
 
-  const router = useRouter();
+  const router = useRouter()
 
   const postRoute = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post._id as string}`);
+    router.push(`/${pu(post).username}/promptories/${post._id as string}`)
 
   const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       if (operationType === "POST") {
-        const post: TPost = await savePostForm(data); // Call the server action
+        const post: TPost = await savePostForm(data) // Call the server action
 
-        router.push("/home");
+        router.push("/home")
         toast({
           description: "Your post has been sent.",
           action: (
@@ -78,29 +78,29 @@ export default function PostForm({
               View
             </ToastAction>
           ),
-        });
+        })
       } else if (operationType === "PATCH" && post) {
-        await updatePostForm(data, post._id as string); // Call the server action
+        await updatePostForm(data, post._id as string) // Call the server action
 
-        postRoute(post);
+        postRoute(post)
         toast({
           description: "Your post has been updated.",
-        });
+        })
       }
 
       // Simulate API call
-      console.log("Form saved:", data);
-      reset();
+      console.log("Form saved:", data)
+      reset()
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem sending your post.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen w-full">
@@ -266,5 +266,5 @@ export default function PostForm({
         </form>
       </main>
     </div>
-  );
+  )
 }
