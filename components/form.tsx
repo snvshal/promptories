@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -35,7 +35,6 @@ const formSchema = z.object({
     required_error: "Please select a promptory type",
   }),
   tags: z.string().optional(),
-  media: z.instanceof(File).optional(),
 })
 
 export type FormValues = z.infer<typeof formSchema>
@@ -46,31 +45,18 @@ export default function PostForm({
   post,
 }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedType, setSelectedType] = useState(
-    defaultValues?.promptory_type || "",
-  )
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   })
 
   const router = useRouter()
-
-  useEffect(() => {
-    // Simulate loading of initial data
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-  }, [])
 
   const postRoute = (post: TPost) =>
     router.push(`/${pu(post).username}/promptories/${post._id as string}`)
@@ -79,7 +65,8 @@ export default function PostForm({
     setIsSubmitting(true)
     try {
       if (operationType === "POST") {
-        const post: TPost = await savePostForm(data)
+        const post: TPost = await savePostForm(data) // Call the server action
+
         router.push("/home")
         toast({
           description: "Your post has been sent.",
@@ -93,16 +80,18 @@ export default function PostForm({
           ),
         })
       } else if (operationType === "PATCH" && post) {
-        await updatePostForm(data, post._id as string)
+        await updatePostForm(data, post._id as string) // Call the server action
+
         postRoute(post)
         toast({
           description: "Your post has been updated.",
         })
       }
+
+      // Simulate API call
       console.log("Form saved:", data)
       reset()
     } catch (error) {
-      setError("There was a problem sending your post.")
       toast({
         title: "Error",
         description: "There was a problem sending your post.",
@@ -111,21 +100,6 @@ export default function PostForm({
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  const showMediaInput =
-    selectedType.startsWith("video-") || selectedType.startsWith("audio-")
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    )
-  }
-
-  if (error) {
-    return <div className="text-center text-red-500">{error}</div>
   }
 
   return (
@@ -160,11 +134,7 @@ export default function PostForm({
               name="model_url"
               control={control}
               render={({ field }) => (
-                <Input
-                  id="model_url"
-                  placeholder="Enter model URL"
-                  {...field}
-                />
+                <Input id="model_url" placeholder="Enter model" {...field} />
               )}
             />
             {errors.model_url && (
@@ -172,6 +142,10 @@ export default function PostForm({
                 {errors.model_url.message}
               </p>
             )}
+            <p className="mt-1 text-sm text-gray-500">
+              Enter full url of the website where we can try it. (e.g.,
+              https://example.com)
+            </p>
           </div>
 
           <div>
@@ -192,6 +166,9 @@ export default function PostForm({
                 {errors.chat_link?.message}
               </p>
             )}
+            <p className="mt-1 text-sm text-gray-500">
+              Enter public chat link of this promptory
+            </p>
           </div>
 
           <div>
@@ -201,10 +178,7 @@ export default function PostForm({
               control={control}
               render={({ field }) => (
                 <Select
-                  onValueChange={(value) => {
-                    field.onChange(value)
-                    setSelectedType(value)
-                  }}
+                  onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <SelectTrigger id="promptory_type">
@@ -226,32 +200,6 @@ export default function PostForm({
               </p>
             )}
           </div>
-
-          {showMediaInput && (
-            <div>
-              <Label htmlFor="media">Upload Media</Label>
-              <Controller
-                name="media"
-                control={control}
-                render={({ field: { onChange, value, ...field } }) => (
-                  <Input
-                    id="media"
-                    type="file"
-                    accept={
-                      selectedType.startsWith("video-") ? "video/*" : "audio/*"
-                    }
-                    onChange={(e) => onChange(e.target.files?.[0])}
-                    {...field}
-                  />
-                )}
-              />
-              {errors.media && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.media.message}
-                </p>
-              )}
-            </div>
-          )}
 
           <div>
             <Label htmlFor="prompt">Prompt</Label>
@@ -297,11 +245,14 @@ export default function PostForm({
               render={({ field }) => (
                 <Input
                   id="tags"
-                  placeholder="Enter tags (space-separated)"
+                  placeholder="Enter tags (comma-separated)"
                   {...field}
                 />
               )}
             />
+            <p className="mt-1 text-sm text-gray-500">
+              Enter tags separated by space (e.g., tag1 tag2 tag3)
+            </p>
             {errors.tags && (
               <p className="mt-1 text-sm text-red-500">
                 {errors.tags?.message}
