@@ -387,7 +387,11 @@ export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size={"icon"} variant={"ghost"} className="rounded-full">
+        <Button
+          size="icon"
+          variant={"ghost"}
+          className="absolute -right-2 size-8 rounded-full"
+        >
           <Ellipsis className="h-4 w-4 text-muted-foreground" />
           <span className="sr-only">Post options</span>
         </Button>
@@ -512,7 +516,7 @@ export function PostType({
       <CardHeader
         className={`${type === "post" && "mb-4"} p-4 pb-0 max-md:pb-0`}
       >
-        <div className={`${type === "posts" && "h-5"} flex-between`}>
+        <div className={`${type === "posts" && "h-5"} flex-between relative`}>
           <div className="flex-start space-x-4">
             <Link
               href={`/${pu(post).username}`}
