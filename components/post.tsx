@@ -517,7 +517,7 @@ export function PostType({
         className={`${type === "post" && "mb-4"} p-4 pb-0 max-md:pb-0`}
       >
         <div className={`${type === "posts" && "h-5"} flex-between relative`}>
-          <div className="flex-start space-x-4">
+          <div className="flex-start space-x-1">
             <Link
               href={`/${pu(post).username}`}
               className="flex-start space-x-2"
