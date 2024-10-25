@@ -587,7 +587,7 @@ export function PostType({
             size="sm"
             onClick={() => handlePostShare(post)}
             aria-label="Share Post"
-            className="p-2 text-muted-foreground"
+            className="p-2 pr-0 text-muted-foreground hover:bg-background"
           >
             <Share2 className="size-4" />
           </Button>
@@ -661,7 +661,7 @@ export function PostTagsDialog({
           variant="ghost"
           size="sm"
           aria-label="View Tags"
-          className="p-2 text-muted-foreground"
+          className="p-2 text-muted-foreground hover:bg-background"
         >
           <Tag className="size-4" />
           <span className="sr-only">View Tags</span>
