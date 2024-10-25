@@ -1,25 +1,25 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Filter, Search as SearchIcon } from "lucide-react";
-import { NavigateBackHeader } from "./post";
-import { search } from "@/actions/searchQuery";
-import { TPost, TUser } from "@/types/schema.type";
-import { PostsComponent } from "./home";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CheckCircle, Filter, Search as SearchIcon } from "lucide-react"
+import { NavigateBackHeader } from "./post"
+import { search } from "@/actions/searchQuery"
+import { TPost, TUser } from "@/types/schema.type"
+import { PostsComponent } from "./home"
+import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -27,10 +27,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { SetAction } from "@/types/generics.type";
-import { Label } from "./ui/label";
-import { FollowButton } from "./profile/user";
+} from "@/components/ui/dialog"
+import { SetAction } from "@/types/generics.type"
+import { Label } from "./ui/label"
+import { FollowButton } from "./profile/user"
 
 export type SearchCategories =
   | "default"
@@ -38,46 +38,46 @@ export type SearchCategories =
   | "prompt"
   | "caption"
   | "user"
-  | "tags";
+  | "tags"
 
 export default function SearchComponent() {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()
 
-  const query = searchParams.get("q");
-  const queryTab = searchParams.get("tab");
-  const category = searchParams.get("category");
-  const dateRange = searchParams.get("dateRange");
+  const query = searchParams.get("q")
+  const queryTab = searchParams.get("tab")
+  const category = searchParams.get("category")
+  const dateRange = searchParams.get("dateRange")
 
-  const [searchQuery, setSearchQuery] = useState(query ?? "");
-  const [emptyQueryError, setEmptyQueryError] = useState("");
-  const [matchedPosts, setMatchedPosts] = useState<TPost[]>([]);
-  const [matchedUsers, setMatchedUsers] = useState<TUser[]>([]);
+  const [searchQuery, setSearchQuery] = useState(query ?? "")
+  const [emptyQueryError, setEmptyQueryError] = useState("")
+  const [matchedPosts, setMatchedPosts] = useState<TPost[]>([])
+  const [matchedUsers, setMatchedUsers] = useState<TUser[]>([])
   const [selectedCategory, setSelectedCategory] = useState(
     category ?? "default",
-  );
+  )
   const [selectedDateRange, setSelectedDateRange] = useState(
     dateRange ?? "default",
-  );
-  const [open, setOpen] = useState(false); // Search Filter Dialog State
+  )
+  const [open, setOpen] = useState(false) // Search Filter Dialog State
 
-  const router = useRouter();
+  const router = useRouter()
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!searchQuery?.trim()) {
-      setSearchQuery("");
-      setEmptyQueryError("Search query cannot be empty");
-      return;
+      setSearchQuery("")
+      setEmptyQueryError("Search query cannot be empty")
+      return
     }
-    const searchUrl = `?q=${searchQuery}&category=${selectedCategory}&tab=${queryTab ?? "posts"}&dateRange=${selectedDateRange}`;
-    router.push(searchUrl);
-  };
+    const searchUrl = `?q=${searchQuery}&category=${selectedCategory}&tab=${queryTab ?? "posts"}&dateRange=${selectedDateRange}`
+    router.push(searchUrl)
+  }
 
   const handleTabChange = (value: string) => {
-    const changeTabUrl = `?q=${query}&category=${category}&tab=${value}&dateRange=${dateRange}`;
-    router.push(changeTabUrl);
-  };
+    const changeTabUrl = `?q=${query}&category=${category}&tab=${value}&dateRange=${dateRange}`
+    router.push(changeTabUrl)
+  }
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -87,19 +87,19 @@ export default function SearchComponent() {
             query?.trim() as string,
             category as string,
             dateRange as string,
-          );
+          )
 
-        setMatchedPosts(posts);
-        setMatchedUsers(users);
+        setMatchedPosts(posts)
+        setMatchedUsers(users)
       } catch (error) {
-        console.error("Error fetching search results:", error);
+        console.error("Error fetching search results:", error)
       }
-    };
+    }
 
     if (query?.trim()) {
-      fetchSearchResults();
+      fetchSearchResults()
     }
-  }, [query, category, dateRange]);
+  }, [query, category, dateRange])
 
   return (
     <div className="w-full">
@@ -162,7 +162,7 @@ export default function SearchComponent() {
         )}
       </main>
     </div>
-  );
+  )
 }
 
 export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
@@ -171,7 +171,7 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
       <div className="flex-center w-full p-4 max-md:pt-10">
         <p>No users matched</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -183,12 +183,12 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
         />
       ))}
     </>
-  );
+  )
 }
 
 export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
-  const router = useRouter();
-  const [followers, setFollowers] = useState(profileUser.followers.length ?? 0);
+  const router = useRouter()
+  const [followers, setFollowers] = useState(profileUser.followers.length ?? 0)
 
   return (
     <Card className="mid-width-card-content">
@@ -207,22 +207,22 @@ export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
           <p className="text-sm text-muted-foreground">
             &#64;{profileUser.username}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {profileUser.bio}
-          </p>
+          <p className="mt-1 text-sm">{profileUser.bio}</p>
           <div className="mt-2 flex space-x-4">
-            <p className="text-sm text-muted-foreground">
-              {followers} followers
+            <p className="text-sm">
+              {followers}{" "}
+              <span className="text-muted-foreground">Followers</span>
             </p>
-            <p className="text-sm text-muted-foreground">
-              {/* {user.posts.length} posts */}
+            <p className="text-sm">
+              {profileUser.posts.length}{" "}
+              <span className="text-muted-foreground">Posts</span>
             </p>
           </div>
         </Link>
         <FollowButton profileUser={profileUser} setFollowers={setFollowers} />
       </CardContent>
     </Card>
-  );
+  )
 }
 
 export function SearchFilterDialog({
@@ -233,12 +233,12 @@ export function SearchFilterDialog({
   dateRange,
   setDateRange,
 }: {
-  open: boolean;
-  setOpen: SetAction<boolean>;
-  selectedCategory: string;
-  setSelectedCategory: SetAction<string>;
-  dateRange: string;
-  setDateRange: SetAction<string>;
+  open: boolean
+  setOpen: SetAction<boolean>
+  selectedCategory: string
+  setSelectedCategory: SetAction<string>
+  dateRange: string
+  setDateRange: SetAction<string>
 }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -297,5 +297,5 @@ export function SearchFilterDialog({
         </Button>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
