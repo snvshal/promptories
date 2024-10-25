@@ -73,27 +73,19 @@ export default function UserProfileComponent({
           postCount={posts.length}
         />
 
-        <Tabs defaultValue={tab} className="w-full">
+        <Tabs defaultValue={tab} onValueChange={toggleTab} className="w-full">
           <TabsList
             className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} mt-4 h-12 items-end rounded-none border-b bg-background p-0`}
           >
-            <TabsTriggerButton tab={tab} tabValue="posts" toggleTab={toggleTab}>
+            <TabsTriggerButton tab={tab} tabValue="posts">
               Posts
             </TabsTriggerButton>
             {isAdmin && (
               <>
-                <TabsTriggerButton
-                  tab={tab}
-                  tabValue="likes"
-                  toggleTab={toggleTab}
-                >
+                <TabsTriggerButton tab={tab} tabValue="likes">
                   Likes
                 </TabsTriggerButton>
-                <TabsTriggerButton
-                  tab={tab}
-                  tabValue="saved"
-                  toggleTab={toggleTab}
-                >
+                <TabsTriggerButton tab={tab} tabValue="saved">
                   Saved
                 </TabsTriggerButton>
               </>
@@ -122,19 +114,16 @@ export default function UserProfileComponent({
 export function TabsTriggerButton({
   tabValue,
   tab,
-  toggleTab,
   children,
 }: {
   tabValue: Tab
   tab: Tab
-  toggleTab: (tab: string) => void
   children: React.ReactNode
 }) {
   return (
     <TabsTrigger
       role="button"
       value={tabValue}
-      onClick={() => toggleTab(tabValue)}
       className="flex w-full flex-col p-0 px-4"
     >
       {children}
