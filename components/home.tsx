@@ -119,6 +119,9 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
       {posts.map((post, index) => (
         <PostType key={index} post={post} type="posts" />
       ))}
+      <div className="h-40 w-full pt-5">
+        <p className="w-full text-center text-muted-foreground">·</p>
+      </div>
     </>
   )
 }
