@@ -11,13 +11,16 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { User } from "lucide-react"
 import { NavigateBackHeader } from "../post"
 import { addFollower } from "@/actions/addFollower"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { st } from "@/utils/ps"
 import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
 import { Types } from "mongoose"
+
+// Define the Tab type based on isAdmin
+export type Tab = "posts" | "likes" | "saved"
 
 export default function UserProfileComponent({
   profileUser,
@@ -37,9 +40,6 @@ export default function UserProfileComponent({
 
   const searchParams = useSearchParams()
   const query = searchParams.get("tab")
-
-  // Define the Tab type based on isAdmin
-  type Tab = "posts" | "likes" | "saved"
 
   // Set initial tab based on query or default to "posts"
   const initialTab: Tab =
@@ -73,38 +73,24 @@ export default function UserProfileComponent({
           postCount={posts.length}
         />
 
-        <Tabs defaultValue={tab} className="w-full">
-          <div className="border-b p-4">
-            <TabsList
-              className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} `}
-            >
-              <TabsTrigger
-                role="button"
-                value="posts"
-                onClick={() => toggleTab("posts")}
-              >
-                Posts
-              </TabsTrigger>
-              {isAdmin && (
-                <>
-                  <TabsTrigger
-                    role="button"
-                    value="likes"
-                    onClick={() => toggleTab("likes")}
-                  >
-                    Likes
-                  </TabsTrigger>
-                  <TabsTrigger
-                    role="button"
-                    value="saved"
-                    onClick={() => toggleTab("saved")}
-                  >
-                    Saved
-                  </TabsTrigger>
-                </>
-              )}
-            </TabsList>
-          </div>
+        <Tabs defaultValue={tab} onValueChange={toggleTab} className="w-full">
+          <TabsList
+            className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} mt-4 h-12 rounded-none border-b bg-background p-0`}
+          >
+            <TabsTriggerButton tab={tab} tabValue="posts">
+              Posts
+            </TabsTriggerButton>
+            {isAdmin && (
+              <>
+                <TabsTriggerButton tab={tab} tabValue="likes">
+                  Likes
+                </TabsTriggerButton>
+                <TabsTriggerButton tab={tab} tabValue="saved">
+                  Saved
+                </TabsTriggerButton>
+              </>
+            )}
+          </TabsList>
 
           <TabsContent value="posts" className="m-0">
             <PostsComponent posts={posts} />
@@ -125,6 +111,29 @@ export default function UserProfileComponent({
   )
 }
 
+export function TabsTriggerButton({
+  tabValue,
+  tab,
+  children,
+}: {
+  tabValue: string
+  tab: string
+  children: React.ReactNode
+}) {
+  return (
+    <TabsTrigger
+      role="button"
+      value={tabValue}
+      className="flex-center relative h-full w-full flex-col rounded-none p-0 px-4 hover:bg-accent"
+    >
+      {children}
+      <span
+        className={`${tab === tabValue ? "visible" : "invisible"} absolute bottom-0 mt-2 h-1 w-[calc(100%-20px)] rounded bg-indigo-500`}
+      ></span>
+    </TabsTrigger>
+  )
+}
+
 export function ProfileUserContent({
   profileUser,
   postCount,
@@ -135,7 +144,7 @@ export function ProfileUserContent({
   const [followers, setFollowers] = useState(profileUser?.following.length)
 
   return (
-    <Card className="mid-width-card-content">
+    <Card className="mb-0 w-full rounded-none border-0">
       <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
         <div className="flex w-full justify-end space-x-4">
           <ProfileOptionButton
