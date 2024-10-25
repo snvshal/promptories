@@ -75,7 +75,7 @@ export default function UserProfileComponent({
 
         <Tabs defaultValue={tab} onValueChange={toggleTab} className="w-full">
           <TabsList
-            className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} mt-4 h-12 items-end rounded-none border-b bg-background p-0`}
+            className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} mt-4 h-12 rounded-none border-b bg-background p-0`}
           >
             <TabsTriggerButton tab={tab} tabValue="posts">
               Posts
@@ -116,19 +116,19 @@ export function TabsTriggerButton({
   tab,
   children,
 }: {
-  tabValue: Tab
-  tab: Tab
+  tabValue: string
+  tab: string
   children: React.ReactNode
 }) {
   return (
     <TabsTrigger
       role="button"
       value={tabValue}
-      className="flex w-full flex-col p-0 px-4"
+      className="flex-center relative h-full w-full flex-col rounded-none p-0 px-4 hover:bg-accent"
     >
       {children}
       <span
-        className={`${tab === tabValue ? "visible" : "invisible"} mt-2 h-1 w-full rounded bg-indigo-500`}
+        className={`${tab === tabValue ? "visible" : "invisible"} absolute bottom-0 mt-2 h-1 w-[calc(100%-20px)] rounded bg-indigo-500`}
       ></span>
     </TabsTrigger>
   )

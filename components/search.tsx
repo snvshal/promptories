@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dialog"
 import { SetAction } from "@/types/generics.type"
 import { Label } from "./ui/label"
-import { FollowButton } from "./profile/user"
+import { FollowButton, TabsTriggerButton } from "./profile/user"
 
 export type SearchCategories =
   | "default"
@@ -105,7 +105,7 @@ export default function SearchComponent() {
     <div className="w-full">
       <NavigateBackHeader page="Search" />
       <main className="main-content">
-        <Card className="mid-width-card-content">
+        <Card className="mb-0 w-full rounded-none border-0">
           <CardContent className="p-4">
             <form onSubmit={handleSearchSubmit}>
               <div className="flex gap-2">
@@ -142,10 +142,14 @@ export default function SearchComponent() {
             onValueChange={handleTabChange}
             className="w-full"
           >
-            <div className="border-b p-4">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="posts">Posts</TabsTrigger>
-                <TabsTrigger value="users">Users</TabsTrigger>
+            <div className="border-b">
+              <TabsList className="mt-4 grid h-12 w-full grid-cols-2 rounded-none border-b bg-background p-0">
+                <TabsTriggerButton tabValue="posts" tab={queryTab as string}>
+                  Posts
+                </TabsTriggerButton>
+                <TabsTriggerButton tabValue="users" tab={queryTab as string}>
+                  Users
+                </TabsTriggerButton>
               </TabsList>
             </div>
             <TabsContent value="posts" className="m-0">
