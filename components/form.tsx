@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -35,6 +35,7 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ]
 const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"]
+const ACCEPTED_AUDIO_TYPES = ["audio/mpeg", "audio/ogg", "audio/wav"]
 
 const mediaSchema = z.object({
   file: z
@@ -43,8 +44,9 @@ const mediaSchema = z.object({
     .refine(
       (file) =>
         ACCEPTED_IMAGE_TYPES.includes(file.type) ||
-        ACCEPTED_VIDEO_TYPES.includes(file.type),
-      "Only .jpg, .jpeg, .png, .webp, .mp4, .webm and .ogg formats are supported.",
+        ACCEPTED_VIDEO_TYPES.includes(file.type) ||
+        ACCEPTED_AUDIO_TYPES.includes(file.type),
+      "Only .jpg, .jpeg, .png, .webp, .mp4, .webm, .ogg, .mp3, and .wav formats are supported.",
     ),
   preview: z.string().url(),
 })
@@ -84,10 +86,13 @@ export default function PostForm({
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   })
+
+  const promptoryType = watch("promptory_type")
 
   const router = useRouter()
 
@@ -147,6 +152,21 @@ export default function PostForm({
     }
   }
 
+  const isPromptText = promptoryType?.toLowerCase().startsWith("text-")
+  const isResponseText = promptoryType?.toLowerCase().endsWith("-text")
+
+  useEffect(() => {
+    // Reset media previews when promptory type changes
+    if (isPromptText) {
+      setPromptMediaPreview(null)
+      setValue("promptMedia", undefined)
+    }
+    if (isResponseText) {
+      setResponseMediaPreview(null)
+      setValue("responseMedia", undefined)
+    }
+  }, [promptoryType, isPromptText, isResponseText, setValue])
+
   return (
     <div className="min-h-screen w-full">
       <NavigateBackHeader
@@ -186,129 +206,151 @@ export default function PostForm({
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="prompt">Prompt</Label>
-                <Controller
-                  name="prompt"
-                  control={control}
-                  render={({ field }) => (
-                    <Textarea
-                      id="prompt"
-                      placeholder="Enter prompt"
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.prompt && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.prompt.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="promptMedia">
-                  Prompt Media (Image or Video)
-                </Label>
-                <Input
-                  id="promptMedia"
-                  type="file"
-                  accept={[
-                    ...ACCEPTED_IMAGE_TYPES,
-                    ...ACCEPTED_VIDEO_TYPES,
-                  ].join(",")}
-                  onChange={(e) => handleFileChange(e, "promptMedia")}
-                  className="mt-1"
-                />
-                {errors.promptMedia && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.promptMedia.message}
-                  </p>
-                )}
-                {promptMediaPreview && (
-                  <div className="mt-2">
-                    {ACCEPTED_IMAGE_TYPES.includes(
-                      control._formValues.promptMedia?.file.type || "",
-                    ) ? (
-                      <Image
-                        src={promptMediaPreview}
-                        alt="Prompt media preview"
-                        width={200}
-                        height={200}
-                        className="w-full rounded"
-                      />
-                    ) : (
-                      <video
-                        src={promptMediaPreview}
-                        controls
-                        className="w-full rounded"
+              {isPromptText ? (
+                <div>
+                  <Label htmlFor="prompt">Prompt</Label>
+                  <Controller
+                    name="prompt"
+                    control={control}
+                    render={({ field }) => (
+                      <Textarea
+                        id="prompt"
+                        placeholder="Enter prompt"
+                        {...field}
                       />
                     )}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="response">Response</Label>
-                <Controller
-                  name="response"
-                  control={control}
-                  render={({ field }) => (
-                    <Textarea
-                      id="response"
-                      placeholder="Enter response"
-                      {...field}
-                    />
+                  />
+                  {errors.prompt && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.prompt.message}
+                    </p>
                   )}
-                />
-                {errors.response && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.response.message}
-                  </p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div>
+                  <Label htmlFor="promptMedia">
+                    Prompt Media (Image, Video, or Audio)
+                  </Label>
+                  <Input
+                    id="promptMedia"
+                    type="file"
+                    accept={[
+                      ...ACCEPTED_IMAGE_TYPES,
+                      ...ACCEPTED_VIDEO_TYPES,
+                      ...ACCEPTED_AUDIO_TYPES,
+                    ].join(",")}
+                    onChange={(e) => handleFileChange(e, "promptMedia")}
+                    className="mt-1"
+                  />
+                  {errors.promptMedia && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.promptMedia.message}
+                    </p>
+                  )}
+                  {promptMediaPreview && (
+                    <div className="mt-2">
+                      {ACCEPTED_IMAGE_TYPES.includes(
+                        control._formValues.promptMedia?.file.type || "",
+                      ) ? (
+                        <Image
+                          src={promptMediaPreview}
+                          alt="Prompt media preview"
+                          width={200}
+                          height={200}
+                          className="rounded"
+                        />
+                      ) : ACCEPTED_VIDEO_TYPES.includes(
+                          control._formValues.promptMedia?.file.type || "",
+                        ) ? (
+                        <video
+                          src={promptMediaPreview}
+                          controls
+                          className="w-full max-w-[200px] rounded"
+                        />
+                      ) : (
+                        <audio
+                          src={promptMediaPreview}
+                          controls
+                          className="w-full max-w-[200px]"
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
-              <div>
-                <Label htmlFor="responseMedia">
-                  Response Media (Image or Video)
-                </Label>
-                <Input
-                  id="responseMedia"
-                  type="file"
-                  accept={[
-                    ...ACCEPTED_IMAGE_TYPES,
-                    ...ACCEPTED_VIDEO_TYPES,
-                  ].join(",")}
-                  onChange={(e) => handleFileChange(e, "responseMedia")}
-                  className="mt-1"
-                />
-                {errors.responseMedia && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.responseMedia.message}
-                  </p>
-                )}
-                {responseMediaPreview && (
-                  <div className="mt-2">
-                    {ACCEPTED_IMAGE_TYPES.includes(
-                      control._formValues.responseMedia?.file.type || "",
-                    ) ? (
-                      <Image
-                        src={responseMediaPreview}
-                        alt="Response media preview"
-                        width={200}
-                        height={200}
-                        className="w-full rounded"
-                      />
-                    ) : (
-                      <video
-                        src={responseMediaPreview}
-                        controls
-                        className="w-full rounded"
+              {isResponseText ? (
+                <div>
+                  <Label htmlFor="response">Response</Label>
+                  <Controller
+                    name="response"
+                    control={control}
+                    render={({ field }) => (
+                      <Textarea
+                        id="response"
+                        placeholder="Enter response"
+                        {...field}
                       />
                     )}
-                  </div>
-                )}
-              </div>
+                  />
+                  {errors.response && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.response.message}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <Label htmlFor="responseMedia">
+                    Response Media (Image, Video, or Audio)
+                  </Label>
+                  <Input
+                    id="responseMedia"
+                    type="file"
+                    accept={[
+                      ...ACCEPTED_IMAGE_TYPES,
+                      ...ACCEPTED_VIDEO_TYPES,
+                      ...ACCEPTED_AUDIO_TYPES,
+                    ].join(",")}
+                    onChange={(e) => handleFileChange(e, "responseMedia")}
+                    className="mt-1"
+                  />
+                  {errors.responseMedia && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.responseMedia.message}
+                    </p>
+                  )}
+                  {responseMediaPreview && (
+                    <div className="mt-2">
+                      {ACCEPTED_IMAGE_TYPES.includes(
+                        control._formValues.responseMedia?.file.type || "",
+                      ) ? (
+                        <Image
+                          src={responseMediaPreview}
+                          alt="Response media preview"
+                          width={200}
+                          height={200}
+                          className="rounded"
+                        />
+                      ) : ACCEPTED_VIDEO_TYPES.includes(
+                          control._formValues.responseMedia?.file.type || "",
+                        ) ? (
+                        <video
+                          src={responseMediaPreview}
+                          controls
+                          className="w-full max-w-[200px] rounded"
+                        />
+                      ) : (
+                        <audio
+                          src={responseMediaPreview}
+                          controls
+                          className="w-full max-w-[200px]"
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <Separator orientation="vertical" className="h-auto" />
@@ -405,8 +447,6 @@ export default function PostForm({
               </div>
             </div>
           </div>
-
-          <Separator orientation="horizontal" className="mt-0" />
 
           <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting ? "Submitting..." : "Submit"}
