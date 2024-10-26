@@ -542,6 +542,9 @@ export function PostViews({ post }: { post: TPost }) {
 }
 
 export function SidePanel() {
+  const pathname = usePathname()
+  if (pathname.startsWith("/compose")) return
+
   return (
     <aside className="w-64 p-4 max-lg:hidden">
       <h2 className="sticky top-4 mb-4 text-lg font-semibold">Side Panel</h2>
