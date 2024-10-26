@@ -257,7 +257,7 @@ export default function PostForm({
                           alt="Prompt media preview"
                           width={200}
                           height={200}
-                          className="rounded"
+                          className="w-full rounded"
                         />
                       ) : ACCEPTED_VIDEO_TYPES.includes(
                           control._formValues.promptMedia?.file.type || "",
@@ -330,7 +330,7 @@ export default function PostForm({
                           alt="Response media preview"
                           width={200}
                           height={200}
-                          className="rounded"
+                          className="w-full rounded"
                         />
                       ) : ACCEPTED_VIDEO_TYPES.includes(
                           control._formValues.responseMedia?.file.type || "",
@@ -447,6 +447,8 @@ export default function PostForm({
               </div>
             </div>
           </div>
+
+          <Separator orientation="horizontal" />
 
           <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting ? "Submitting..." : "Submit"}
