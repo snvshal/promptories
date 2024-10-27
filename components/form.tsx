@@ -450,9 +450,18 @@ export default function PostForm({
 
           <Separator orientation="horizontal" />
 
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </Button>
+          <div className="flex w-full gap-2">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </Button>
+          </div>
         </form>
       </main>
     </div>
