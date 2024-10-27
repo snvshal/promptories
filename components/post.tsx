@@ -623,7 +623,7 @@ export function PostContentType({
 
 export function PostTime({ createdAt }: { createdAt: Date }) {
   return (
-    <div className="flex-start mb-2 ml-4 mr-4 border-b pb-2 text-muted-foreground">
+    <div className="flex-start mb-2 ml-4 mr-4 border-b pb-2 text-sm text-muted-foreground">
       {new Date(createdAt as Date).toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
