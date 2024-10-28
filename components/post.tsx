@@ -228,19 +228,23 @@ export function PostRepliesContent({
           </Link>
           <div className="flex-1">
             <div className="flex-between">
-              <div className="flex-start space-x-2">
+              <div className="flex-start">
                 <Link
                   href={`/${pu(reply).username}`}
                   className="flex-start gap-1"
                   prefetch={false}
                 >
-                  <p className="font-semibold">{pu(reply).name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    &#64;{pu(reply).username}
+                  <p className="font-semibold max-sm:hidden">
+                    {pu(reply).name}
+                  </p>
+                  <p className="max-sm:font-semibold sm:text-muted-foreground">
+                    <span className="max-sm:hidden">&#64;</span>
+                    {pu(reply).username}
                   </p>
                 </Link>
-                <p className="space-x-4 text-sm text-muted-foreground">
-                  &#8226; <TimeAgo timestamp={reply.timestamp} />
+                <p className="text-muted-foreground">
+                  <span className="px-1">&#183;</span>
+                  <TimeAgo timestamp={reply.timestamp} />
                 </p>
               </div>
               <PostReplyOptions
@@ -517,7 +521,7 @@ export function PostType({
         className={`${type === "post" && "mb-4"} p-4 pb-0 max-md:pb-0`}
       >
         <div className={`${type === "posts" && "h-5"} flex-between relative`}>
-          <div className="flex-start space-x-1">
+          <div className="flex-start">
             <Link
               href={`/${pu(post).username}`}
               className="flex-start space-x-2"
@@ -532,17 +536,25 @@ export function PostType({
               <div
                 className={`${type === "post" ? "flex-col items-start gap-0" : "items-center gap-1"} flex justify-start`}
               >
-                <p className="font-semibold hover:underline">{pu(post).name}</p>
                 <p
-                  className={`text-sm text-muted-foreground ${type === "posts" && "max-sm:hidden"}`}
+                  className={`${type === "posts" && "max-sm:hidden"} font-semibold hover:underline`}
                 >
-                  &#64;{pu(post).username}
+                  {pu(post).name}
+                </p>
+                <p
+                  className={`${type === "posts" ? "max-sm:font-semibold sm:text-muted-foreground" : "text-muted-foreground"} `}
+                >
+                  <span className={`${type === "posts" && "max-sm:hidden"}`}>
+                    &#64;
+                  </span>
+                  {pu(post).username}
                 </p>
               </div>
             </Link>
             {type === "posts" && (
-              <p className="text-sm text-muted-foreground">
-                &#183; <TimeAgo timestamp={post.createdAt as Date} />
+              <p className="text-muted-foreground">
+                <span className="px-1">&#183;</span>
+                <TimeAgo timestamp={post.createdAt as Date} />
               </p>
             )}
           </div>
@@ -628,8 +640,8 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
         hour: "numeric",
         minute: "numeric",
         hour12: true,
-      })}{" "}
-      &#8226;{" "}
+      })}
+      <span className="px-1">&#183;</span>
       {new Date(createdAt as Date).toLocaleString("en-US", {
         day: "numeric",
         month: "short",
