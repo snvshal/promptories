@@ -372,8 +372,8 @@ export function Sidebar({
       </aside>
 
       <aside className="flex-1 overflow-y-auto">
-        <div className="flex">
-          <div className="w-full flex-1 border-r sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
+        <div className="flex h-full">
+          <div className="w-full flex-1 sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
             {children}
           </div>
           <SidePanel />
@@ -546,16 +546,16 @@ export function SidePanel() {
   if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return
 
   return (
-    <aside className="w-64 p-4 max-lg:hidden">
-      <h2 className="sticky top-4 mb-4 text-lg font-semibold">Side Panel</h2>
-      <div className="sticky top-16 max-h-[calc(100vh-74px)] overflow-y-auto">
-        <ScrollArea className="h-[calc(100vh-74px)] rounded-md border">
+    <aside className="flex w-64 flex-col justify-between border-l p-4 max-lg:hidden">
+      <h2 className="text-lg font-semibold">Side Panel</h2>
+      <div className="overflow-y-auto">
+        <ScrollArea className="h-[calc(100vh-75px)] rounded-md border">
           <div className="mr-2 flex flex-col gap-2 p-2">
             {promptory_types.map((type, index) => (
               <Link
                 key={index}
                 href={"/"}
-                className="w-full rounded-md border p-1 text-center"
+                className="w-full rounded-md p-1 text-center"
               >
                 {type}
               </Link>
