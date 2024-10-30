@@ -26,7 +26,7 @@ import { ToastAction } from "./ui/toast"
 import { TPost } from "@/types/schema.type"
 import Image from "next/image"
 import { Separator } from "@/components/ui/separator"
-import { CldUploadWidget } from "next-cloudinary"
+import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ACCEPTED_IMAGE_TYPES = [
@@ -89,7 +89,7 @@ export default function PostForm({
     router.push(`/${pu(post).username}/promptories/${post._id as string}`)
 
   const handleUploadSuccess = (
-    result: any,
+    result: CloudinaryUploadWidgetResults,
     mediaType: "prompt" | "response",
   ) => {
     const info = result.info as {
