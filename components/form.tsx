@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -26,6 +26,7 @@ import { ToastAction } from "./ui/toast"
 import { TPost } from "@/types/schema.type"
 import Image from "next/image"
 import { Separator } from "@/components/ui/separator"
+import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ACCEPTED_IMAGE_TYPES = [
@@ -35,20 +36,10 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ]
 const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"]
-const ACCEPTED_AUDIO_TYPES = ["audio/mpeg", "audio/ogg", "audio/wav"]
 
 const mediaSchema = z.object({
-  file: z
-    .instanceof(File)
-    .refine((file) => file.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
-    .refine(
-      (file) =>
-        ACCEPTED_IMAGE_TYPES.includes(file.type) ||
-        ACCEPTED_VIDEO_TYPES.includes(file.type) ||
-        ACCEPTED_AUDIO_TYPES.includes(file.type),
-      "Only .jpg, .jpeg, .png, .webp, .mp4, .webm, .ogg, .mp3, and .wav formats are supported.",
-    ),
-  preview: z.string().url(),
+  url: z.string().url(),
+  type: z.enum(["image", "video"]),
 })
 
 const formSchema = z.object({
@@ -56,9 +47,9 @@ const formSchema = z.object({
   model_url: z.string().url("Invalid model URL").min(10, "Model is required"),
   chat_link: z.string().url("Invalid chat URL").optional().or(z.literal("")),
   prompt: z.string().min(1, "Prompt is required"),
-  promptMedia: mediaSchema.optional(),
+  prompt_media: mediaSchema.optional(),
   response: z.string().min(1, "Response is required"),
-  responseMedia: mediaSchema.optional(),
+  response_media: mediaSchema.optional(),
   promptory_type: z.enum(promptory_types as [string, ...string[]], {
     required_error: "Please select a promptory type",
   }),
@@ -67,25 +58,24 @@ const formSchema = z.object({
 
 export type FormValues = z.infer<typeof formSchema>
 
+export type MediaType = "image" | "video" | null
+
 export default function PostForm({
   defaultValues,
   operationType,
   post,
 }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [promptMediaPreview, setPromptMediaPreview] = useState<string | null>(
-    null,
-  )
-  const [responseMediaPreview, setResponseMediaPreview] = useState<
-    string | null
-  >(null)
+  const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(null)
+  const [promptMediaType, setPromptMediaType] = useState<MediaType>(null)
+  const [responseMediaUrl, setResponseMediaUrl] = useState<string | null>(null)
+  const [responseMediaType, setResponseMediaType] = useState<MediaType>(null)
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
     watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -93,17 +83,73 @@ export default function PostForm({
   })
 
   const promptoryType = watch("promptory_type")
-
   const router = useRouter()
 
   const postRoute = (post: TPost) =>
     router.push(`/${pu(post).username}/promptories/${post._id as string}`)
 
+  const handleUploadSuccess = (
+    result: CloudinaryUploadWidgetResults,
+    mediaType: "prompt" | "response",
+  ) => {
+    const info = result.info as {
+      secure_url: string
+      resource_type: string
+      format: string
+      bytes: number
+    }
+
+    // Check file size
+    if (info.bytes > MAX_FILE_SIZE) {
+      toast({
+        title: "Error",
+        description: "File size exceeds 5MB limit.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Check file type
+    const fileType = `${info.resource_type}/${info.format}`
+    if (
+      !ACCEPTED_IMAGE_TYPES.includes(fileType) &&
+      !ACCEPTED_VIDEO_TYPES.includes(fileType)
+    ) {
+      toast({
+        title: "Error",
+        description:
+          "Unsupported file type. Please upload a valid image or video file.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (mediaType === "prompt") {
+      setPromptMediaUrl(info.secure_url)
+      setPromptMediaType(info.resource_type as MediaType)
+    } else {
+      setResponseMediaUrl(info.secure_url)
+      setResponseMediaType(info.resource_type as MediaType)
+    }
+  }
+
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true)
     try {
+      const formData = {
+        ...data,
+        prompt_media:
+          promptMediaUrl && promptMediaType
+            ? { url: promptMediaUrl, type: promptMediaType }
+            : undefined,
+        response_media:
+          responseMediaUrl && responseMediaType
+            ? { url: responseMediaUrl, type: responseMediaType }
+            : undefined,
+      }
+
       if (operationType === "POST") {
-        const post: TPost = await savePostForm(data)
+        const post: TPost = await savePostForm(formData)
         router.push("/home")
         toast({
           description: "Your post has been sent.",
@@ -117,13 +163,12 @@ export default function PostForm({
           ),
         })
       } else if (operationType === "PATCH" && post) {
-        await updatePostForm(data, post._id as string)
+        await updatePostForm(formData, post._id as string)
         postRoute(post)
         toast({
           description: "Your post has been updated.",
         })
       }
-      console.log("Form saved:", data)
       reset()
     } catch (error) {
       toast({
@@ -136,36 +181,8 @@ export default function PostForm({
     }
   }
 
-  const handleFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    fieldName: "promptMedia" | "responseMedia",
-  ) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const url = URL.createObjectURL(file)
-      if (fieldName === "promptMedia") {
-        setPromptMediaPreview(url)
-      } else {
-        setResponseMediaPreview(url)
-      }
-      setValue(fieldName, { file, preview: url })
-    }
-  }
-
   const isPromptText = promptoryType?.toLowerCase().startsWith("text-")
   const isResponseText = promptoryType?.toLowerCase().endsWith("-text")
-
-  useEffect(() => {
-    // Reset media previews when promptory type changes
-    if (isPromptText) {
-      setPromptMediaPreview(null)
-      setValue("promptMedia", undefined)
-    }
-    if (isResponseText) {
-      setResponseMediaPreview(null)
-      setValue("responseMedia", undefined)
-    }
-  }, [promptoryType, isPromptText, isResponseText, setValue])
 
   return (
     <div className="min-h-screen w-full">
@@ -229,51 +246,38 @@ export default function PostForm({
               ) : (
                 <div>
                   <Label htmlFor="promptMedia">
-                    Prompt Media (Image, Video, or Audio)
+                    Prompt Media (Image or Video)
                   </Label>
-                  <Input
-                    id="promptMedia"
-                    type="file"
-                    accept={[
-                      ...ACCEPTED_IMAGE_TYPES,
-                      ...ACCEPTED_VIDEO_TYPES,
-                      ...ACCEPTED_AUDIO_TYPES,
-                    ].join(",")}
-                    onChange={(e) => handleFileChange(e, "promptMedia")}
-                    className="mt-1"
-                  />
-                  {errors.promptMedia && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.promptMedia.message}
-                    </p>
-                  )}
-                  {promptMediaPreview && (
-                    <div className="mt-2">
-                      {ACCEPTED_IMAGE_TYPES.includes(
-                        control._formValues.promptMedia?.file.type || "",
-                      ) ? (
-                        <Image
-                          src={promptMediaPreview}
-                          alt="Prompt media preview"
-                          width={200}
-                          height={200}
-                          className="w-full rounded"
-                        />
-                      ) : ACCEPTED_VIDEO_TYPES.includes(
-                          control._formValues.promptMedia?.file.type || "",
-                        ) ? (
-                        <video
-                          src={promptMediaPreview}
-                          controls
-                          className="w-full max-w-[200px] rounded"
-                        />
-                      ) : (
-                        <audio
-                          src={promptMediaPreview}
-                          controls
-                          className="w-full max-w-[200px]"
-                        />
-                      )}
+                  <CldUploadWidget
+                    uploadPreset={
+                      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+                    }
+                    options={{
+                      maxFiles: 1,
+                      resourceType: "auto",
+                      clientAllowedFormats: [
+                        ...ACCEPTED_IMAGE_TYPES,
+                        ...ACCEPTED_VIDEO_TYPES,
+                      ],
+                      maxFileSize: MAX_FILE_SIZE,
+                    }}
+                    onSuccess={(result) =>
+                      handleUploadSuccess(result, "prompt")
+                    }
+                  >
+                    {({ open }) => (
+                      <Button onClick={() => open()} className="w-full">
+                        Upload Image or Video
+                      </Button>
+                    )}
+                  </CldUploadWidget>
+                  {promptMediaUrl && promptMediaType && (
+                    <div className="mt-4">
+                      <h3 className="mb-2 text-lg font-semibold">Preview:</h3>
+                      <RenderPreview
+                        mediaUrl={promptMediaUrl}
+                        mediaType={promptMediaType}
+                      />
                     </div>
                   )}
                 </div>
@@ -302,51 +306,38 @@ export default function PostForm({
               ) : (
                 <div>
                   <Label htmlFor="responseMedia">
-                    Response Media (Image, Video, or Audio)
+                    Response Media (Image or Video)
                   </Label>
-                  <Input
-                    id="responseMedia"
-                    type="file"
-                    accept={[
-                      ...ACCEPTED_IMAGE_TYPES,
-                      ...ACCEPTED_VIDEO_TYPES,
-                      ...ACCEPTED_AUDIO_TYPES,
-                    ].join(",")}
-                    onChange={(e) => handleFileChange(e, "responseMedia")}
-                    className="mt-1"
-                  />
-                  {errors.responseMedia && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.responseMedia.message}
-                    </p>
-                  )}
-                  {responseMediaPreview && (
-                    <div className="mt-2">
-                      {ACCEPTED_IMAGE_TYPES.includes(
-                        control._formValues.responseMedia?.file.type || "",
-                      ) ? (
-                        <Image
-                          src={responseMediaPreview}
-                          alt="Response media preview"
-                          width={200}
-                          height={200}
-                          className="w-full rounded"
-                        />
-                      ) : ACCEPTED_VIDEO_TYPES.includes(
-                          control._formValues.responseMedia?.file.type || "",
-                        ) ? (
-                        <video
-                          src={responseMediaPreview}
-                          controls
-                          className="w-full max-w-[200px] rounded"
-                        />
-                      ) : (
-                        <audio
-                          src={responseMediaPreview}
-                          controls
-                          className="w-full max-w-[200px]"
-                        />
-                      )}
+                  <CldUploadWidget
+                    uploadPreset={
+                      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+                    }
+                    options={{
+                      maxFiles: 1,
+                      resourceType: "auto",
+                      clientAllowedFormats: [
+                        ...ACCEPTED_IMAGE_TYPES,
+                        ...ACCEPTED_VIDEO_TYPES,
+                      ],
+                      maxFileSize: MAX_FILE_SIZE,
+                    }}
+                    onSuccess={(result) =>
+                      handleUploadSuccess(result, "response")
+                    }
+                  >
+                    {({ open }) => (
+                      <Button onClick={() => open()} className="w-full">
+                        Upload Image or Video
+                      </Button>
+                    )}
+                  </CldUploadWidget>
+                  {responseMediaUrl && responseMediaType && (
+                    <div className="mt-4">
+                      <h3 className="mb-2 text-lg font-semibold">Preview:</h3>
+                      <RenderPreview
+                        mediaUrl={responseMediaUrl}
+                        mediaType={responseMediaType}
+                      />
                     </div>
                   )}
                 </div>
@@ -466,4 +457,40 @@ export default function PostForm({
       </main>
     </div>
   )
+}
+
+const RenderPreview = ({
+  mediaUrl,
+  mediaType,
+}: {
+  mediaUrl: string
+  mediaType: MediaType
+}) => {
+  if (!mediaUrl) return null
+
+  if (mediaType === "image") {
+    return (
+      <Image
+        src={mediaUrl}
+        alt="Uploaded image"
+        width={300}
+        height={200}
+        className="mt-2 h-auto max-w-full rounded-lg"
+      />
+    )
+  }
+
+  if (mediaType === "video") {
+    return (
+      <video
+        src={mediaUrl}
+        controls
+        className="mt-2 h-auto max-w-full rounded-lg"
+      >
+        Your browser does not support the video tag.
+      </video>
+    )
+  }
+
+  return <p>Unsupported media type</p>
 }
