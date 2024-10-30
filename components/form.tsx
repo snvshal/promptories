@@ -40,6 +40,18 @@ const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"]
 const mediaSchema = z.object({
   url: z.string().url(),
   type: z.enum(["image", "video"]),
+  file: z
+    .custom<File>()
+    .refine(
+      (file) => file.size <= MAX_FILE_SIZE,
+      `File size should be less than 5MB.`,
+    )
+    .refine(
+      (file) =>
+        ACCEPTED_IMAGE_TYPES.includes(file.type) ||
+        ACCEPTED_VIDEO_TYPES.includes(file.type),
+      "Only .jpg, .jpeg, .png, .webp, .mp4, .webm, and .ogg formats are supported.",
+    ),
 })
 
 const formSchema = z.object({
@@ -47,9 +59,9 @@ const formSchema = z.object({
   model_url: z.string().url("Invalid model URL").min(10, "Model is required"),
   chat_link: z.string().url("Invalid chat URL").optional().or(z.literal("")),
   prompt: z.string().min(1, "Prompt is required"),
-  promptMedia: mediaSchema.optional(),
+  prompt_media: mediaSchema.optional(),
   response: z.string().min(1, "Response is required"),
-  responseMedia: mediaSchema.optional(),
+  response_media: mediaSchema.optional(),
   promptory_type: z.enum(promptory_types as [string, ...string[]], {
     required_error: "Please select a promptory type",
   }),
@@ -58,7 +70,7 @@ const formSchema = z.object({
 
 export type FormValues = z.infer<typeof formSchema>
 
-type MediaType = "image" | "video" | null
+export type MediaType = "image" | "video" | null
 
 export default function PostForm({
   defaultValues,
@@ -92,7 +104,35 @@ export default function PostForm({
     result: any,
     mediaType: "prompt" | "response",
   ) => {
-    const info = result.info as { secure_url: string; resource_type: MediaType }
+    const info = result.info as {
+      secure_url: string
+      resource_type: MediaType
+      original_filename: string
+    }
+    const file = result.file as File
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "Error",
+        description: "File size exceeds 5MB limit.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (
+      !ACCEPTED_IMAGE_TYPES.includes(file.type) &&
+      !ACCEPTED_VIDEO_TYPES.includes(file.type)
+    ) {
+      toast({
+        title: "Error",
+        description:
+          "Unsupported file type. Please upload a valid image or video file.",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (mediaType === "prompt") {
       setPromptMediaUrl(info.secure_url)
       setPromptMediaType(info.resource_type as MediaType)
@@ -107,11 +147,11 @@ export default function PostForm({
     try {
       const formData = {
         ...data,
-        promptMedia:
+        prompt_media:
           promptMediaUrl && promptMediaType
             ? { url: promptMediaUrl, type: promptMediaType }
             : undefined,
-        responseMedia:
+        response_media:
           responseMediaUrl && responseMediaType
             ? { url: responseMediaUrl, type: responseMediaType }
             : undefined,
