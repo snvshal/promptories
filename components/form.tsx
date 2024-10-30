@@ -40,18 +40,6 @@ const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"]
 const mediaSchema = z.object({
   url: z.string().url(),
   type: z.enum(["image", "video"]),
-  file: z
-    .custom<File>()
-    .refine(
-      (file) => file.size <= MAX_FILE_SIZE,
-      `File size should be less than 5MB.`,
-    )
-    .refine(
-      (file) =>
-        ACCEPTED_IMAGE_TYPES.includes(file.type) ||
-        ACCEPTED_VIDEO_TYPES.includes(file.type),
-      "Only .jpg, .jpeg, .png, .webp, .mp4, .webm, and .ogg formats are supported.",
-    ),
 })
 
 const formSchema = z.object({
@@ -106,12 +94,13 @@ export default function PostForm({
   ) => {
     const info = result.info as {
       secure_url: string
-      resource_type: MediaType
-      original_filename: string
+      resource_type: string
+      format: string
+      bytes: number
     }
-    const file = result.file as File
 
-    if (file.size > MAX_FILE_SIZE) {
+    // Check file size
+    if (info.bytes > MAX_FILE_SIZE) {
       toast({
         title: "Error",
         description: "File size exceeds 5MB limit.",
@@ -120,9 +109,11 @@ export default function PostForm({
       return
     }
 
+    // Check file type
+    const fileType = `${info.resource_type}/${info.format}`
     if (
-      !ACCEPTED_IMAGE_TYPES.includes(file.type) &&
-      !ACCEPTED_VIDEO_TYPES.includes(file.type)
+      !ACCEPTED_IMAGE_TYPES.includes(fileType) &&
+      !ACCEPTED_VIDEO_TYPES.includes(fileType)
     ) {
       toast({
         title: "Error",
@@ -264,6 +255,11 @@ export default function PostForm({
                     options={{
                       maxFiles: 1,
                       resourceType: "auto",
+                      clientAllowedFormats: [
+                        ...ACCEPTED_IMAGE_TYPES,
+                        ...ACCEPTED_VIDEO_TYPES,
+                      ],
+                      maxFileSize: MAX_FILE_SIZE,
                     }}
                     onSuccess={(result) =>
                       handleUploadSuccess(result, "prompt")
@@ -319,6 +315,11 @@ export default function PostForm({
                     options={{
                       maxFiles: 1,
                       resourceType: "auto",
+                      clientAllowedFormats: [
+                        ...ACCEPTED_IMAGE_TYPES,
+                        ...ACCEPTED_VIDEO_TYPES,
+                      ],
+                      maxFileSize: MAX_FILE_SIZE,
                     }}
                     onSuccess={(result) =>
                       handleUploadSuccess(result, "response")
