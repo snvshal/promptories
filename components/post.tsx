@@ -572,11 +572,14 @@ export function PostType({
         <div className="bbn space-y-4 rounded-lg p-4">
           <div className="relative overflow-hidden">
             <h3 className="mb-2 font-semibold">Prompt:</h3>
-            <PostContentType type={type} content={post.prompt} />
+            <PostContentType type={type} content={post.prompt.text as string} />
           </div>
           <div className="relative overflow-hidden">
             <h3 className="mb-2 font-semibold">Response:</h3>
-            <PostContentType type={type} content={post.response} />
+            <PostContentType
+              type={type}
+              content={post.response.text as string}
+            />
           </div>
         </div>
       </CardContent>
