@@ -266,7 +266,11 @@ export default function PostForm({
                     }
                   >
                     {({ open }) => (
-                      <Button onClick={() => open()} className="w-full">
+                      <Button
+                        type="button"
+                        onClick={() => open()}
+                        className="w-full"
+                      >
                         Upload Image or Video
                       </Button>
                     )}
@@ -326,7 +330,11 @@ export default function PostForm({
                     }
                   >
                     {({ open }) => (
-                      <Button onClick={() => open()} className="w-full">
+                      <Button
+                        type="button"
+                        onClick={() => open()}
+                        className="w-full"
+                      >
                         Upload Image or Video
                       </Button>
                     )}
