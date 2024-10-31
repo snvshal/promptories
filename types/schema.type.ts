@@ -5,10 +5,8 @@ export type TPost = Document & {
   caption: string
   model_url: string
   chat_link?: string
-  prompt: string
-  prompt_media: PRMedia
-  response: string
-  response_media: PRMedia
+  prompt: PRContent
+  response: PRContent
   promptory_type: PromptoryType
   replies: TReplies[]
   likes: Types.ObjectId[]
@@ -33,6 +31,11 @@ export type TUser = Document & {
   posts: Types.ObjectId[]
   followers: Types.ObjectId[]
   following: Types.ObjectId[]
+}
+
+export type PRContent = {
+  text?: string
+  media?: PRMedia
 }
 
 // Prompt or Response Media Type

@@ -1,10 +1,15 @@
 import { Schema, model, models } from "mongoose"
 import { promptory_types } from "@/lib/constants"
-import { TPost, PRMedia } from "@/types/schema.type"
+import { TPost, PRMedia, PRContent } from "@/types/schema.type"
 
 const PRMediaSchema = new Schema<PRMedia>({
   url: { type: String, required: true },
   type: { type: String, enum: ["image", "video"], required: true },
+})
+
+const PRContentSchema = new Schema<PRContent>({
+  text: { type: String },
+  media: { type: PRMediaSchema },
 })
 
 const PostSchema = new Schema<TPost>(
@@ -25,22 +30,8 @@ const PostSchema = new Schema<TPost>(
     chat_link: {
       type: String,
     },
-    prompt: {
-      type: String,
-      required: true,
-    },
-    prompt_media: {
-      type: PRMediaSchema,
-      required: true,
-    },
-    response: {
-      type: String,
-      required: true,
-    },
-    response_media: {
-      type: PRMediaSchema,
-      required: true,
-    },
+    prompt: { type: PRContentSchema },
+    response: { type: PRContentSchema },
     promptory_type: {
       type: String,
       enum: promptory_types,
