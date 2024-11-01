@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useCallback } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -42,23 +42,50 @@ const mediaSchema = z.object({
   type: z.enum(["image", "video"]),
 })
 
-const formSchema = z.object({
-  caption: z.string().min(1, "Caption is required"),
-  model_url: z.string().url("Invalid model URL").min(10, "Model is required"),
-  chat_link: z.string().url("Invalid chat URL").optional().or(z.literal("")),
-  prompt: z.string().min(1, "Prompt is required"),
-  prompt_media: mediaSchema.optional(),
-  response: z.string().min(1, "Response is required"),
-  response_media: mediaSchema.optional(),
-  promptory_type: z.enum(promptory_types as [string, ...string[]], {
-    required_error: "Please select a promptory type",
-  }),
-  tags: z.string().optional(),
-})
+const formSchema = z
+  .object({
+    caption: z.string().min(1, "Caption is required"),
+    model_url: z.string().url("Invalid model URL").min(10, "Model is required"),
+    chat_link: z.string().url("Invalid chat URL").optional().or(z.literal("")),
+    prompt: z.string().optional(),
+    prompt_media: mediaSchema.optional(),
+    response: z.string().optional(),
+    response_media: mediaSchema.optional(),
+    promptory_type: z.enum(promptory_types as [string, ...string[]], {
+      required_error: "Please select a promptory type",
+    }),
+    tags: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.promptory_type.toLowerCase().startsWith("text-")) {
+        return !!data.prompt
+      } else {
+        return !!data.prompt_media
+      }
+    },
+    {
+      message: "Prompt is required based on the selected promptory type",
+      path: ["prompt"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.promptory_type.toLowerCase().endsWith("-text")) {
+        return !!data.response
+      } else {
+        return !!data.response_media
+      }
+    },
+    {
+      message: "Response is required based on the selected promptory type",
+      path: ["response"],
+    },
+  )
 
 export type FormValues = z.infer<typeof formSchema>
 
-export type MediaType = "image" | "video" | null
+export type MediaType = "image" | "video"
 
 export default function PostForm({
   defaultValues,
@@ -67,9 +94,11 @@ export default function PostForm({
 }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(null)
-  const [promptMediaType, setPromptMediaType] = useState<MediaType>(null)
+  const [promptMediaType, setPromptMediaType] = useState<MediaType | null>(null)
   const [responseMediaUrl, setResponseMediaUrl] = useState<string | null>(null)
-  const [responseMediaType, setResponseMediaType] = useState<MediaType>(null)
+  const [responseMediaType, setResponseMediaType] = useState<MediaType | null>(
+    null,
+  )
 
   const {
     control,
@@ -77,6 +106,7 @@ export default function PostForm({
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -85,53 +115,63 @@ export default function PostForm({
   const promptoryType = watch("promptory_type")
   const router = useRouter()
 
-  const postRoute = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post._id as string}`)
+  const postRoute = useCallback(
+    (post: TPost) =>
+      router.push(`/${pu(post).username}/promptories/${post._id as string}`),
+    [router],
+  )
 
-  const handleUploadSuccess = (
-    result: CloudinaryUploadWidgetResults,
-    mediaType: "prompt" | "response",
-  ) => {
-    const info = result.info as {
-      secure_url: string
-      resource_type: string
-      format: string
-      bytes: number
-    }
+  const handleUploadSuccess = useCallback(
+    (
+      result: CloudinaryUploadWidgetResults,
+      mediaType: "prompt" | "response",
+    ) => {
+      const info = result.info as {
+        secure_url: string
+        resource_type: string
+        format: string
+        bytes: number
+      }
 
-    // Check file size
-    if (info.bytes > MAX_FILE_SIZE) {
-      toast({
-        title: "Error",
-        description: "File size exceeds 5MB limit.",
-        variant: "destructive",
-      })
-      return
-    }
+      if (info.bytes > MAX_FILE_SIZE) {
+        toast({
+          title: "Error",
+          description: "File size exceeds 5MB limit.",
+          variant: "destructive",
+        })
+        return
+      }
 
-    // Check file type
-    const fileType = `${info.resource_type}/${info.format}`
-    if (
-      !ACCEPTED_IMAGE_TYPES.includes(fileType) &&
-      !ACCEPTED_VIDEO_TYPES.includes(fileType)
-    ) {
-      toast({
-        title: "Error",
-        description:
-          "Unsupported file type. Please upload a valid image or video file.",
-        variant: "destructive",
-      })
-      return
-    }
+      const fileType = `${info.resource_type}/${info.format}`
+      if (
+        !ACCEPTED_IMAGE_TYPES.includes(fileType) &&
+        !ACCEPTED_VIDEO_TYPES.includes(fileType)
+      ) {
+        toast({
+          title: "Error",
+          description:
+            "Unsupported file type. Please upload a valid image or video file.",
+          variant: "destructive",
+        })
+        return
+      }
 
-    if (mediaType === "prompt") {
-      setPromptMediaUrl(info.secure_url)
-      setPromptMediaType(info.resource_type as MediaType)
-    } else {
-      setResponseMediaUrl(info.secure_url)
-      setResponseMediaType(info.resource_type as MediaType)
-    }
-  }
+      const mediaData = {
+        url: info.secure_url,
+        type: info.resource_type as MediaType,
+      }
+      if (mediaType === "prompt") {
+        setPromptMediaUrl(info.secure_url)
+        setPromptMediaType(info.resource_type as MediaType)
+        setValue("prompt_media", mediaData)
+      } else {
+        setResponseMediaUrl(info.secure_url)
+        setResponseMediaType(info.resource_type as MediaType)
+        setValue("response_media", mediaData)
+      }
+    },
+    [setValue],
+  )
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true)
@@ -171,6 +211,7 @@ export default function PostForm({
       }
       reset()
     } catch (error) {
+      console.error("Error submitting form:", error)
       toast({
         title: "Error",
         description: "There was a problem sending your post.",
@@ -284,6 +325,11 @@ export default function PostForm({
                       />
                     </div>
                   )}
+                  {!promptMediaUrl && errors.prompt && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.prompt.message || "Prompt media is required"}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -348,6 +394,11 @@ export default function PostForm({
                       />
                     </div>
                   )}
+                  {!responseMediaUrl && errors.response && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.response.message || "Response media is required"}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -383,7 +434,7 @@ export default function PostForm({
                   render={({ field }) => (
                     <Input
                       id="model_url"
-                      placeholder="Enter model"
+                      placeholder="Enter model URL"
                       {...field}
                     />
                   )}
@@ -394,7 +445,7 @@ export default function PostForm({
                   </p>
                 )}
                 <p className="mt-1 text-sm text-gray-500">
-                  Enter full url of the website where we can try it. (e.g.,
+                  Enter full URL of the website where we can try it. (e.g.,
                   https://example.com)
                 </p>
               </div>
@@ -414,7 +465,7 @@ export default function PostForm({
                 />
                 {errors.chat_link && (
                   <p className="mt-1 text-sm text-red-500">
-                    {errors.chat_link?.message}
+                    {errors.chat_link.message}
                   </p>
                 )}
                 <p className="mt-1 text-sm text-gray-500">
@@ -438,11 +489,6 @@ export default function PostForm({
                 <p className="mt-1 text-sm text-gray-500">
                   Enter tags separated by space (e.g., tag1 tag2 tag3)
                 </p>
-                {errors.tags && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.tags?.message}
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -467,12 +513,9 @@ export default function PostForm({
   )
 }
 
-const RenderPreview = ({
+const RenderPreview: React.FC<{ mediaUrl: string; mediaType: MediaType }> = ({
   mediaUrl,
   mediaType,
-}: {
-  mediaUrl: string
-  mediaType: MediaType
 }) => {
   if (!mediaUrl) return null
 
