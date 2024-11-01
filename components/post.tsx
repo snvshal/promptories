@@ -64,6 +64,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { toast } from "@/hooks/use-toast"
+import Image from "next/image"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies)
@@ -573,6 +574,12 @@ export function PostType({
           <div className="relative overflow-hidden">
             <h3 className="mb-2 font-semibold">Prompt:</h3>
             <PostContentType type={type} content={post.prompt.text as string} />
+            {post.prompt.media?.url && (
+              <PromptoryMedia
+                mediaType={post.prompt.media?.type}
+                mediaUrl={post.prompt.media?.url}
+              />
+            )}
           </div>
           <div className="relative overflow-hidden">
             <h3 className="mb-2 font-semibold">Response:</h3>
@@ -580,6 +587,12 @@ export function PostType({
               type={type}
               content={post.response.text as string}
             />
+            {post.response.media?.url && (
+              <PromptoryMedia
+                mediaType={post.response.media?.type}
+                mediaUrl={post.response.media?.url}
+              />
+            )}
           </div>
         </div>
       </CardContent>
@@ -626,7 +639,6 @@ export function PostContentType({
       <>
         <p className="whitespace-pre-wrap">
           {content.split(" ").slice(0, 24).join(" ")}
-          {content.split(" ").length > 24}
         </p>
         {content.split(" ").length > 24 && (
           <button className="text-blue-500 hover:underline">Show more</button>
@@ -711,5 +723,29 @@ export function PostTagsDialog({
         </ScrollArea>
       </DialogContent>
     </Dialog>
+  )
+}
+
+export function PromptoryMedia({
+  mediaType,
+  mediaUrl,
+}: {
+  mediaType: "image" | "video"
+  mediaUrl: string
+}) {
+  return (
+    <div className="w-full">
+      {mediaType === "image" ? (
+        <Image
+          src={mediaUrl}
+          height={40}
+          width={40}
+          className="w-full rounded"
+          alt="promptory image"
+        />
+      ) : (
+        <video src={mediaUrl} className="w-full rounded" />
+      )}
+    </div>
   )
 }
