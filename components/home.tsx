@@ -164,7 +164,7 @@ export const LikeButton = ({ post }: { post: TPost }) => {
         variant="ghost"
         size="sm"
         aria-label="Like Post"
-        className="pl-0 text-muted-foreground hover:bg-background"
+        className="p-0 text-muted-foreground hover:bg-background"
       >
         <Heart
           style={{ color: il(hasLiked) }}
@@ -216,7 +216,7 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
         variant="ghost"
         size="sm"
         aria-label="Bookmark Post"
-        className="text-muted-foreground hover:bg-background"
+        className="p-0 text-muted-foreground hover:bg-background"
       >
         <Bookmark
           style={{ color: ib(hasBookmarked) }}
@@ -286,7 +286,7 @@ export function PostReplyDialog({
             variant="ghost"
             size="sm"
             aria-label="Reply to Post"
-            className="text-muted-foreground hover:bg-background"
+            className="p-0 text-muted-foreground hover:bg-background"
           >
             <MessageCircle className="mr-2 size-4" />
             {repliesCount}
@@ -532,7 +532,7 @@ export function PostViews({ post }: { post: TPost }) {
       variant="ghost"
       size="sm"
       aria-label="Post Views"
-      className="text-muted-foreground hover:bg-background"
+      className="p-0 text-muted-foreground hover:bg-background"
     >
       <ChartNoAxesColumn className="mr-2 size-4" />
       {post.views.length < 1 ? "" : post.views.length}
