@@ -519,7 +519,7 @@ export function PostType({
       data-key={post._id?.toString() as string}
     >
       <CardHeader
-        className={`${type === "post" && "mb-4"} p-4 pb-0 max-md:pb-0`}
+        className={`${type === "post" && "mb-4"} px-4 pb-0 pt-3 max-md:pb-0`}
       >
         <div className={`${type === "posts" && "h-5"} flex-between relative`}>
           <div className="flex-start">
@@ -567,46 +567,51 @@ export function PostType({
         onClick={type === "posts" ? () => postClick(post) : undefined}
         className={`${type === "post" ? "pl-4" : "pl-16"} border-0 pb-2 pr-4`}
       >
-        <div className="relative mb-4 overflow-hidden">
+        <div className="relative mb-2 overflow-hidden">
           <PostContentType type={type} content={post.caption} />
         </div>
-        <div className="bbn space-y-4 rounded-lg p-4">
-          <div className="relative overflow-hidden">
-            <h3 className="mb-2 font-semibold">Prompt:</h3>
-            <PostContentType type={type} content={post.prompt.text as string} />
-            {post.prompt.media?.url && (
-              <PromptoryMedia
-                mediaType={post.prompt.media?.type}
-                mediaUrl={post.prompt.media?.url}
-              />
-            )}
-          </div>
-          <div className="relative overflow-hidden">
-            <h3 className="mb-2 font-semibold">Response:</h3>
-            <PostContentType
-              type={type}
-              content={post.response.text as string}
+        <div className="relative overflow-hidden">
+          {post.prompt.media?.url ? (
+            <PromptoryMedia
+              mediaType={post.prompt.media?.type}
+              mediaUrl={post.prompt.media?.url}
             />
-            {post.response.media?.url && (
-              <PromptoryMedia
-                mediaType={post.response.media?.type}
-                mediaUrl={post.response.media?.url}
+          ) : (
+            <div className="rounded-t-lg border border-b-0 bg-secondary p-2">
+              <PostContentType
+                type={type}
+                content={post.prompt.text as string}
               />
-            )}
-          </div>
+            </div>
+          )}
+        </div>
+        <div className="relative overflow-hidden">
+          {post.response.media?.url ? (
+            <PromptoryMedia
+              mediaType={post.response.media?.type}
+              mediaUrl={post.response.media?.url}
+            />
+          ) : (
+            <div className="rounded-b-lg border border-t-0 p-2">
+              <PostContentType
+                type={type}
+                content={post.response.text as string}
+              />
+            </div>
+          )}
         </div>
       </CardContent>
       {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
       <CardFooter
         className={`${type === "post" ? "pl-4" : "pl-16"} flex justify-between pb-2 pr-4`}
       >
-        <div className="flex space-x-4 max-sm:space-x-0">
+        <div className="flex gap-8 max-sm:gap-4">
           <LikeButton post={post} />
           <PostReplyDialog post={post} />
           <BookmarkButton post={post} />
           <PostViews post={post} />
         </div>
-        <div>
+        <div className="flex gap-4">
           {post.tags.length > 0 && (
             <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
           )}
@@ -615,7 +620,7 @@ export function PostType({
             size="sm"
             onClick={() => handlePostShare(post)}
             aria-label="Share Post"
-            className="p-2 pr-0 text-muted-foreground hover:bg-background"
+            className="p-0 text-muted-foreground hover:bg-background"
           >
             <Share2 className="size-4" />
           </Button>
@@ -688,7 +693,7 @@ export function PostTagsDialog({
           variant="ghost"
           size="sm"
           aria-label="View Tags"
-          className="p-2 text-muted-foreground hover:bg-background"
+          className="p-0 text-muted-foreground hover:bg-background"
         >
           <Tag className="size-4" />
           <span className="sr-only">View Tags</span>
@@ -740,11 +745,11 @@ export function PromptoryMedia({
           src={mediaUrl}
           height={40}
           width={40}
-          className="w-full rounded"
+          className="w-full rounded-b-lg"
           alt="promptory image"
         />
       ) : (
-        <video src={mediaUrl} className="w-full rounded" />
+        <video src={mediaUrl} className="w-full rounded-b-lg" />
       )}
     </div>
   )
