@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { type ThemeProviderProps } from "next-themes/dist/types";
+import * as React from "react"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { type ThemeProviderProps } from "next-themes/dist/types"
 
-import { Laptop, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Laptop, Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 
 import {
   Select,
@@ -21,14 +21,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
 }
 
 export function ModeToggle() {
-  const { setTheme } = useTheme();
+  const { setTheme } = useTheme()
 
   return (
     <DropdownMenu>
@@ -51,12 +51,12 @@ export function ModeToggle() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
 
 export function NextThemes() {
-  const { theme, setTheme } = useTheme();
-  const handleThemeSelection = (value: string) => setTheme(value);
+  const { theme, setTheme } = useTheme()
+  const handleThemeSelection = (value: string) => setTheme(value)
 
   return (
     <Select value={theme || "system"} onValueChange={handleThemeSelection}>
@@ -84,5 +84,5 @@ export function NextThemes() {
         </SelectItem>
       </SelectContent>
     </Select>
-  );
+  )
 }
