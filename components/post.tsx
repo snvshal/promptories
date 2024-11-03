@@ -33,6 +33,7 @@ import {
   DynamicHeader,
   il,
   LikeButton,
+  PostIconButton,
   PostReplyDialog,
   PostViews,
   pu,
@@ -273,7 +274,7 @@ export function PostRepliesContent({
                   />
                 </Button>
                 <p className="text-sm text-muted-foreground">
-                  {reply.likes.length}
+                  {reply.likes.length ? reply.likes.length : null}
                 </p>
               </div>
             </div>
@@ -575,6 +576,7 @@ export function PostType({
             <PromptoryMedia
               mediaType={post.prompt.media?.type}
               mediaUrl={post.prompt.media?.url}
+              prType="prompt"
             />
           ) : (
             <div className="rounded-t-lg border border-b-0 bg-secondary p-2">
@@ -590,6 +592,7 @@ export function PostType({
             <PromptoryMedia
               mediaType={post.response.media?.type}
               mediaUrl={post.response.media?.url}
+              prType="response"
             />
           ) : (
             <div className="rounded-b-lg border border-t-0 p-2">
@@ -605,7 +608,7 @@ export function PostType({
       <CardFooter
         className={`${type === "post" ? "pl-4" : "pl-16"} flex justify-between pb-2 pr-4`}
       >
-        <div className="flex gap-8 max-sm:gap-4">
+        <div className="flex-between w-2/3">
           <LikeButton post={post} />
           <PostReplyDialog post={post} />
           <BookmarkButton post={post} />
@@ -615,15 +618,11 @@ export function PostType({
           {post.tags.length > 0 && (
             <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handlePostShare(post)}
-            aria-label="Share Post"
-            className="p-0 text-muted-foreground hover:bg-background"
-          >
+
+          <PostIconButton onClick={() => handlePostShare(post)}>
             <Share2 className="size-4" />
-          </Button>
+            <span className="sr-only">Share Post</span>
+          </PostIconButton>
         </div>
       </CardFooter>
     </Card>
@@ -689,15 +688,10 @@ export function PostTagsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label="View Tags"
-          className="p-0 text-muted-foreground hover:bg-background"
-        >
+        <PostIconButton>
           <Tag className="size-4" />
           <span className="sr-only">View Tags</span>
-        </Button>
+        </PostIconButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -734,22 +728,28 @@ export function PostTagsDialog({
 export function PromptoryMedia({
   mediaType,
   mediaUrl,
+  prType,
 }: {
   mediaType: "image" | "video"
   mediaUrl: string
+  prType: "prompt" | "response"
 }) {
   return (
     <div className="w-full">
       {mediaType === "image" ? (
         <Image
           src={mediaUrl}
-          height={40}
-          width={40}
-          className="w-full rounded-b-lg"
+          width={500}
+          height={500}
+          quality={80}
+          className={`${prType === "prompt" ? "rounded-t-lg border-b-0" : "rounded-b-lg border-t-0"} w-full border`}
           alt="promptory image"
         />
       ) : (
-        <video src={mediaUrl} className="w-full rounded-b-lg" />
+        <video
+          src={mediaUrl}
+          className={`${prType === "prompt" ? "rounded-t-lg" : "rounded-b-lg"} w-full`}
+        />
       )}
     </div>
   )
