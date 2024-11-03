@@ -739,8 +739,9 @@ export function PromptoryMedia({
       {mediaType === "image" ? (
         <Image
           src={mediaUrl}
-          height={40}
-          width={40}
+          width={500}
+          height={500}
+          quality={80}
           className={`${prType === "prompt" ? "rounded-t-lg" : "rounded-b-lg"} w-full`}
           alt="promptory image"
         />
