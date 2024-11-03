@@ -570,3 +570,5 @@ export const PostIconButton = React.forwardRef<
     </Button>
   )
 })
+
+PostIconButton.displayName = "PostIconButton"
