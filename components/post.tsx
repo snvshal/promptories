@@ -608,7 +608,7 @@ export function PostType({
       <CardFooter
         className={`${type === "post" ? "pl-4" : "pl-16"} flex justify-between pb-2 pr-4`}
       >
-        <div className="flex gap-8 max-sm:gap-4">
+        <div className="flex-between w-2/3">
           <LikeButton post={post} />
           <PostReplyDialog post={post} />
           <BookmarkButton post={post} />
@@ -742,7 +742,7 @@ export function PromptoryMedia({
           width={500}
           height={500}
           quality={80}
-          className={`${prType === "prompt" ? "rounded-t-lg" : "rounded-b-lg"} w-full`}
+          className={`${prType === "prompt" ? "rounded-t-lg border-b-0" : "rounded-b-lg border-t-0"} w-full border`}
           alt="promptory image"
         />
       ) : (
