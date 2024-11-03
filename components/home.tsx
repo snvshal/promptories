@@ -44,6 +44,7 @@ import { toast } from "@/hooks/use-toast"
 import { Badge } from "./ui/badge"
 import { promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
+import React from "react"
 
 export const pu = (post: TPost | TReplies) => post.user as TUser
 
@@ -160,19 +161,15 @@ export const LikeButton = ({ post }: { post: TPost }) => {
 
   return (
     <form onSubmit={handleLikeClick}>
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label="Like Post"
-        className="p-0 text-muted-foreground hover:bg-background"
-      >
+      <PostIconButton>
         <Heart
           style={{ color: il(hasLiked) }}
           fill={il(hasLiked)}
           className="mr-2 size-4"
         />
-        {likes}
-      </Button>
+        {likes ? likes : null}
+        <span className="sr-only">Like Post</span>
+      </PostIconButton>
     </form>
   )
 }
@@ -212,19 +209,15 @@ export const BookmarkButton = ({ post }: { post: TPost }) => {
 
   return (
     <form onSubmit={handleBookmarkClick}>
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label="Bookmark Post"
-        className="p-0 text-muted-foreground hover:bg-background"
-      >
+      <PostIconButton>
         <Bookmark
           style={{ color: ib(hasBookmarked) }}
           fill={ib(hasBookmarked)}
           className="mr-2 size-4"
         />
-        {bookmarks}
-      </Button>
+        {bookmarks ? bookmarks : null}
+        <span className="sr-only">Bookmark Post</span>
+      </PostIconButton>
     </form>
   )
 }
@@ -282,15 +275,11 @@ export function PostReplyDialog({
         {children ? (
           children
         ) : (
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-label="Reply to Post"
-            className="p-0 text-muted-foreground hover:bg-background"
-          >
+          <PostIconButton>
             <MessageCircle className="mr-2 size-4" />
-            {repliesCount}
-          </Button>
+            {repliesCount ? repliesCount : null}
+            <span className="sr-only">Reply Post</span>
+          </PostIconButton>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -527,17 +516,12 @@ export function PostViews({ post }: { post: TPost }) {
     }
   }, [post._id, post.views, user?.id])
   return (
-    <Button
-      ref={postRef}
-      variant="ghost"
-      size="sm"
-      aria-label="Post Views"
-      className="p-0 text-muted-foreground hover:bg-background"
-    >
+    <PostIconButton>
       <ChartNoAxesColumn className="mr-2 size-4" />
       {post.views.length < 1 ? "" : post.views.length}
       {/* {post.views.length} */}
-    </Button>
+      <span className="sr-only">Post Views</span>
+    </PostIconButton>
   )
 }
 
@@ -566,3 +550,23 @@ export function SidePanel() {
     </aside>
   )
 }
+
+export const PostIconButton = React.forwardRef<
+  HTMLButtonElement,
+  {
+    children: React.ReactNode
+    onClick?: () => void
+  }
+>(({ children, onClick }, ref) => {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      ref={ref} // Forward the ref here
+      className="p-0 text-muted-foreground hover:bg-background"
+    >
+      {children}
+    </Button>
+  )
+})
