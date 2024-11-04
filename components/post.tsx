@@ -220,16 +220,14 @@ export function PostRepliesContent({
     <div className="space-y-4">
       {replies.map((reply, index) => (
         <div key={index} className="flex space-x-2">
-          <Link href={`/${pu(reply).username}`} prefetch={false}>
-            <Avatar className="mt-1 size-8">
-              <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
-              <AvatarFallback>
-                <User className="size-4" />
-              </AvatarFallback>
-            </Avatar>
-          </Link>
+          <Avatar>
+            <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
+            <AvatarFallback>
+              <User className="size-4" />
+            </AvatarFallback>
+          </Avatar>
           <div className="flex-1">
-            <div className="flex-between">
+            <div className="flex-between h-6">
               <div className="flex-start">
                 <Link
                   href={`/${pu(reply).username}`}
@@ -530,7 +528,7 @@ export function PostType({ post, type }: PostContentProps) {
 
 export function PostAvatar({ user }: { user: TUser }) {
   return (
-    <Avatar className="size-12">
+    <Avatar>
       <AvatarImage src={user.avatar} alt={user.name} />
       <AvatarFallback>
         <User className="size-5" />
@@ -688,8 +686,8 @@ export function PostFooter({ post }: { post: TPost }) {
   return (
     <CardFooter className={`flex justify-between p-0 pt-2`}>
       <div className="flex-between w-2/3">
-        <LikeButton post={post} />
         <PostReplyDialog post={post} />
+        <LikeButton post={post} />
         <BookmarkButton post={post} />
         <PostViews post={post} />
       </div>
