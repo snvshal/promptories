@@ -91,13 +91,20 @@ export default function PostForm({
   defaultValues,
   operationType,
   post,
+  media,
 }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(null)
-  const [promptMediaType, setPromptMediaType] = useState<MediaType | null>(null)
-  const [responseMediaUrl, setResponseMediaUrl] = useState<string | null>(null)
+  const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(
+    media?.prompt.url as string,
+  )
+  const [promptMediaType, setPromptMediaType] = useState<MediaType | null>(
+    media?.prompt.type as MediaType,
+  )
+  const [responseMediaUrl, setResponseMediaUrl] = useState<string | null>(
+    media?.response.url as string,
+  )
   const [responseMediaType, setResponseMediaType] = useState<MediaType | null>(
-    null,
+    media?.response.type as MediaType,
   )
 
   const {
@@ -405,7 +412,7 @@ export default function PostForm({
 
             <Separator orientation="vertical" className="h-auto" />
 
-            <div className="flex-1 space-y-6">
+            <div className="w-1/3 space-y-6">
               <div>
                 <Label htmlFor="caption">Caption</Label>
                 <Controller

@@ -1,4 +1,5 @@
-import { FormValues } from "@/components/form";
+import { FormValues } from "@/components/form"
+import { PRMedia } from "@/types/schema.type"
 
 export const promptory_types = [
   "text-to-text",
@@ -17,7 +18,7 @@ export const promptory_types = [
   "audio-to-image",
   "audio-to-video",
   "audio-to-audio",
-];
+]
 
 export const defaultValues: FormValues = {
   caption: "",
@@ -27,7 +28,12 @@ export const defaultValues: FormValues = {
   response: "",
   promptory_type: promptory_types[0],
   tags: "",
-};
+}
+
+export const postMedia: { prompt: PRMedia; response: PRMedia } = {
+  prompt: { type: "image", url: "" },
+  response: { type: "image", url: "" },
+}
 
 export const reservedUsernames = [
   "admin",
@@ -105,4 +111,4 @@ export const reservedUsernames = [
   "guest",
   "editor",
   "anonymous",
-];
+]
