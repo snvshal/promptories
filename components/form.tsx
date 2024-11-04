@@ -58,7 +58,7 @@ const formSchema = z
   })
   .refine(
     (data) => {
-      if (data.promptory_type.toLowerCase().startsWith("text-")) {
+      if (data.promptory_type.toLowerCase().startsWith("text")) {
         return !!data.prompt
       } else {
         return !!data.prompt_media
@@ -71,7 +71,7 @@ const formSchema = z
   )
   .refine(
     (data) => {
-      if (data.promptory_type.toLowerCase().endsWith("-text")) {
+      if (data.promptory_type.toLowerCase().endsWith("text")) {
         return !!data.response
       } else {
         return !!data.response_media
@@ -120,6 +120,9 @@ export default function PostForm({
   })
 
   const promptoryType = watch("promptory_type")
+  const isPromptText = promptoryType?.toLowerCase().startsWith("text")
+  const isResponseText = promptoryType?.toLowerCase().endsWith("text")
+
   const router = useRouter()
 
   const postRoute = useCallback(
@@ -186,11 +189,11 @@ export default function PostForm({
       const formData = {
         ...data,
         prompt_media:
-          promptMediaUrl && promptMediaType
+          promptMediaUrl && promptMediaType && !isPromptText
             ? { url: promptMediaUrl, type: promptMediaType }
             : undefined,
         response_media:
-          responseMediaUrl && responseMediaType
+          responseMediaUrl && responseMediaType && !isResponseText
             ? { url: responseMediaUrl, type: responseMediaType }
             : undefined,
       }
@@ -228,9 +231,6 @@ export default function PostForm({
       setIsSubmitting(false)
     }
   }
-
-  const isPromptText = promptoryType?.toLowerCase().startsWith("text-")
-  const isResponseText = promptoryType?.toLowerCase().endsWith("-text")
 
   return (
     <div className="min-h-screen w-full">
