@@ -741,7 +741,8 @@ export function PromptoryMedia({
           src={mediaUrl}
           width={500}
           height={500}
-          quality={80}
+          quality={75}
+          priority={true}
           className={`${prType === "prompt" ? "rounded-t-lg border-b-0" : "rounded-b-lg border-t-0"} w-full border`}
           alt="promptory image"
         />
