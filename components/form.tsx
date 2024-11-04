@@ -294,7 +294,12 @@ export default function PostForm({
               ) : (
                 <div>
                   <Label htmlFor="promptMedia">
-                    Prompt Media (Image or Video)
+                    Prompt{" "}
+                    {promptoryType?.toLowerCase().startsWith("image")
+                      ? "Image"
+                      : promptoryType?.toLowerCase().startsWith("video")
+                        ? "Video"
+                        : "Audio as Video"}
                   </Label>
                   <CldUploadWidget
                     uploadPreset={
@@ -316,16 +321,16 @@ export default function PostForm({
                     {({ open }) => (
                       <Button
                         type="button"
+                        variant="outline"
                         onClick={() => open()}
                         className="w-full"
                       >
-                        Upload Image or Video
+                        Upload Prompt Media
                       </Button>
                     )}
                   </CldUploadWidget>
                   {promptMediaUrl && promptMediaType && (
                     <div className="mt-4">
-                      <h3 className="mb-2 text-lg font-semibold">Preview:</h3>
                       <RenderPreview
                         mediaUrl={promptMediaUrl}
                         mediaType={promptMediaType}
@@ -363,7 +368,12 @@ export default function PostForm({
               ) : (
                 <div>
                   <Label htmlFor="responseMedia">
-                    Response Media (Image or Video)
+                    Response{" "}
+                    {promptoryType?.toLowerCase().endsWith("image")
+                      ? "Image"
+                      : promptoryType?.toLowerCase().endsWith("video")
+                        ? "Video"
+                        : "Audio as Video"}
                   </Label>
                   <CldUploadWidget
                     uploadPreset={
@@ -385,16 +395,16 @@ export default function PostForm({
                     {({ open }) => (
                       <Button
                         type="button"
+                        variant="outline"
                         onClick={() => open()}
                         className="w-full"
                       >
-                        Upload Image or Video
+                        Upload Response Media
                       </Button>
                     )}
                   </CldUploadWidget>
                   {responseMediaUrl && responseMediaType && (
                     <div className="mt-4">
-                      <h3 className="mb-2 text-lg font-semibold">Preview:</h3>
                       <RenderPreview
                         mediaUrl={responseMediaUrl}
                         mediaType={responseMediaType}
@@ -533,18 +543,14 @@ const RenderPreview: React.FC<{ mediaUrl: string; mediaType: MediaType }> = ({
         alt="Uploaded image"
         width={300}
         height={200}
-        className="mt-2 h-auto max-w-full rounded-lg"
+        className="mt-2 h-auto w-full rounded-lg"
       />
     )
   }
 
   if (mediaType === "video") {
     return (
-      <video
-        src={mediaUrl}
-        controls
-        className="mt-2 h-auto max-w-full rounded-lg"
-      >
+      <video src={mediaUrl} controls className="mt-2 h-auto w-full rounded-lg">
         Your browser does not support the video tag.
       </video>
     )
