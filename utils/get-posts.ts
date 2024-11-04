@@ -3,6 +3,7 @@ import { connectToDatabase } from "./db"
 import { PRMedia, TPost, TUser } from "@/types/schema.type"
 import { User } from "@/models/user.model"
 import { seedPostDatabase } from "@/lib/seed"
+import { FormValues } from "@/components/form"
 
 export const getPosts = async () => {
   try {
@@ -77,15 +78,31 @@ export const getBookmarkedPosts = async (profileUser: TUser) => {
 }
 
 export const updatePostValues = (post: TPost) => {
+  const prompt = post.promptory_type.toLowerCase().startsWith("text")
+    ? (post.prompt.text as string)
+    : ""
+  const prompt_media = post.promptory_type.toLowerCase().startsWith("text")
+    ? ""
+    : (post.prompt.media as PRMedia)
+  const response = post.promptory_type.toLowerCase().endsWith("text")
+    ? (post.response.text as string)
+    : ""
+  const response_media = post.promptory_type.toLowerCase().endsWith("text")
+    ? ""
+    : (post.response.media as PRMedia)
   return {
-    caption: post.caption,
-    model_url: post.model_url,
-    chat_link: post.chat_link,
-    prompt: post.prompt.text as string,
-    prompt_media: post.prompt.media as PRMedia,
-    response: post.response.text as string,
-    response_media: post.response.media as PRMedia,
-    promptory_type: post.promptory_type,
-    tags: post.tags.join(),
+    postValues: {
+      caption: post.caption,
+      model_url: post.model_url,
+      chat_link: post.chat_link,
+      prompt,
+      response,
+      promptory_type: post.promptory_type,
+      tags: post.tags.join(),
+    } as FormValues,
+    editPostMedia: {
+      prompt: prompt_media,
+      response: response_media,
+    } as { prompt: PRMedia; response: PRMedia },
   }
 }

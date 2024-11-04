@@ -9,12 +9,13 @@ export default async function UpdatePromptory({
   params: { promptory_id: string }
 }) {
   const post = await getPostById(params.promptory_id)
-  const postValues = updatePostValues(post as TPost)
+  const { postValues, editPostMedia } = updatePostValues(post as TPost)
   return (
     <PostForm
       defaultValues={postValues}
       operationType="PATCH"
       post={ps(post as TPost)}
+      media={ps(editPostMedia)}
     />
   )
 }

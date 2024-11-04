@@ -39,7 +39,7 @@ import {
   pu,
 } from "./home"
 import { TimeAgo } from "./time-ago"
-import { TPost, TReplies } from "@/types/schema.type"
+import { TPost, TReplies, TUser } from "@/types/schema.type"
 import { addReplyToPost } from "@/actions/addReplyToPost"
 import { Separator } from "./ui/separator"
 import { deleteReply, handleLikeReply } from "@/actions/replyActions"
@@ -220,16 +220,14 @@ export function PostRepliesContent({
     <div className="space-y-4">
       {replies.map((reply, index) => (
         <div key={index} className="flex space-x-2">
-          <Link href={`/${pu(reply).username}`} prefetch={false}>
-            <Avatar className="mt-1 size-8">
-              <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
-              <AvatarFallback>
-                <User className="size-4" />
-              </AvatarFallback>
-            </Avatar>
-          </Link>
+          <Avatar>
+            <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
+            <AvatarFallback>
+              <User className="size-4" />
+            </AvatarFallback>
+          </Avatar>
           <div className="flex-1">
-            <div className="flex-between">
+            <div className="flex-between h-6">
               <div className="flex-start">
                 <Link
                   href={`/${pu(reply).username}`}
@@ -359,7 +357,13 @@ export function PostReplyOptions({
   )
 }
 
-export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
+export function PostOptions({
+  post,
+  type,
+}: {
+  post: TPost
+  type: "post" | "posts"
+}) {
   const { data: session } = useSession()
   const user = session?.user
 
@@ -372,7 +376,7 @@ export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
 
       if (element) {
         await handleDeletePost(post._id as string)
-        tp && router.push("/home")
+        type === "post" && router.push("/home")
         element.remove()
       }
 
@@ -396,7 +400,7 @@ export function PostOptions({ post, tp }: { post: TPost; tp: boolean }) {
         <Button
           size="icon"
           variant={"ghost"}
-          className="absolute -right-2 size-8 rounded-full"
+          className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full`}
         >
           <Ellipsis className="h-4 w-4 text-muted-foreground" />
           <span className="sr-only">Post options</span>
@@ -501,131 +505,35 @@ export function PromptoryReplyButton({
   )
 }
 
-export function PostType({
-  post,
-  type,
-}: {
-  post: TPost
-  type: "post" | "posts"
-}) {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
-
-  const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post._id as string}`)
-
+export function PostType({ post, type }: PostContentProps) {
   return (
     <Card
-      className="mid-width-card-content"
+      className="mid-width-card-content flex px-4 py-3"
       data-key={post._id?.toString() as string}
     >
-      <CardHeader
-        className={`${type === "post" && "mb-4"} px-4 pb-0 pt-3 max-md:pb-0`}
-      >
-        <div className={`${type === "posts" && "h-5"} flex-between relative`}>
-          <div className="flex-start">
-            <Link
-              href={`/${pu(post).username}`}
-              className="flex-start space-x-2"
-              prefetch={false}
-            >
-              <Avatar className={`${type === "posts" && "mt-5"}`}>
-                <AvatarImage src={pu(post).avatar} alt={pu(post).name} />
-                <AvatarFallback>
-                  <User className="size-5" />
-                </AvatarFallback>
-              </Avatar>
-              <div
-                className={`${type === "post" ? "flex-col items-start gap-0" : "items-center gap-1"} flex justify-start`}
-              >
-                <p
-                  className={`${type === "posts" && "max-sm:hidden"} font-semibold hover:underline`}
-                >
-                  {pu(post).name}
-                </p>
-                <p
-                  className={`${type === "posts" ? "max-sm:font-semibold sm:text-muted-foreground" : "text-muted-foreground"} `}
-                >
-                  <span className={`${type === "posts" && "max-sm:hidden"}`}>
-                    &#64;
-                  </span>
-                  {pu(post).username}
-                </p>
-              </div>
-            </Link>
-            {type === "posts" && (
-              <p className="text-muted-foreground">
-                <span className="px-1">&#183;</span>
-                <TimeAgo timestamp={post.createdAt as Date} />
-              </p>
-            )}
-          </div>
-          <PostOptions post={post} tp={type === "post" ? true : false} />
+      {type === "posts" && (
+        <div className="mr-2 flex items-start">
+          <PostAvatar user={pu(post)} />
         </div>
-      </CardHeader>
-      <CardContent
-        role={type === "posts" ? "button" : undefined}
-        onClick={type === "posts" ? () => postClick(post) : undefined}
-        className={`${type === "post" ? "pl-4" : "pl-16"} border-0 pb-2 pr-4`}
-      >
-        <div className="relative mb-2 overflow-hidden">
-          <PostContentType type={type} content={post.caption} />
-        </div>
-        <div className="relative overflow-hidden">
-          {post.prompt.media?.url ? (
-            <PromptoryMedia
-              mediaType={post.prompt.media?.type}
-              mediaUrl={post.prompt.media?.url}
-              prType="prompt"
-            />
-          ) : (
-            <div className="rounded-t-lg border border-b-0 bg-secondary p-2">
-              <PostContentType
-                type={type}
-                content={post.prompt.text as string}
-              />
-            </div>
-          )}
-        </div>
-        <div className="relative overflow-hidden">
-          {post.response.media?.url ? (
-            <PromptoryMedia
-              mediaType={post.response.media?.type}
-              mediaUrl={post.response.media?.url}
-              prType="response"
-            />
-          ) : (
-            <div className="rounded-b-lg border border-t-0 p-2">
-              <PostContentType
-                type={type}
-                content={post.response.text as string}
-              />
-            </div>
-          )}
-        </div>
-      </CardContent>
-      {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
-      <CardFooter
-        className={`${type === "post" ? "pl-4" : "pl-16"} flex justify-between pb-2 pr-4`}
-      >
-        <div className="flex-between w-2/3">
-          <LikeButton post={post} />
-          <PostReplyDialog post={post} />
-          <BookmarkButton post={post} />
-          <PostViews post={post} />
-        </div>
-        <div className="flex gap-4">
-          {post.tags.length > 0 && (
-            <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
-          )}
-
-          <PostIconButton onClick={() => handlePostShare(post)}>
-            <Share2 className="size-4" />
-            <span className="sr-only">Share Post</span>
-          </PostIconButton>
-        </div>
-      </CardFooter>
+      )}
+      <div className="flex-1">
+        <PostHeader type={type} post={post} />
+        <PostContent type={type} post={post} />
+        {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
+        <PostFooter post={post} />
+      </div>
     </Card>
+  )
+}
+
+export function PostAvatar({ user }: { user: TUser }) {
+  return (
+    <Avatar>
+      <AvatarImage src={user.avatar} alt={user.name} />
+      <AvatarFallback>
+        <User className="size-5" />
+      </AvatarFallback>
+    </Avatar>
   )
 }
 
@@ -637,7 +545,7 @@ export function PostContentType({
   content: string
 }) {
   if (type === "post") {
-    return <p className="whitespace-pre-wrap">{content}</p>
+    return <p className="whitespace-pre-wrap text-lg">{content}</p>
   } else {
     return (
       <>
@@ -652,9 +560,64 @@ export function PostContentType({
   }
 }
 
+export type PostContentProps = { type: "post" | "posts"; post: TPost }
+
+export function PostHeader({ type, post }: PostContentProps) {
+  return (
+    <CardHeader className="p-0">
+      <div className={`${type === "post" && "mb-4"} flex-between relative`}>
+        <div className="flex-start">
+          {type === "post" && (
+            <div className="mr-2">
+              <PostAvatar user={pu(post)} />
+            </div>
+          )}
+          <PostAuthorName type={type} postAuthor={pu(post)} />
+          {type === "posts" && (
+            <p className="text-muted-foreground">
+              <span className="px-1">&#183;</span>
+              <TimeAgo timestamp={post.createdAt as Date} />
+            </p>
+          )}
+        </div>
+        <PostOptions post={post} type={type} />
+      </div>
+    </CardHeader>
+  )
+}
+
+export function PostAuthorName({
+  type,
+  postAuthor,
+}: {
+  type: "post" | "posts"
+  postAuthor: TUser
+}) {
+  if (type === "post") {
+    return (
+      <div className="flex flex-col gap-0">
+        <p className="font-semibold hover:underline">{postAuthor.name}</p>
+        <p className="text-muted-foreground">&#64;{postAuthor.username}</p>
+      </div>
+    )
+  } else {
+    return (
+      <div className="flex items-center justify-start gap-1">
+        <p className="font-semibold hover:underline max-sm:hidden">
+          {postAuthor.name}
+        </p>
+        <p className="max-sm:font-semibold sm:text-muted-foreground">
+          <span className="max-sm:hidden">&#64;</span>
+          {postAuthor.username}
+        </p>
+      </div>
+    )
+  }
+}
+
 export function PostTime({ createdAt }: { createdAt: Date }) {
   return (
-    <div className="flex-start mb-2 ml-4 mr-4 border-b pb-2 text-sm text-muted-foreground">
+    <div className="flex-start border-b py-2 text-sm text-muted-foreground">
       {new Date(createdAt as Date).toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
@@ -667,6 +630,78 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
         year: "numeric",
       })}
     </div>
+  )
+}
+
+export function PostContent({ type, post }: PostContentProps) {
+  const router = useRouter()
+
+  const postClick = (post: TPost) =>
+    router.push(`/${pu(post).username}/promptories/${post._id as string}`)
+  return (
+    <CardContent
+      role={type === "posts" ? "button" : undefined}
+      onClick={type === "posts" ? () => postClick(post) : undefined}
+      className={`border-0 p-0`}
+    >
+      <div className="relative mb-2 overflow-hidden">
+        <PostContentType type={type} content={post.caption} />
+      </div>
+      <div className="relative overflow-hidden">
+        {post.prompt.media?.url ? (
+          <PromptoryMedia
+            mediaType={post.prompt.media?.type}
+            mediaUrl={post.prompt.media?.url}
+            prType="prompt"
+          />
+        ) : (
+          <div className="rounded-t-lg border border-b-0 bg-secondary p-2">
+            <PostContentType type={type} content={post.prompt.text as string} />
+          </div>
+        )}
+      </div>
+      <div className="relative overflow-hidden">
+        {post.response.media?.url ? (
+          <PromptoryMedia
+            mediaType={post.response.media?.type}
+            mediaUrl={post.response.media?.url}
+            prType="response"
+          />
+        ) : (
+          <div className="rounded-b-lg border border-t-0 p-2">
+            <PostContentType
+              type={type}
+              content={post.response.text as string}
+            />
+          </div>
+        )}
+      </div>
+    </CardContent>
+  )
+}
+
+export function PostFooter({ post }: { post: TPost }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <CardFooter className={`flex justify-between p-0 pt-2`}>
+      <div className="flex-between w-2/3">
+        <PostReplyDialog post={post} />
+        <LikeButton post={post} />
+        <BookmarkButton post={post} />
+        <PostViews post={post} />
+      </div>
+      <div className="flex gap-4">
+        {post.tags.length > 0 && (
+          <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
+        )}
+
+        <PostIconButton onClick={() => handlePostShare(post)}>
+          <Share2 className="size-4" />
+          <span className="sr-only">Share Post</span>
+        </PostIconButton>
+      </div>
+    </CardFooter>
   )
 }
 
@@ -741,7 +776,8 @@ export function PromptoryMedia({
           src={mediaUrl}
           width={500}
           height={500}
-          quality={80}
+          quality={75}
+          priority={true}
           className={`${prType === "prompt" ? "rounded-t-lg border-b-0" : "rounded-b-lg border-t-0"} w-full border`}
           alt="promptory image"
         />

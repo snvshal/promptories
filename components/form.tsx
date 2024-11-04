@@ -58,7 +58,7 @@ const formSchema = z
   })
   .refine(
     (data) => {
-      if (data.promptory_type.toLowerCase().startsWith("text-")) {
+      if (data.promptory_type.toLowerCase().startsWith("text")) {
         return !!data.prompt
       } else {
         return !!data.prompt_media
@@ -71,7 +71,7 @@ const formSchema = z
   )
   .refine(
     (data) => {
-      if (data.promptory_type.toLowerCase().endsWith("-text")) {
+      if (data.promptory_type.toLowerCase().endsWith("text")) {
         return !!data.response
       } else {
         return !!data.response_media
@@ -91,13 +91,20 @@ export default function PostForm({
   defaultValues,
   operationType,
   post,
+  media,
 }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(null)
-  const [promptMediaType, setPromptMediaType] = useState<MediaType | null>(null)
-  const [responseMediaUrl, setResponseMediaUrl] = useState<string | null>(null)
+  const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(
+    media?.prompt.url as string,
+  )
+  const [promptMediaType, setPromptMediaType] = useState<MediaType | null>(
+    media?.prompt.type as MediaType,
+  )
+  const [responseMediaUrl, setResponseMediaUrl] = useState<string | null>(
+    media?.response.url as string,
+  )
   const [responseMediaType, setResponseMediaType] = useState<MediaType | null>(
-    null,
+    media?.response.type as MediaType,
   )
 
   const {
@@ -113,6 +120,9 @@ export default function PostForm({
   })
 
   const promptoryType = watch("promptory_type")
+  const isPromptText = promptoryType?.toLowerCase().startsWith("text")
+  const isResponseText = promptoryType?.toLowerCase().endsWith("text")
+
   const router = useRouter()
 
   const postRoute = useCallback(
@@ -179,11 +189,11 @@ export default function PostForm({
       const formData = {
         ...data,
         prompt_media:
-          promptMediaUrl && promptMediaType
+          promptMediaUrl && promptMediaType && !isPromptText
             ? { url: promptMediaUrl, type: promptMediaType }
             : undefined,
         response_media:
-          responseMediaUrl && responseMediaType
+          responseMediaUrl && responseMediaType && !isResponseText
             ? { url: responseMediaUrl, type: responseMediaType }
             : undefined,
       }
@@ -221,9 +231,6 @@ export default function PostForm({
       setIsSubmitting(false)
     }
   }
-
-  const isPromptText = promptoryType?.toLowerCase().startsWith("text-")
-  const isResponseText = promptoryType?.toLowerCase().endsWith("-text")
 
   return (
     <div className="min-h-screen w-full">
@@ -287,7 +294,12 @@ export default function PostForm({
               ) : (
                 <div>
                   <Label htmlFor="promptMedia">
-                    Prompt Media (Image or Video)
+                    Prompt{" "}
+                    {promptoryType?.toLowerCase().startsWith("image")
+                      ? "Image"
+                      : promptoryType?.toLowerCase().startsWith("video")
+                        ? "Video"
+                        : "Audio as Video"}
                   </Label>
                   <CldUploadWidget
                     uploadPreset={
@@ -309,16 +321,16 @@ export default function PostForm({
                     {({ open }) => (
                       <Button
                         type="button"
+                        variant="outline"
                         onClick={() => open()}
                         className="w-full"
                       >
-                        Upload Image or Video
+                        Upload Prompt Media
                       </Button>
                     )}
                   </CldUploadWidget>
                   {promptMediaUrl && promptMediaType && (
                     <div className="mt-4">
-                      <h3 className="mb-2 text-lg font-semibold">Preview:</h3>
                       <RenderPreview
                         mediaUrl={promptMediaUrl}
                         mediaType={promptMediaType}
@@ -356,7 +368,12 @@ export default function PostForm({
               ) : (
                 <div>
                   <Label htmlFor="responseMedia">
-                    Response Media (Image or Video)
+                    Response{" "}
+                    {promptoryType?.toLowerCase().endsWith("image")
+                      ? "Image"
+                      : promptoryType?.toLowerCase().endsWith("video")
+                        ? "Video"
+                        : "Audio as Video"}
                   </Label>
                   <CldUploadWidget
                     uploadPreset={
@@ -378,16 +395,16 @@ export default function PostForm({
                     {({ open }) => (
                       <Button
                         type="button"
+                        variant="outline"
                         onClick={() => open()}
                         className="w-full"
                       >
-                        Upload Image or Video
+                        Upload Response Media
                       </Button>
                     )}
                   </CldUploadWidget>
                   {responseMediaUrl && responseMediaType && (
                     <div className="mt-4">
-                      <h3 className="mb-2 text-lg font-semibold">Preview:</h3>
                       <RenderPreview
                         mediaUrl={responseMediaUrl}
                         mediaType={responseMediaType}
@@ -405,7 +422,7 @@ export default function PostForm({
 
             <Separator orientation="vertical" className="h-auto" />
 
-            <div className="flex-1 space-y-6">
+            <div className="w-1/3 space-y-6">
               <div>
                 <Label htmlFor="caption">Caption</Label>
                 <Controller
@@ -526,18 +543,14 @@ const RenderPreview: React.FC<{ mediaUrl: string; mediaType: MediaType }> = ({
         alt="Uploaded image"
         width={300}
         height={200}
-        className="mt-2 h-auto max-w-full rounded-lg"
+        className="mt-2 h-auto w-full rounded-lg"
       />
     )
   }
 
   if (mediaType === "video") {
     return (
-      <video
-        src={mediaUrl}
-        controls
-        className="mt-2 h-auto max-w-full rounded-lg"
-      >
+      <video src={mediaUrl} controls className="mt-2 h-auto w-full rounded-lg">
         Your browser does not support the video tag.
       </video>
     )
