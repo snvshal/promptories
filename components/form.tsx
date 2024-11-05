@@ -422,7 +422,7 @@ export default function PostForm({
 
             <Separator orientation="vertical" className="h-auto" />
 
-            <div className="w-1/3 space-y-6">
+            <div className="space-y-6 md:w-1/3">
               <div>
                 <Label htmlFor="caption">Caption</Label>
                 <Controller
