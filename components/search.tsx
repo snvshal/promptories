@@ -48,6 +48,7 @@ export default function SearchComponent() {
   const category = searchParams.get("category")
   const dateRange = searchParams.get("dateRange")
 
+  const [searchTab, setSearchTab] = useState<"posts" | "users">("posts")
   const [searchQuery, setSearchQuery] = useState(query ?? "")
   const [emptyQueryError, setEmptyQueryError] = useState("")
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([])
@@ -78,6 +79,12 @@ export default function SearchComponent() {
     const changeTabUrl = `?q=${query}&category=${category}&tab=${value}&dateRange=${dateRange}`
     router.push(changeTabUrl)
   }
+
+  useEffect(() => {
+    setSearchTab(
+      queryTab === "posts" || queryTab === "users" ? queryTab : "posts",
+    )
+  }, [queryTab])
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -141,16 +148,16 @@ export default function SearchComponent() {
 
         {query ? (
           <Tabs
-            value={(queryTab as string) || "posts"}
+            defaultValue="posts"
             onValueChange={handleTabChange}
             className="w-full"
           >
             <div className="border-b">
               <TabsList className="mt-4 grid h-12 w-full grid-cols-2 rounded-none border-b bg-background p-0">
-                <TabsTriggerButton tabValue="posts" tab={queryTab as string}>
+                <TabsTriggerButton tabValue="posts" tab={searchTab}>
                   Posts
                 </TabsTriggerButton>
-                <TabsTriggerButton tabValue="users" tab={queryTab as string}>
+                <TabsTriggerButton tabValue="users" tab={searchTab}>
                   Users
                 </TabsTriggerButton>
               </TabsList>
