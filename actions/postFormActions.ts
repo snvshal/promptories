@@ -22,6 +22,8 @@ export async function savePostForm(data: FormValues) {
       tags: parseTags(data.tags as string),
     })
 
+    user?.posts.push(post)
+    await user?.save()
     return ps(post)
   } catch (error) {
     console.error("Error saving post:", error)
