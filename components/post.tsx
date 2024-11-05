@@ -22,7 +22,6 @@ import {
   Ellipsis,
   User,
   SquareArrowOutUpRight,
-  Settings,
   MessageSquareShare,
   Tag,
   Edit,
