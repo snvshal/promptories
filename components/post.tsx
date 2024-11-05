@@ -22,7 +22,6 @@ import {
   Ellipsis,
   User,
   SquareArrowOutUpRight,
-  Settings,
   MessageSquareShare,
   Tag,
   Edit,
@@ -450,40 +449,6 @@ export function PostOptions({
             <span className="text-red-500">Delete</span>
           </DropdownMenuItem>
         )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
-export function UserOptions() {
-  const { data: session } = useSession()
-  const user = session?.user
-
-  const router = useRouter()
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar className="cursor-pointer">
-          <AvatarImage src={user?.image} alt={user?.username} />
-          <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-auto">
-        <DropdownMenuItem
-          onClick={() => router.push(`/${user?.username}`)}
-          className="cursor-pointer"
-        >
-          <User className="mr-2 h-4 w-4" />
-          <span>{user?.name}</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => router.push("/settings/profile")}
-          className="cursor-pointer"
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

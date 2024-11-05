@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
-import { CheckCircle, Filter, Search as SearchIcon } from "lucide-react"
+import { CheckCircle, Filter, Search as SearchIcon, User } from "lucide-react"
 import { NavigateBackHeader } from "./post"
 import { search } from "@/actions/searchQuery"
 import { TPost, TUser } from "@/types/schema.type"
@@ -48,6 +48,7 @@ export default function SearchComponent() {
   const category = searchParams.get("category")
   const dateRange = searchParams.get("dateRange")
 
+  const [searchTab, setSearchTab] = useState<"posts" | "users">("posts")
   const [searchQuery, setSearchQuery] = useState(query ?? "")
   const [emptyQueryError, setEmptyQueryError] = useState("")
   const [matchedPosts, setMatchedPosts] = useState<TPost[]>([])
@@ -80,17 +81,23 @@ export default function SearchComponent() {
   }
 
   useEffect(() => {
+    setSearchTab(
+      queryTab === "posts" || queryTab === "users" ? queryTab : "posts",
+    )
+  }, [queryTab])
+
+  useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const { posts, users }: { posts: TPost[]; users: TUser[] } =
-          await search(
-            query?.trim() as string,
-            category as string,
-            dateRange as string,
-          )
+        type SearchResults = { posts: TPost[]; users: TUser[] }
+        const results: SearchResults = await search(
+          query?.trim() as string,
+          category as SearchCategories,
+          dateRange as string,
+        )
 
-        setMatchedPosts(posts)
-        setMatchedUsers(users)
+        setMatchedPosts(results?.posts)
+        setMatchedUsers(results?.users)
       } catch (error) {
         console.error("Error fetching search results:", error)
       }
@@ -113,7 +120,10 @@ export default function SearchComponent() {
                   type="text"
                   placeholder="Search for posts, users, or tags..."
                   value={searchQuery as string}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    setEmptyQueryError("")
+                  }}
                   className="flex-1"
                 />
                 <Button type="submit">
@@ -138,16 +148,16 @@ export default function SearchComponent() {
 
         {query ? (
           <Tabs
-            value={(queryTab as string) || "posts"}
+            defaultValue="posts"
             onValueChange={handleTabChange}
             className="w-full"
           >
             <div className="border-b">
               <TabsList className="mt-4 grid h-12 w-full grid-cols-2 rounded-none border-b bg-background p-0">
-                <TabsTriggerButton tabValue="posts" tab={queryTab as string}>
+                <TabsTriggerButton tabValue="posts" tab={searchTab}>
                   Posts
                 </TabsTriggerButton>
-                <TabsTriggerButton tabValue="users" tab={queryTab as string}>
+                <TabsTriggerButton tabValue="users" tab={searchTab}>
                   Users
                 </TabsTriggerButton>
               </TabsList>
@@ -170,7 +180,7 @@ export default function SearchComponent() {
 }
 
 export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
-  if (!matchedUsers.length) {
+  if (!matchedUsers?.length) {
     return (
       <div className="flex-center w-full p-4 max-md:pt-10">
         <p>No users matched</p>
@@ -203,7 +213,9 @@ export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
           onClick={() => router.push(`/${profileUser.username}`)}
         >
           <AvatarImage src={profileUser.avatar} alt={profileUser.name} />
-          <AvatarFallback>{profileUser.name.charAt(0)}</AvatarFallback>
+          <AvatarFallback>
+            <User className="size-8" />
+          </AvatarFallback>
         </Avatar>
 
         <Link href={`/${profileUser.username}`} className="flex-1">
@@ -275,7 +287,7 @@ export function SearchFilterDialog({
                 <SelectItem value="prompt">Prompt</SelectItem>
                 <SelectItem value="response">Response</SelectItem>
                 <SelectItem value="tags">Tags</SelectItem>
-                <SelectItem value="username">User</SelectItem>
+                <SelectItem value="user">User</SelectItem>
               </SelectContent>
             </Select>
           </div>
