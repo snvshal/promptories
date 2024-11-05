@@ -107,10 +107,10 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
 }
 
 export function PostsComponent({ posts }: { posts: TPost[] }) {
-  if (!posts.length) {
+  if (!posts?.length) {
     return (
       <div className="flex-center w-full p-4 max-md:pt-10">
-        <p>No posts here.</p>
+        <p>No posts here</p>
       </div>
     )
   }
