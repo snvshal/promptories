@@ -28,7 +28,7 @@ export type TUser = Document & {
     twitter?: string
     github?: string
   }
-  posts: Types.ObjectId[]
+  posts: Types.ObjectId[] | TPost[]
   followers: Types.ObjectId[]
   following: Types.ObjectId[]
 }

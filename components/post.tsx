@@ -624,7 +624,7 @@ export function PostContent({ type, post }: PostContentProps) {
                 />
               </div>
               <div className="self-center">
-                <p> ResponseMade with Media </p>
+                <p>Response Made with Media</p>
               </div>
             </div>
           ) : (
