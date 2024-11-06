@@ -613,17 +613,24 @@ export function PostContent({ type, post }: PostContentProps) {
         <PostContentType type={type} content={post.caption} />
       </div>
       <div className="relative overflow-hidden">
-        {post.prompt.media?.url ? (
-          <PromptoryMedia
-            mediaType={post.prompt.media?.type}
-            mediaUrl={post.prompt.media?.url}
-            prType="prompt"
-          />
-        ) : (
-          <div className="rounded-t-lg border border-b-0 bg-secondary p-2">
+        <div className="rounded-t-lg border border-b-0 bg-secondary p-2">
+          {post.prompt.media?.url ? (
+            <div className="flex gap-4">
+              <div className="w-auto">
+                <PromptoryMedia
+                  mediaType={post.prompt.media?.type}
+                  mediaUrl={post.prompt.media?.url}
+                  prType="prompt"
+                />
+              </div>
+              <div className="self-center">
+                <p> ResponseMade with Media </p>
+              </div>
+            </div>
+          ) : (
             <PostContentType type={type} content={post.prompt.text as string} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <div className="relative overflow-hidden">
         {post.response.media?.url ? (
@@ -743,13 +750,13 @@ export function PromptoryMedia({
           height={500}
           quality={75}
           priority={true}
-          className={`${prType === "prompt" ? "rounded-t-lg border-b-0" : "rounded-b-lg border-t-0"} w-full border`}
+          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg border border-muted-foreground" : "w-full rounded-b-lg border-t-0"} border`}
           alt="promptory image"
         />
       ) : (
         <video
           src={mediaUrl}
-          className={`${prType === "prompt" ? "rounded-t-lg" : "rounded-b-lg"} w-full`}
+          className={`${prType === "prompt" ? "rounded-t-lg" : "w-full rounded-b-lg"}`}
         />
       )}
     </div>
