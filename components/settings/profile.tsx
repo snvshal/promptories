@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/form"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
+import { ACCEPTED_IMAGE_TYPES } from "../form"
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -61,7 +63,17 @@ export default function ProfileSettings() {
   const { data: session, update } = useSession()
   const user = session?.user
 
-  const [avatar, setAvatar] = useState(user?.image)
+  const [avatar, setAvatar] = useState<string | null>(user?.image as string)
+
+  const handleUpload = (result: CloudinaryUploadWidgetResults) => {
+    const info = result?.info as {
+      secure_url: string
+      resource_type: string
+      format: string
+      bytes: number
+    }
+    setAvatar(info.secure_url)
+  }
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -73,22 +85,12 @@ export default function ProfileSettings() {
     },
   })
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setAvatar(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
   const router = useRouter()
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      await updateUserData(user?.id as string, data)
+      const dataWithAvatar = { ...data, avatar }
+      await updateUserData(user?.id as string, dataWithAvatar)
 
       await update({
         ...session,
@@ -96,6 +98,7 @@ export default function ProfileSettings() {
           ...session?.user,
           name: data.name,
           bio: data.bio,
+          image: avatar,
           social_links: {
             twitter: data.twitter,
             github: data.github,
@@ -130,17 +133,36 @@ export default function ProfileSettings() {
               <Label htmlFor="avatar">Avatar</Label>
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={avatar} alt="User avatar" />
+                  <AvatarImage src={avatar as string} alt="User avatar" />
                   <AvatarFallback>
                     <User className="h-10 w-10" />
                   </AvatarFallback>
                 </Avatar>
-                <Input
-                  id="avatar"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                />
+
+                <CldUploadWidget
+                  uploadPreset={
+                    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+                  }
+                  options={{
+                    cropping: true,
+                    croppingAspectRatio: 1, // 1:1 aspect ratio
+                    folder: "profile_pics", // Optional: specify folder in Cloudinary
+                    maxFileSize: 1_000_000, // Limit to 1MB, if needed
+                    resourceType: "image",
+                    clientAllowedFormats: ACCEPTED_IMAGE_TYPES,
+                  }}
+                  onSuccess={handleUpload}
+                >
+                  {({ open }) => (
+                    <Button
+                      variant="secondary"
+                      onClick={() => open()}
+                      type="button"
+                    >
+                      Upload Profile Picture
+                    </Button>
+                  )}
+                </CldUploadWidget>
               </div>
             </div>
             <FormField
