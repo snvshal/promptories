@@ -492,8 +492,12 @@ export function PostType({ post, type }: PostContentProps) {
 }
 
 export function PostAvatar({ user }: { user: TUser }) {
+  const router = useRouter()
   return (
-    <Avatar>
+    <Avatar
+      className="cursor-pointer"
+      onClick={() => router.push(`/${user.username}`)}
+    >
       <AvatarImage src={user.avatar} alt={user.name} />
       <AvatarFallback>
         <User className="size-5" />
@@ -560,14 +564,14 @@ export function PostAuthorName({
 }) {
   if (type === "post") {
     return (
-      <div className="flex flex-col gap-0">
+      <div className="flex cursor-pointer flex-col gap-0">
         <p className="font-semibold hover:underline">{postAuthor.name}</p>
         <p className="text-muted-foreground">&#64;{postAuthor.username}</p>
       </div>
     )
   } else {
     return (
-      <div className="flex items-center justify-start gap-1">
+      <div className="flex cursor-pointer items-center justify-start gap-1">
         <p className="font-semibold hover:underline max-sm:hidden">
           {postAuthor.name}
         </p>
