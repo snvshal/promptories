@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Heart, MessageCircle, UserPlus, Bell, User } from "lucide-react"
-import { NavigateBackHeader } from "./post"
+import { AvatarComponent, NavigateBackHeader } from "./post"
 import { TNotification, TUser } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { TimeAgo } from "./time-ago"
@@ -122,12 +122,7 @@ export function NotificationContent({
       key={notification._id?.toString() as string}
       className={`flex items-center space-x-4 py-4 pr-2 ${notification.read ? "opacity-50" : ""}`}
     >
-      <Avatar role="button" onClick={() => router.push(`/${nactor.username}`)}>
-        <AvatarImage src={nactor?.avatar} alt={nactor?.name} />
-        <AvatarFallback>
-          <User className="size-5" />
-        </AvatarFallback>
-      </Avatar>
+      <AvatarComponent user={nactor} />
       <div
         role="button"
         className="flex-1"

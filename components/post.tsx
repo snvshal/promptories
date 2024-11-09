@@ -478,7 +478,7 @@ export function PostType({ post, type }: PostContentProps) {
     >
       {type === "posts" && (
         <div className="mr-2 flex items-start">
-          <PostAvatar user={pu(post)} />
+          <AvatarComponent user={pu(post)} />
         </div>
       )}
       <div className="flex-1">
@@ -491,14 +491,15 @@ export function PostType({ post, type }: PostContentProps) {
   )
 }
 
-export function PostAvatar({ user }: { user: TUser }) {
+export function AvatarComponent({ user }: { user: TUser }) {
   const router = useRouter()
   return (
     <Avatar
+      role="button"
       className="cursor-pointer"
-      onClick={() => router.push(`/${user.username}`)}
+      onClick={() => router.push(`/${user?.username}`)}
     >
-      <AvatarImage src={user.avatar} alt={user.name} />
+      <AvatarImage src={user?.avatar} alt={user?.name} />
       <AvatarFallback>
         <User className="size-5" />
       </AvatarFallback>
@@ -538,7 +539,7 @@ export function PostHeader({ type, post }: PostContentProps) {
         <div className="flex-start">
           {type === "post" && (
             <div className="mr-2">
-              <PostAvatar user={pu(post)} />
+              <AvatarComponent user={pu(post)} />
             </div>
           )}
           <PostAuthorName type={type} postAuthor={pu(post)} />
