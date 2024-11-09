@@ -409,14 +409,17 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         size={"icon"}
         onClick={() => router.push("/notifications")}
         variant={iv(pathname === "/notifications")}
-        className="nav-button relative"
+        className="nav-button"
       >
-        {notificationCount > 0 && (
-          <Badge className="flex-center absolute right-1 top-1 size-2 p-0">
-            {/* {notificationCount <= 10 ? notificationCount : "10+"} */}
-          </Badge>
-        )}
-        <Bell className="size-6" />
+        <span className="relative">
+          {notificationCount > 0 && (
+            <Badge className="flex-center absolute -right-1 -top-1 h-4 rounded-full px-1">
+              {notificationCount <= 10 ? notificationCount : "10+"}
+            </Badge>
+          )}
+          <Bell className="size-6" />
+        </span>
+
         <span
           className={`${fw(pathname === "/notifications")} text-base max-md:hidden`}
         >

@@ -478,7 +478,7 @@ export function PostType({ post, type }: PostContentProps) {
     >
       {type === "posts" && (
         <div className="mr-2 flex items-start">
-          <PostAvatar user={pu(post)} />
+          <AvatarComponent user={pu(post)} />
         </div>
       )}
       <div className="flex-1">
@@ -491,10 +491,15 @@ export function PostType({ post, type }: PostContentProps) {
   )
 }
 
-export function PostAvatar({ user }: { user: TUser }) {
+export function AvatarComponent({ user }: { user: TUser }) {
+  const router = useRouter()
   return (
-    <Avatar>
-      <AvatarImage src={user.avatar} alt={user.name} />
+    <Avatar
+      role="button"
+      className="cursor-pointer"
+      onClick={() => router.push(`/${user?.username}`)}
+    >
+      <AvatarImage src={user?.avatar} alt={user?.name} />
       <AvatarFallback>
         <User className="size-5" />
       </AvatarFallback>
@@ -534,7 +539,7 @@ export function PostHeader({ type, post }: PostContentProps) {
         <div className="flex-start">
           {type === "post" && (
             <div className="mr-2">
-              <PostAvatar user={pu(post)} />
+              <AvatarComponent user={pu(post)} />
             </div>
           )}
           <PostAuthorName type={type} postAuthor={pu(post)} />
@@ -560,14 +565,14 @@ export function PostAuthorName({
 }) {
   if (type === "post") {
     return (
-      <div className="flex flex-col gap-0">
+      <div className="flex cursor-pointer flex-col gap-0">
         <p className="font-semibold hover:underline">{postAuthor.name}</p>
         <p className="text-muted-foreground">&#64;{postAuthor.username}</p>
       </div>
     )
   } else {
     return (
-      <div className="flex items-center justify-start gap-1">
+      <div className="flex cursor-pointer items-center justify-start gap-1">
         <p className="font-semibold hover:underline max-sm:hidden">
           {postAuthor.name}
         </p>
@@ -668,7 +673,7 @@ export function PostFooter({ post }: { post: TPost }) {
           <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
         )}
 
-        <PostIconButton onClick={() => handlePostShare(post)}>
+        <PostIconButton onClick={async () => await handlePostShare(post)}>
           <Share2 className="size-4" />
           <span className="sr-only">Share Post</span>
         </PostIconButton>
@@ -750,7 +755,7 @@ export function PromptoryMedia({
           height={500}
           quality={75}
           priority={true}
-          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg border border-muted-foreground" : "w-full rounded-b-lg border-t-0"} border`}
+          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
           alt="promptory image"
         />
       ) : (

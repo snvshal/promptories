@@ -232,6 +232,13 @@ export default function PostForm({
     }
   }
 
+  const autoResize = (element: HTMLTextAreaElement) => {
+    if (element) {
+      element.style.height = "auto"
+      element.style.height = `${element.scrollHeight + 2}px`
+    }
+  }
+
   return (
     <div className="min-h-screen w-full">
       <NavigateBackHeader
@@ -281,7 +288,16 @@ export default function PostForm({
                       <Textarea
                         id="prompt"
                         placeholder="Enter prompt"
-                        {...field}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          autoResize(e.target as HTMLTextAreaElement)
+                        }}
+                        onBlur={field.onBlur}
+                        ref={(element) => {
+                          field.ref(element)
+                          autoResize(element as HTMLTextAreaElement)
+                        }}
                       />
                     )}
                   />
@@ -355,7 +371,16 @@ export default function PostForm({
                       <Textarea
                         id="response"
                         placeholder="Enter response"
-                        {...field}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          autoResize(e.target as HTMLTextAreaElement)
+                        }}
+                        onBlur={field.onBlur}
+                        ref={(element) => {
+                          field.ref(element)
+                          autoResize(element as HTMLTextAreaElement)
+                        }}
                       />
                     )}
                   />
@@ -432,7 +457,16 @@ export default function PostForm({
                     <Textarea
                       id="caption"
                       placeholder="Enter caption"
-                      {...field}
+                      value={field.value}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        autoResize(e.target as HTMLTextAreaElement)
+                      }}
+                      onBlur={field.onBlur}
+                      ref={(element) => {
+                        field.ref(element)
+                        autoResize(element as HTMLTextAreaElement)
+                      }}
                     />
                   )}
                 />
