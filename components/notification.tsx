@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Heart, MessageCircle, UserPlus, Bell, User } from "lucide-react"
+import { Heart, MessageCircle, UserPlus, Bell } from "lucide-react"
 import { AvatarComponent, NavigateBackHeader } from "./post"
 import { TNotification, TUser } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
