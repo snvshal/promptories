@@ -214,7 +214,7 @@ export function UserNotFound() {
     <div className="min-h-screen">
       <NavigateBackHeader page="User not found" />
       <div className="main-content">
-        <Card className="mid-width-card-content max-md:border-0">
+        <Card className="mb-0 w-full rounded-none border-0">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
               <Avatar className="mb-4 h-24 w-24">
