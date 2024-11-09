@@ -673,7 +673,7 @@ export function PostFooter({ post }: { post: TPost }) {
           <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
         )}
 
-        <PostIconButton onClick={() => handlePostShare(post)}>
+        <PostIconButton onClick={async () => await handlePostShare(post)}>
           <Share2 className="size-4" />
           <span className="sr-only">Share Post</span>
         </PostIconButton>
@@ -755,7 +755,7 @@ export function PromptoryMedia({
           height={500}
           quality={75}
           priority={true}
-          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg border border-muted-foreground" : "w-full rounded-b-lg border-t-0"} border`}
+          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
           alt="promptory image"
         />
       ) : (

@@ -9,7 +9,7 @@ export const objId = (id: string | undefined | unknown) =>
   new Types.ObjectId(id as string)
 
 export const handlePostShare = async (post: TPost) => {
-  const postUrl = `${process.env.METADATA_BASE_URL}/${pu(post).username}/promptories/${post._id?.toString() as string}` // Replace with dynamic post URL
+  const postUrl = `/${pu(post).username}/promptories/${post._id?.toString() as string}`
 
   if (navigator.share) {
     try {
