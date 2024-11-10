@@ -73,33 +73,28 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
   const [lastScrollTop, setLastScrollTop] = useState(0)
 
   useEffect(() => {
+    const scrollableElement = document.getElementById("scrollable-element")
+    if (!scrollableElement) return
+
     const handleScroll = () => {
-      const scrollTop = window.scrollY
+      const scrollTop = scrollableElement.scrollTop
       const scrollDiff = Math.abs(scrollTop - lastScrollTop)
 
-      // Only change state if scroll difference exceeds 4rem (64px)
       if (scrollDiff > 64) {
-        if (scrollTop > lastScrollTop) {
-          // Scrolling down, hide the header
-          setIsVisible(false)
-        } else {
-          // Scrolling up, show the header
-          setIsVisible(true)
-        }
-
+        setIsVisible(scrollTop <= lastScrollTop)
         setLastScrollTop(scrollTop)
       }
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    scrollableElement.addEventListener("scroll", handleScroll)
+    return () => scrollableElement.removeEventListener("scroll", handleScroll)
   }, [lastScrollTop])
 
   return (
     <header
       className={`sticky top-0 z-20 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
-      } shadow`}
+      }`}
     >
       {children}
     </header>
@@ -360,7 +355,7 @@ export function Sidebar({
         </nav>
       </aside>
 
-      <aside className="flex-1 overflow-y-auto">
+      <aside id="scrollable-element" className="flex-1 overflow-y-auto">
         <div className="flex">
           <div className="w-full flex-1 sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
             {children}
@@ -542,7 +537,7 @@ export function SidePanel() {
               <Link
                 key={index}
                 href={"/"}
-                className="w-full rounded-md p-1 text-center"
+                className="w-full rounded-md p-1 text-center capitalize"
               >
                 {type}
               </Link>
