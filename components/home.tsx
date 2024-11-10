@@ -514,10 +514,9 @@ export function PostViews({ post }: { post: TPost }) {
     }
   }, [post._id, post.views, user?.id])
   return (
-    <PostIconButton>
+    <PostIconButton ref={postRef}>
       <ChartNoAxesColumn className="mr-2 size-4" />
       {post.views.length < 1 ? "" : post.views.length}
-      {/* {post.views.length} */}
       <span className="sr-only">Post Views</span>
     </PostIconButton>
   )
