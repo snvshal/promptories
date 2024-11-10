@@ -272,8 +272,14 @@ export function PostReplyDialog({
     }
   }
 
+  // Empty Textarea on Dialog Close
+  const onDialogChange = () => {
+    setDialogState((prev) => !prev)
+    setReplyContent("")
+  }
+
   return (
-    <Dialog open={dialogState} onOpenChange={setDialogState}>
+    <Dialog open={dialogState} onOpenChange={onDialogChange}>
       <DialogTrigger asChild>
         {children ? (
           children
