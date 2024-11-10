@@ -16,6 +16,7 @@ import {
   Settings,
   ChartNoAxesColumn,
   User,
+  TrendingUp,
 } from "lucide-react"
 import Link from "next/link"
 import { TPost, TReplies, TUser } from "@/types/schema.type"
@@ -34,6 +35,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 import { PostType } from "./post"
 import { Textarea } from "./ui/textarea"
 import { addReplyToPost } from "@/actions/addReplyToPost"
@@ -42,7 +50,7 @@ import { useSession } from "next-auth/react"
 import { SetAction } from "@/types/generics.type"
 import { toast } from "@/hooks/use-toast"
 import { Badge } from "./ui/badge"
-import { promptory_types } from "@/lib/constants"
+import { ai_platforms, promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
 
@@ -73,33 +81,28 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
   const [lastScrollTop, setLastScrollTop] = useState(0)
 
   useEffect(() => {
+    const scrollableElement = document.getElementById("scrollable-element")
+    if (!scrollableElement) return
+
     const handleScroll = () => {
-      const scrollTop = window.scrollY
+      const scrollTop = scrollableElement.scrollTop
       const scrollDiff = Math.abs(scrollTop - lastScrollTop)
 
-      // Only change state if scroll difference exceeds 4rem (64px)
       if (scrollDiff > 64) {
-        if (scrollTop > lastScrollTop) {
-          // Scrolling down, hide the header
-          setIsVisible(false)
-        } else {
-          // Scrolling up, show the header
-          setIsVisible(true)
-        }
-
+        setIsVisible(scrollTop <= lastScrollTop)
         setLastScrollTop(scrollTop)
       }
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    scrollableElement.addEventListener("scroll", handleScroll)
+    return () => scrollableElement.removeEventListener("scroll", handleScroll)
   }, [lastScrollTop])
 
   return (
     <header
       className={`sticky top-0 z-20 w-full border-b bg-background shadow-sm transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
-      } shadow`}
+      }`}
     >
       {children}
     </header>
@@ -269,8 +272,14 @@ export function PostReplyDialog({
     }
   }
 
+  // Empty Textarea on Dialog Close
+  const onDialogChange = () => {
+    setDialogState((prev) => !prev)
+    setReplyContent("")
+  }
+
   return (
-    <Dialog open={dialogState} onOpenChange={setDialogState}>
+    <Dialog open={dialogState} onOpenChange={onDialogChange}>
       <DialogTrigger asChild>
         {children ? (
           children
@@ -360,7 +369,7 @@ export function Sidebar({
         </nav>
       </aside>
 
-      <aside className="flex-1 overflow-y-auto">
+      <aside id="scrollable-element" className="flex-1 overflow-y-auto">
         <div className="flex">
           <div className="w-full flex-1 sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
             {children}
@@ -519,10 +528,9 @@ export function PostViews({ post }: { post: TPost }) {
     }
   }, [post._id, post.views, user?.id])
   return (
-    <PostIconButton>
+    <PostIconButton ref={postRef}>
       <ChartNoAxesColumn className="mr-2 size-4" />
       {post.views.length < 1 ? "" : post.views.length}
-      {/* {post.views.length} */}
       <span className="sr-only">Post Views</span>
     </PostIconButton>
   )
@@ -533,22 +541,73 @@ export function SidePanel() {
   if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return
 
   return (
-    <aside className="w-64 border-l p-4 max-lg:hidden">
-      <h2 className="sticky top-4 mb-4 text-lg font-semibold">Side Panel</h2>
-      <div className="sticky top-16 max-h-[calc(100vh-74px)] overflow-y-auto">
-        <ScrollArea className="h-[calc(100vh-75px)] rounded-md border">
-          <div className="mr-2 flex flex-col gap-2 p-2">
-            {promptory_types.map((type, index) => (
+    <aside className="w-1/3 border-l px-4 max-lg:hidden">
+      {/* <h2 className="sticky top-4 mb-4 text-lg font-semibold">Side Panel</h2> */}
+      <div className="sticky top-4 max-h-[calc(100vh-4px)] overflow-y-auto">
+        <div className="mr-2 flex flex-col gap-2 p-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-56 rounded-lg">
+                Promptory Types
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <ScrollArea className="h-48 rounded-lg">
+                {promptory_types.map((type, index) => (
+                  <DropdownMenuItem key={index} className="cursor-pointer">
+                    <Link
+                      href={"/"}
+                      className="flex-start w-full gap-1 rounded-lg p-1 text-center capitalize"
+                    >
+                      <Search className="mr-2 h-4 w-4" />
+                      <span>{type}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </ScrollArea>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-56 rounded-lg">
+                AI Platforms
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <ScrollArea className="h-48 rounded-lg">
+                {ai_platforms.map((type, index) => (
+                  <DropdownMenuItem key={index} className="cursor-pointer">
+                    <Link
+                      href={"/"}
+                      className="flex-start w-full gap-1 rounded-lg p-1 text-center capitalize"
+                    >
+                      <Search className="mr-2 h-4 w-4" />
+                      <span>{type}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </ScrollArea>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="flex-center flex-col">
+          <p className="flex-start mb-2 mt-4 w-56 gap-2 text-xl font-medium">
+            <TrendingUp />
+            <span>Trending</span>
+          </p>
+          <ScrollArea className="h-64 w-56 rounded-lg border p-2">
+            {ai_platforms.map((type, index) => (
               <Link
                 key={index}
                 href={"/"}
-                className="w-full rounded-md p-1 text-center"
+                className="flex-start w-full gap-1 rounded-lg p-1 text-center capitalize"
               >
-                {type}
+                <span className="font-mono text-xl font-medium">#</span>
+                <span className="font-medium">{type}</span>
               </Link>
             ))}
-          </div>
-        </ScrollArea>
+          </ScrollArea>
+        </div>
       </div>
     </aside>
   )

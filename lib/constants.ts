@@ -20,6 +20,23 @@ export const promptory_types = [
   "audio-to-audio",
 ]
 
+export const ai_platforms = [
+  "chatGPT",
+  "Suno",
+  "DALL-E",
+  "Perplexity",
+  "Gemini",
+  "Copilot",
+  "Whisper",
+  "LLaMA",
+  "Claude",
+  "PaLM ",
+  "BERT",
+  "Ernie",
+  "Midjourney",
+  "Runway",
+]
+
 export const defaultValues: FormValues = {
   caption: "",
   model_url: "",
