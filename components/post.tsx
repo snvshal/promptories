@@ -46,6 +46,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
@@ -356,13 +358,7 @@ export function PostReplyOptions({
   )
 }
 
-export function PostOptions({
-  post,
-  type,
-}: {
-  post: TPost
-  type: "post" | "posts"
-}) {
+export function PostOptions({ post, type }: PostContentProps) {
   const { data: session } = useSession()
   const user = session?.user
 
@@ -405,7 +401,9 @@ export function PostOptions({
           <span className="sr-only">Post options</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-auto">
+      <DropdownMenuContent className="absolute -left-28 -top-8 w-auto shadow-2xl shadow-slate-900">
+        <DropdownMenuLabel>Post Options</DropdownMenuLabel>
+        <DropdownMenuSeparator className="h-[.1mm]" />
         <DropdownMenuItem
           onClick={() => router.push(`/${pu(post).username}`)}
           className="cursor-pointer sm:hidden"
