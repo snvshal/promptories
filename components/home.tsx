@@ -53,6 +53,7 @@ import { Badge } from "./ui/badge"
 import { ai_platforms, promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
+import { Input } from "./ui/input"
 
 export const pu = (post: TPost | TReplies) => post.user as TUser
 
@@ -537,21 +538,42 @@ export function PostViews({ post }: { post: TPost }) {
 }
 
 export function SidePanel() {
+  const [inputValue, setInputValue] = useState("")
+
+  const router = useRouter()
   const pathname = usePathname()
+
   if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return
 
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    router.push(`/search?q=${inputValue}`)
+  }
+
   return (
-    <aside className="w-1/3 border-l px-4 max-lg:hidden">
-      {/* <h2 className="sticky top-4 mb-4 text-lg font-semibold">Side Panel</h2> */}
-      <div className="sticky top-4 max-h-[calc(100vh-4px)] overflow-y-auto">
-        <div className="mr-2 flex flex-col gap-2 p-2">
+    <aside className="w-1/3 max-lg:hidden">
+      <div className="sticky top-0 h-screen w-full overflow-hidden border-l px-4 pt-4">
+        {pathname.startsWith("/search") || (
+          <div className="flex-center mt-2">
+            <form onSubmit={onSubmit} className="w-full">
+              <Input
+                name="search"
+                placeholder="Search"
+                value={inputValue}
+                className="w-full"
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+            </form>
+          </div>
+        )}
+        <div className="my-2 flex w-full flex-col gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-56 rounded-lg">
+              <Button variant="outline" className="w-full rounded-lg">
                 Promptory Types
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+            <DropdownMenuContent className="w-56 shadow-2xl shadow-slate-900">
               <ScrollArea className="h-48 rounded-lg">
                 {promptory_types.map((type, index) => (
                   <DropdownMenuItem key={index} className="cursor-pointer">
@@ -569,11 +591,11 @@ export function SidePanel() {
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-56 rounded-lg">
+              <Button variant="outline" className="w-full rounded-lg">
                 AI Platforms
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+            <DropdownMenuContent className="w-56 shadow-2xl shadow-slate-900">
               <ScrollArea className="h-48 rounded-lg">
                 {ai_platforms.map((type, index) => (
                   <DropdownMenuItem key={index} className="cursor-pointer">
@@ -591,19 +613,19 @@ export function SidePanel() {
           </DropdownMenu>
         </div>
         <div className="flex-center flex-col">
-          <p className="flex-start mb-2 mt-4 w-56 gap-2 text-xl font-medium">
-            <TrendingUp />
-            <span>Trending</span>
-          </p>
-          <ScrollArea className="h-64 w-56 rounded-lg border p-2">
+          <ScrollArea className="h-[17rem] w-full rounded-lg border">
+            <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
+              <TrendingUp />
+              <span>Trending</span>
+            </h2>
             {ai_platforms.map((type, index) => (
               <Link
                 key={index}
                 href={"/"}
-                className="flex-start w-full gap-1 rounded-lg p-1 text-center capitalize"
+                className="flex-start w-full gap-2 px-4 py-1 text-center capitalize hover:bg-accent hover:text-accent-foreground"
               >
-                <span className="font-mono text-xl font-medium">#</span>
-                <span className="font-medium">{type}</span>
+                <span className="font-mono text-xl">#</span>
+                <span>{type}</span>
               </Link>
             ))}
           </ScrollArea>
