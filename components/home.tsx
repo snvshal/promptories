@@ -354,7 +354,7 @@ export function Sidebar({
   if (status === "unauthenticated") return children
 
   return (
-    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
+    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
       <aside className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-dvh sm:w-16 sm:border-r md:w-60">
         <nav className="h-full">
           <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
@@ -370,7 +370,10 @@ export function Sidebar({
         </nav>
       </aside>
 
-      <aside id="scrollable-element" className="flex-1 overflow-y-auto">
+      <aside
+        id="scrollable-element"
+        className="flex-1 overflow-y-auto xl:pr-40 2xl:pr-80"
+      >
         <div className="flex">
           <div className="w-full flex-1 sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
             {children}
@@ -552,7 +555,7 @@ export function SidePanel() {
 
   return (
     <aside className="w-1/3 max-lg:hidden">
-      <div className="sticky top-0 h-screen w-full overflow-hidden border-l px-4 pt-4">
+      <div className="sticky top-0 h-dvh w-full overflow-hidden border-l px-4 pt-4">
         {pathname.startsWith("/search") || (
           <div className="flex-center mt-2">
             <form onSubmit={onSubmit} className="w-full">
