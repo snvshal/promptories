@@ -98,7 +98,7 @@ export const updatePostValues = (post: TPost) => {
       prompt,
       response,
       promptory_type: post.promptory_type,
-      tags: post.tags.join(),
+      tags: post.tags.join(" "),
     } as FormValues,
     editPostMedia: {
       prompt: prompt_media,
