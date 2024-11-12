@@ -8,7 +8,6 @@ export default async function PhotoPage({
     username: string
     promptory_id: string
     prompt_response: "response" | "prompt"
-    photoId: string
   }
 }) {
   const { promptory_id, prompt_response } = params
