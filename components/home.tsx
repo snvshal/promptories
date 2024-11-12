@@ -35,13 +35,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
 import { PostType } from "./post"
 import { Textarea } from "./ui/textarea"
 import { addReplyToPost } from "@/actions/addReplyToPost"
