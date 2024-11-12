@@ -35,13 +35,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
 import { PostType } from "./post"
 import { Textarea } from "./ui/textarea"
 import { addReplyToPost } from "@/actions/addReplyToPost"
@@ -54,6 +47,13 @@ import { ai_platforms, promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
 import { Input } from "./ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select"
 
 export const pu = (post: TPost | TReplies) => post.user as TUser
 
@@ -375,9 +375,7 @@ export function Sidebar({
         className="flex-1 overflow-y-auto xl:pr-40 2xl:pr-80"
       >
         <div className="flex">
-          <div className="w-full flex-1 sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
-            {children}
-          </div>
+          <div className="w-full flex-1 md:w-2/3">{children}</div>
           <SidePanel />
         </div>
       </aside>
@@ -542,6 +540,8 @@ export function PostViews({ post }: { post: TPost }) {
 
 export function SidePanel() {
   const [inputValue, setInputValue] = useState("")
+  const [promptoryType, setPromptoryType] = useState("every")
+  const [feedType, setFeedType] = useState("for-you")
 
   const router = useRouter()
   const pathname = usePathname()
@@ -570,50 +570,30 @@ export function SidePanel() {
           </div>
         )}
         <div className="my-2 flex w-full flex-col gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full rounded-lg">
-                Promptory Types
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 shadow-2xl shadow-slate-900">
+          <Select value={promptoryType} onValueChange={setPromptoryType}>
+            <SelectTrigger>
+              <SelectValue placeholder="Promptory Types" />
+            </SelectTrigger>
+            <SelectContent className="shadow-2xl shadow-slate-900">
               <ScrollArea className="h-48 rounded-lg">
+                <SelectItem value="every">Every</SelectItem>
                 {promptory_types.map((type, index) => (
-                  <DropdownMenuItem key={index} className="cursor-pointer">
-                    <Link
-                      href={"/"}
-                      className="flex-start w-full gap-1 rounded-lg p-1 text-center capitalize"
-                    >
-                      <Search className="mr-2 h-4 w-4" />
-                      <span>{type}</span>
-                    </Link>
-                  </DropdownMenuItem>
+                  <SelectItem key={index} value={type}>
+                    <span className="capitalize">{type}</span>
+                  </SelectItem>
                 ))}
               </ScrollArea>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full rounded-lg">
-                AI Platforms
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 shadow-2xl shadow-slate-900">
-              <ScrollArea className="h-48 rounded-lg">
-                {ai_platforms.map((type, index) => (
-                  <DropdownMenuItem key={index} className="cursor-pointer">
-                    <Link
-                      href={"/"}
-                      className="flex-start w-full gap-1 rounded-lg p-1 text-center capitalize"
-                    >
-                      <Search className="mr-2 h-4 w-4" />
-                      <span>{type}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </ScrollArea>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </SelectContent>
+          </Select>
+          <Select value={feedType} onValueChange={setFeedType}>
+            <SelectTrigger>
+              <SelectValue placeholder="Feed Types" />
+            </SelectTrigger>
+            <SelectContent className="shadow-2xl shadow-slate-900">
+              <SelectItem value="for-you">For You</SelectItem>
+              <SelectItem value="following">Following</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex-center flex-col">
           <ScrollArea className="h-[17rem] w-full rounded-lg border">

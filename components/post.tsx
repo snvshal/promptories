@@ -606,6 +606,7 @@ export function PostContent({ type, post }: PostContentProps) {
 
   const postClick = (post: TPost) =>
     router.push(`/${pu(post).username}/promptories/${post._id as string}`)
+
   return (
     <CardContent
       role={type === "posts" ? "button" : undefined}
@@ -620,14 +621,18 @@ export function PostContent({ type, post }: PostContentProps) {
           {post.prompt.media?.url ? (
             <div className="flex gap-4">
               <div className="w-auto">
-                <PromptoryMedia
-                  mediaType={post.prompt.media?.type}
-                  mediaUrl={post.prompt.media?.url}
-                  prType="prompt"
-                />
+                <Link
+                  href={`/${pu(post).username}/promptories/${post._id as string}/prompt/media`}
+                >
+                  <PromptoryMedia
+                    mediaType={post.prompt.media?.type}
+                    mediaUrl={post.prompt.media?.url}
+                    prType="prompt"
+                  />
+                </Link>
               </div>
-              <div className="self-center">
-                <p>Response Made with Media</p>
+              <div className="flex-1 self-center">
+                <p>Response made with this media</p>
               </div>
             </div>
           ) : (
@@ -637,11 +642,15 @@ export function PostContent({ type, post }: PostContentProps) {
       </div>
       <div className="relative overflow-hidden">
         {post.response.media?.url ? (
-          <PromptoryMedia
-            mediaType={post.response.media?.type}
-            mediaUrl={post.response.media?.url}
-            prType="response"
-          />
+          <Link
+            href={`/${pu(post).username}/promptories/${post._id as string}/response/media`}
+          >
+            <PromptoryMedia
+              mediaType={post.response.media?.type}
+              mediaUrl={post.response.media?.url}
+              prType="response"
+            />
+          </Link>
         ) : (
           <div className="rounded-b-lg border border-t-0 p-2">
             <PostContentType
