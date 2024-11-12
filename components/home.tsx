@@ -382,9 +382,7 @@ export function Sidebar({
         className="flex-1 overflow-y-auto xl:pr-40 2xl:pr-80"
       >
         <div className="flex">
-          <div className="w-full flex-1 sm:w-[calc(100%-4rem)] md:w-[calc(100%-15rem)]">
-            {children}
-          </div>
+          <div className="w-full flex-1 md:w-2/3">{children}</div>
           <SidePanel />
         </div>
       </aside>
