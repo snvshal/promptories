@@ -27,6 +27,8 @@ import { TPost } from "@/types/schema.type"
 import Image from "next/image"
 import { Separator } from "@/components/ui/separator"
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
+import { Info } from "lucide-react"
+import { ToolTipComponent } from "./ui/tooltip"
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 export const ACCEPTED_IMAGE_TYPES = [
@@ -478,7 +480,12 @@ export default function PostForm({
               </div>
 
               <div>
-                <Label htmlFor="model_url">Model</Label>
+                <LabelWithToolTip
+                  htmlFor="model_url"
+                  label="Platform"
+                  content="Enter full URL of the website where we can try it. (e.g.,
+                  https://example.com)"
+                />
                 <Controller
                   name="model_url"
                   control={control}
@@ -495,14 +502,14 @@ export default function PostForm({
                     {errors.model_url.message}
                   </p>
                 )}
-                <p className="mt-1 text-sm text-gray-500">
-                  Enter full URL of the website where we can try it. (e.g.,
-                  https://example.com)
-                </p>
               </div>
 
               <div>
-                <Label htmlFor="chat_link">Chat</Label>
+                <LabelWithToolTip
+                  htmlFor="chat_link"
+                  label="Chat"
+                  content="Enter public chat link of this promptory"
+                />
                 <Controller
                   name="chat_link"
                   control={control}
@@ -519,13 +526,14 @@ export default function PostForm({
                     {errors.chat_link.message}
                   </p>
                 )}
-                <p className="mt-1 text-sm text-gray-500">
-                  Enter public chat link of this promptory
-                </p>
               </div>
 
               <div>
-                <Label htmlFor="tags">Tags</Label>
+                <LabelWithToolTip
+                  htmlFor="tags"
+                  label="Tags"
+                  content="Enter tags separated by space (e.g., tag1 tag2 tag3)"
+                />
                 <Controller
                   name="tags"
                   control={control}
@@ -537,9 +545,6 @@ export default function PostForm({
                     />
                   )}
                 />
-                <p className="mt-1 text-sm text-gray-500">
-                  Enter tags separated by space (e.g., tag1 tag2 tag3)
-                </p>
               </div>
             </div>
           </div>
@@ -591,4 +596,26 @@ const RenderPreview: React.FC<{ mediaUrl: string; mediaType: MediaType }> = ({
   }
 
   return <p>Unsupported media type</p>
+}
+
+export function LabelWithToolTip({
+  htmlFor,
+  label,
+  content,
+}: {
+  htmlFor: string
+  label: string
+  content: string
+}) {
+  return (
+    <Label htmlFor={htmlFor} className="mb-1 flex items-end">
+      <span>{label}</span>
+      <ToolTipComponent
+        content={content}
+        className="border bg-background text-foreground"
+      >
+        <Info className="ml-2 size-3 text-muted-foreground" />
+      </ToolTipComponent>
+    </Label>
+  )
 }
