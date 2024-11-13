@@ -623,6 +623,7 @@ export function PostContent({ type, post }: PostContentProps) {
               <div className="w-auto">
                 <Link
                   href={`/${pu(post).username}/promptories/${post._id as string}/prompt/media`}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <PromptoryMedia
                     mediaType={post.prompt.media?.type}
@@ -644,6 +645,7 @@ export function PostContent({ type, post }: PostContentProps) {
         {post.response.media?.url ? (
           <Link
             href={`/${pu(post).username}/promptories/${post._id as string}/response/media`}
+            onClick={(e) => e.stopPropagation()}
           >
             <PromptoryMedia
               mediaType={post.response.media?.type}

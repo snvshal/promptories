@@ -1,5 +1,6 @@
-import { getPostMediaById } from "@/utils/get-posts"
-import Image from "next/image"
+import { PostMedia } from "@/components/post-media"
+import { getPostById } from "@/utils/get-posts"
+import { ps } from "@/utils/ps"
 
 export default async function PhotoPage({
   params,
@@ -11,19 +12,13 @@ export default async function PhotoPage({
   }
 }) {
   const { promptory_id, prompt_response } = params
-  const media = await getPostMediaById(promptory_id, prompt_response)
+  const post = await getPostById(promptory_id)
 
-  if (!media) return <div>Photo not found</div>
+  if (!post) return <div className="flex-center h-screen">Photo not found</div>
 
-  return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <Image
-        src={media.url}
-        alt="Photo"
-        width={800}
-        height={600}
-        className="h-72 w-auto"
-      />
-    </div>
-  )
+  const mediaUrl = post[prompt_response]?.media?.url
+  if (!mediaUrl)
+    return <div className="flex-center h-screen">Photo not found</div>
+
+  return <PostMedia post={ps(post)} mediaUrl={mediaUrl} />
 }

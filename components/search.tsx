@@ -1,18 +1,18 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
-import { CheckCircle, Filter, Search as SearchIcon, User } from "lucide-react"
+import { CheckCircle, Filter, SearchIcon, User } from "lucide-react"
 import { NavigateBackHeader } from "./post"
 import { search } from "@/actions/searchQuery"
 import { TPost, TUser } from "@/types/schema.type"
 import { PostsComponent } from "./home"
-import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
 import {
   Select,
   SelectContent,
@@ -28,7 +28,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { SetAction } from "@/types/generics.type"
 import { Label } from "./ui/label"
 import { FollowButton, TabsTriggerButton } from "./profile/user"
 
@@ -41,72 +40,56 @@ export type SearchCategories =
   | "tags"
 
 export default function SearchComponent() {
+  const router = useRouter()
   const searchParams = useSearchParams()
 
-  const query = searchParams.get("q")
-  const queryTab = searchParams.get("tab")
-  const category = searchParams.get("category")
-  const dateRange = searchParams.get("dateRange")
+  const [searchState, setSearchState] = useState({
+    query: searchParams.get("q") ?? "",
+    tab: (searchParams.get("tab") as "posts" | "users") ?? "posts",
+    category: searchParams.get("category") ?? "default",
+    dateRange: searchParams.get("dateRange") ?? "default",
+  })
 
-  const [searchTab, setSearchTab] = useState<"posts" | "users">("posts")
-  const [searchQuery, setSearchQuery] = useState(query ?? "")
+  const [results, setResults] = useState<{ posts: TPost[]; users: TUser[] }>({
+    posts: [],
+    users: [],
+  })
   const [emptyQueryError, setEmptyQueryError] = useState("")
-  const [matchedPosts, setMatchedPosts] = useState<TPost[]>([])
-  const [matchedUsers, setMatchedUsers] = useState<TUser[]>([])
-  const [selectedCategory, setSelectedCategory] = useState(
-    category ?? "default",
-  )
-  const [selectedDateRange, setSelectedDateRange] = useState(
-    dateRange ?? "default",
-  )
-  const [open, setOpen] = useState(false) // Search Filter Dialog State
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
 
-  const router = useRouter()
-
-  const handleSearchSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!searchQuery?.trim()) {
-      setSearchQuery("")
-      setEmptyQueryError("Search query cannot be empty")
-      return
-    }
-    const searchUrl = `?q=${searchQuery}&category=${selectedCategory}&tab=${queryTab ?? "posts"}&dateRange=${selectedDateRange}`
+  const updateSearchParams = (newParams: Partial<typeof searchState>) => {
+    const updatedParams = { ...searchState, ...newParams }
+    setSearchState(updatedParams)
+    const searchUrl = `?q=${updatedParams.query}&category=${updatedParams.category}&tab=${updatedParams.tab}&dateRange=${updatedParams.dateRange}`
     router.push(searchUrl)
   }
 
-  const handleTabChange = (value: string) => {
-    const changeTabUrl = `?q=${query}&category=${category}&tab=${value}&dateRange=${dateRange}`
-    router.push(changeTabUrl)
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!searchState.query.trim()) {
+      setEmptyQueryError("Search query cannot be empty")
+      return
+    }
+    updateSearchParams({ query: searchState.query })
   }
 
   useEffect(() => {
-    setSearchTab(
-      queryTab === "posts" || queryTab === "users" ? queryTab : "posts",
-    )
-  }, [queryTab])
-
-  useEffect(() => {
     const fetchSearchResults = async () => {
-      try {
-        type SearchResults = { posts: TPost[]; users: TUser[] }
-        const results: SearchResults = await search(
-          query?.trim() as string,
-          category as SearchCategories,
-          dateRange as string,
-        )
-
-        setMatchedPosts(results?.posts)
-        setMatchedUsers(results?.users)
-      } catch (error) {
-        console.error("Error fetching search results:", error)
+      if (searchState.query.trim()) {
+        try {
+          const results = await search(
+            searchState.query,
+            searchState.category as SearchCategories,
+            searchState.dateRange,
+          )
+          setResults(results)
+        } catch (error) {
+          console.error("Error fetching search results:", error)
+        }
       }
     }
-
-    if (query?.trim()) {
-      fetchSearchResults()
-    }
-  }, [query, category, dateRange])
+    fetchSearchResults()
+  }, [searchState.query, searchState.category, searchState.dateRange])
 
   return (
     <div className="w-full">
@@ -119,9 +102,12 @@ export default function SearchComponent() {
                 <Input
                   type="text"
                   placeholder="Search for posts, users, or tags..."
-                  value={searchQuery as string}
+                  value={searchState.query}
                   onChange={(e) => {
-                    setSearchQuery(e.target.value)
+                    setSearchState((prev) => ({
+                      ...prev,
+                      query: e.target.value,
+                    }))
                     setEmptyQueryError("")
                   }}
                   className="flex-1"
@@ -131,12 +117,10 @@ export default function SearchComponent() {
                   <span className="ml-2 max-sm:hidden">Search</span>
                 </Button>
                 <SearchFilterDialog
-                  open={open}
-                  setOpen={setOpen}
-                  selectedCategory={selectedCategory}
-                  setSelectedCategory={setSelectedCategory}
-                  dateRange={selectedDateRange}
-                  setDateRange={setSelectedDateRange}
+                  open={isFilterDialogOpen}
+                  setOpen={setIsFilterDialogOpen}
+                  searchState={searchState}
+                  updateSearchParams={updateSearchParams}
                 />
               </div>
             </form>
@@ -146,27 +130,29 @@ export default function SearchComponent() {
           </CardContent>
         </Card>
 
-        {query ? (
+        {searchState.query ? (
           <Tabs
-            defaultValue="posts"
-            onValueChange={handleTabChange}
+            value={searchState.tab}
+            onValueChange={(value) =>
+              updateSearchParams({ tab: value as "posts" | "users" })
+            }
             className="w-full"
           >
             <div className="border-b">
               <TabsList className="mt-4 grid h-12 w-full grid-cols-2 rounded-none border-b bg-background p-0">
-                <TabsTriggerButton tabValue="posts" tab={searchTab}>
+                <TabsTriggerButton tabValue="posts" tab={searchState.tab}>
                   Posts
                 </TabsTriggerButton>
-                <TabsTriggerButton tabValue="users" tab={searchTab}>
+                <TabsTriggerButton tabValue="users" tab={searchState.tab}>
                   Users
                 </TabsTriggerButton>
               </TabsList>
             </div>
             <TabsContent value="posts" className="m-0">
-              <PostsComponent posts={matchedPosts as TPost[]} />
+              <PostsComponent posts={results.posts} />
             </TabsContent>
             <TabsContent value="users" className="m-0">
-              <MatchedUsers matchedUsers={matchedUsers} />
+              <MatchedUsers matchedUsers={results.users} />
             </TabsContent>
           </Tabs>
         ) : (
@@ -179,7 +165,7 @@ export default function SearchComponent() {
   )
 }
 
-export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
+function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
   if (!matchedUsers?.length) {
     return (
       <div className="flex-center w-full p-4 max-md:pt-10">
@@ -190,17 +176,17 @@ export function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 
   return (
     <>
-      {matchedUsers?.map((MatchedUser) => (
+      {matchedUsers.map((matchedUser) => (
         <UserProfileCard
-          key={MatchedUser._id?.toString()}
-          profileUser={MatchedUser}
+          key={matchedUser._id?.toString()}
+          profileUser={matchedUser}
         />
       ))}
     </>
   )
 }
 
-export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
+function UserProfileCard({ profileUser }: { profileUser: TUser }) {
   const router = useRouter()
   const [followers, setFollowers] = useState(profileUser.followers.length ?? 0)
 
@@ -221,7 +207,7 @@ export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
         <Link href={`/${profileUser.username}`} className="flex-1">
           <h3 className="text-lg font-semibold">{profileUser.name}</h3>
           <p className="text-sm text-muted-foreground">
-            &#64;{profileUser.username}
+            @{profileUser.username}
           </p>
           <p className="mt-1 text-sm">{profileUser.bio}</p>
           <div className="mt-2 flex space-x-4">
@@ -241,21 +227,33 @@ export function UserProfileCard({ profileUser }: { profileUser: TUser }) {
   )
 }
 
-export function SearchFilterDialog({
+function SearchFilterDialog({
   open,
   setOpen,
-  selectedCategory,
-  setSelectedCategory,
-  dateRange,
-  setDateRange,
+  searchState,
+  updateSearchParams,
 }: {
   open: boolean
-  setOpen: SetAction<boolean>
-  selectedCategory: string
-  setSelectedCategory: SetAction<string>
-  dateRange: string
-  setDateRange: SetAction<string>
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  searchState: {
+    category: string
+    dateRange: string
+  }
+  updateSearchParams: (params: Partial<typeof searchState>) => void
 }) {
+  const [localCategory, setLocalCategory] = useState(searchState.category)
+  const [localDateRange, setLocalDateRange] = useState(searchState.dateRange)
+
+  useEffect(() => {
+    setLocalCategory(searchState.category)
+    setLocalDateRange(searchState.dateRange)
+  }, [searchState, open])
+
+  const handleDone = () => {
+    updateSearchParams({ category: localCategory, dateRange: localDateRange })
+    setOpen(false)
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -274,10 +272,7 @@ export function SearchFilterDialog({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div>
             <Label className="text-sm font-medium">Category</Label>
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
+            <Select value={localCategory} onValueChange={setLocalCategory}>
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
@@ -293,7 +288,7 @@ export function SearchFilterDialog({
           </div>
           <div>
             <Label className="text-sm font-medium">Date Range</Label>
-            <Select value={dateRange} onValueChange={setDateRange}>
+            <Select value={localDateRange} onValueChange={setLocalDateRange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select date range" />
               </SelectTrigger>
@@ -307,7 +302,7 @@ export function SearchFilterDialog({
             </Select>
           </div>
         </div>
-        <Button type="button" onClick={() => setOpen(false)}>
+        <Button type="button" onClick={handleDone}>
           <CheckCircle className="mr-2 h-4 w-4" />
           <span>Done</span>
         </Button>

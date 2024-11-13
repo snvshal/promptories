@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -54,6 +54,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select"
+import { getNotificationCount } from "@/actions/notificationActions"
 
 export const pu = (post: TPost | TReplies) => post.user as TUser
 
@@ -342,16 +343,44 @@ export function ComposePromptoryButton() {
   )
 }
 
-export function Sidebar({
-  notificationCount,
-  children,
-}: {
-  notificationCount: number
-  children: ReactNode
-}) {
+export function Sidebar({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
+  const pathname = usePathname()
+
+  const [notificationCount, setNotificationCount] = useState(0)
+  const intervalIdRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Fetch notification count initially and update in real-time
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const count = await getNotificationCount()
+        setNotificationCount(count)
+      } catch (error) {
+        console.error("Failed to get notification count")
+      }
+    }
+
+    fetchNotifications()
+
+    // Set up interval to reset count if on the notifications page
+    if (pathname === "/notifications" && notificationCount > 0) {
+      intervalIdRef.current = setInterval(() => {
+        setNotificationCount(0)
+      }, 4000)
+    }
+
+    // Cleanup function to clear the interval
+    return () => {
+      if (intervalIdRef.current) {
+        clearInterval(intervalIdRef.current)
+        intervalIdRef.current = null
+      }
+    }
+  }, [pathname, notificationCount])
 
   if (status === "unauthenticated") return children
+  if (pathname.endsWith("/media")) return children
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
