@@ -68,6 +68,18 @@ import {
 import { toast } from "@/hooks/use-toast"
 import Image from "next/image"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies)
 
@@ -362,16 +374,20 @@ export function PostOptions({ post, type }: PostContentProps) {
   const { data: session } = useSession()
   const user = session?.user
 
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
   const router = useRouter()
 
   const handleDeletePostClick = async () => {
     try {
+      setIsDeleting(true)
       const data_key = post._id?.toString() as string
       const element = document.querySelector(`[data-key="${data_key}"]`)
 
       if (element) {
         await handleDeletePost(post._id as string)
-        type === "post" && router.push("/home")
+        type === "post" && router.back()
         element.remove()
       }
 
@@ -384,6 +400,9 @@ export function PostOptions({ post, type }: PostContentProps) {
         description: "There was a problem deleting your post.",
         variant: "destructive",
       })
+    } finally {
+      setIsDeleting(false)
+      setIsAlertOpen(false)
     }
   }
 
@@ -394,7 +413,7 @@ export function PostOptions({ post, type }: PostContentProps) {
       <DropdownMenuTrigger asChild>
         <Button
           size="icon"
-          variant={"ghost"}
+          variant="ghost"
           className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full`}
         >
           <Ellipsis className="h-4 w-4 text-muted-foreground" />
@@ -404,21 +423,20 @@ export function PostOptions({ post, type }: PostContentProps) {
       <DropdownMenuContent className="absolute -left-28 -top-8 w-auto shadow-2xl shadow-slate-900">
         <DropdownMenuLabel>Post Options</DropdownMenuLabel>
         <DropdownMenuSeparator className="h-[.1mm]" />
-        <DropdownMenuItem
-          onClick={() => router.push(`/${pu(post).username}`)}
-          className="cursor-pointer sm:hidden"
-        >
-          <User className="mr-2 h-4 w-4" />
-          <span>&#64;{pu(post).username}</span>
-        </DropdownMenuItem>
-        <Link href={post.model_url} target="_black" prefetch={false}>
+        <Link href={`/${pu(post).username}`} prefetch={false}>
+          <DropdownMenuItem className="cursor-pointer sm:hidden">
+            <User className="mr-2 h-4 w-4" />
+            <span>&#64;{pu(post).username}</span>
+          </DropdownMenuItem>
+        </Link>
+        <Link href={post.model_url} target="_blank" prefetch={false}>
           <DropdownMenuItem className="cursor-pointer">
             <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
             <span>Try it</span>
           </DropdownMenuItem>
         </Link>
         {post.chat_link && (
-          <Link href={post.chat_link} target="_black" prefetch={false}>
+          <Link href={post.chat_link} target="_blank" prefetch={false}>
             <DropdownMenuItem className="cursor-pointer">
               <MessageSquareShare className="mr-2 h-4 w-4" />
               <span>View chat</span>
@@ -426,26 +444,50 @@ export function PostOptions({ post, type }: PostContentProps) {
           </Link>
         )}
         {authorized && (
-          <DropdownMenuItem
-            onClick={() =>
-              router.push(
-                `/${pu(post).username}/promptories/${post._id as string}/edit`,
-              )
-            }
-            className="cursor-pointer"
+          <Link
+            href={`/${pu(post).username}/promptories/${post._id as string}/edit`}
+            prefetch={false}
           >
-            <Edit className="mr-2 h-4 w-4" />
-            <span>Edit</span>
-          </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
+              <Edit className="mr-2 h-4 w-4" />
+              <span>Edit</span>
+            </DropdownMenuItem>
+          </Link>
         )}
         {authorized && (
-          <DropdownMenuItem
-            onClick={handleDeletePostClick}
-            className="cursor-pointer"
-          >
-            <Trash className="mr-2 h-4 w-4 text-red-500" />
-            <span className="text-red-500">Delete</span>
-          </DropdownMenuItem>
+          <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={(event) => {
+                  event.preventDefault()
+                  setIsAlertOpen(true)
+                }}
+              >
+                <Trash className="mr-2 h-4 w-4 text-red-500" />
+                <span className="text-red-500">Delete</span>
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action will permanently delete the promptory. Are you
+                  sure you want to proceed? This cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeletePostClick}
+                  disabled={isDeleting}
+                  className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
