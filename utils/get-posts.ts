@@ -106,23 +106,3 @@ export const updatePostValues = (post: TPost) => {
     } as { prompt: PRMedia; response: PRMedia },
   }
 }
-
-export async function getPostMediaById(
-  id: string,
-  prompt_response: "response" | "prompt",
-) {
-  try {
-    await connectToDatabase()
-
-    const post = await Post.findById(id).select(`${prompt_response}.media.url`)
-
-    if (!post || !post[prompt_response]?.media) {
-      return null
-    }
-
-    return post[prompt_response].media
-  } catch (error) {
-    console.error("Error fetching post media:", error)
-    return null
-  }
-}

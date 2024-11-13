@@ -380,6 +380,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
   }, [pathname, notificationCount])
 
   if (status === "unauthenticated") return children
+  if (pathname.endsWith("/media")) return children
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
