@@ -9,7 +9,9 @@ import { FormValues } from "@/components/form"
 export async function savePostForm(data: FormValues) {
   try {
     await connectToDatabase()
+
     const user = await currentUser()
+    if (!user) throw new Error("User not found.")
 
     const post = await Post.create({
       user: user,
@@ -38,19 +40,40 @@ export async function updatePostForm(data: FormValues, postId: string) {
     if (!post) throw new Error("Post not found!")
 
     const user = await currentUser()
+    if (!user) throw new Error("User not found.")
 
     if (!post.user.equals(user?._id))
       throw new Error("Not authorized to delete this post.")
 
-    post.caption = data.caption
-    post.model_url = data.model_url
-    post.chat_link = data.chat_link
-    post.prompt = { text: data.prompt, media: data.prompt_media }
-    post.response = { text: data.response, media: data.response_media }
-    post.promptory_type = data.promptory_type
-    post.tags = parseTags(data.tags as string)
+    const {
+      promptory_type,
+      prompt,
+      response,
+      caption,
+      chat_link,
+      model_url,
+      prompt_media,
+      response_media,
+      tags,
+    } = data
 
-    // Save the updated post
+    if (post.caption !== caption) post.caption = caption
+    if (post.model_url !== model_url) post.model_url = model_url
+    if (post.chat_link !== chat_link) post.chat_link = chat_link
+    if (post.promptory_type !== promptory_type)
+      post.promptory_type = promptory_type
+
+    if (post.prompt.text !== prompt || post.prompt.media !== prompt_media)
+      post.prompt = { text: prompt, media: prompt_media }
+
+    if (
+      post.response.text !== response ||
+      post.response.media !== response_media
+    )
+      post.response = { text: response, media: response_media }
+
+    post.tags = parseTags(tags as string)
+
     await post.save()
   } catch (error) {
     console.error("Error saving post:", error)

@@ -553,7 +553,13 @@ export default function PostForm({
 
           <div className="flex w-full gap-2">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {operationType === "POST"
+                ? isSubmitting
+                  ? "Submitting..."
+                  : "Submit"
+                : isSubmitting
+                  ? "Updating..."
+                  : "Update"}
             </Button>
             <Button
               variant="secondary"
