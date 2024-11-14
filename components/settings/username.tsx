@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 import {
   Card,
@@ -12,7 +12,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -21,10 +21,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { toast } from "@/hooks/use-toast";
-import { isUsernameUnique, updateUsername } from "@/actions/profileActions";
-import { useSession } from "next-auth/react";
+} from "@/components/ui/form"
+import { toast } from "@/hooks/use-toast"
+import { isUsernameUnique, updateUsername } from "@/actions/profileActions"
+import { useSession } from "next-auth/react"
 
 const usernameSchema = z.object({
   username: z
@@ -32,47 +32,55 @@ const usernameSchema = z.object({
     .min(3)
     .max(20)
     .superRefine(async (username, ctx) => {
-      const result = await isUsernameUnique(username);
+      const result = await isUsernameUnique(username)
       if (!result.status) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: result.message,
-        });
+        })
       }
     }),
-});
+})
 
-export type UsernameFormValues = z.infer<typeof usernameSchema>;
+export type UsernameFormValues = z.infer<typeof usernameSchema>
 
-export default function ChangeUsernamePage() {
-  const { data: session } = useSession();
-  const user = session?.user;
+export default function UsernameSettings() {
+  const { data: session, update } = useSession()
+  const user = session?.user
 
   const usernameForm = useForm<UsernameFormValues>({
     resolver: zodResolver(usernameSchema),
     defaultValues: {
       username: user?.username,
     },
-  });
+  })
 
   const onUsernameSubmit = async (data: UsernameFormValues) => {
     try {
-      // Simulate API call
-      //   await new Promise((resolve) => setTimeout(resolve, 2000));
-      await updateUsername(user?.id as string, data.username);
-      console.log(data);
-      toast({
-        title: "Username updated",
-        description: "Your username has been successfully updated.",
-      });
+      const { success } = await updateUsername(data.username)
+      if (success) {
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            username: data.username,
+          },
+        })
+
+        console.log(data)
+        toast({
+          title: "Username updated",
+          description: "Your username has been successfully updated.",
+        })
+      }
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem updating your username.",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
   return (
     <Card>
       <CardHeader>
@@ -106,5 +114,5 @@ export default function ChangeUsernamePage() {
         </Form>
       </CardContent>
     </Card>
-  );
+  )
 }

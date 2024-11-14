@@ -90,28 +90,30 @@ export default function ProfileSettings() {
   const onSubmit = async (data: ProfileFormValues) => {
     try {
       const dataWithAvatar = { ...data, avatar }
-      await updateUserData(user?.id as string, dataWithAvatar)
+      const { success } = await updateUserData(dataWithAvatar)
 
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          name: data.name,
-          bio: data.bio,
-          image: avatar,
-          social_links: {
-            twitter: data.twitter,
-            github: data.github,
+      if (success) {
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            name: data.name,
+            bio: data.bio,
+            image: avatar,
+            social_links: {
+              twitter: data.twitter,
+              github: data.github,
+            },
           },
-        },
-      })
+        })
 
-      router.push(`/${user?.username}`)
+        router.push(`/${user?.username}`)
 
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated.",
-      })
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been successfully updated.",
+        })
+      }
     } catch (error) {
       toast({
         title: "Error",
