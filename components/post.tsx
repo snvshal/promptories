@@ -528,7 +528,7 @@ export function PostOptions({ post, type }: PostContentProps) {
             <span className="sr-only">Post options</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="absolute -left-28 -top-8 w-auto shadow-2xl shadow-slate-900">
+        <DropdownMenuContent className="absolute -left-36 -top-8 w-40 shadow-2xl shadow-slate-900">
           <DropdownMenuLabel>Post Options</DropdownMenuLabel>
           <DropdownMenuSeparator className="h-[.1mm]" />
           <PostOptionItems />

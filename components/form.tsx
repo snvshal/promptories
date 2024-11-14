@@ -208,7 +208,7 @@ export default function PostForm({
           action: (
             <ToastAction
               onClick={() => postRoute(post)}
-              altText="Goto schedule to undo"
+              altText="View your created post"
             >
               View
             </ToastAction>
@@ -588,6 +588,7 @@ const RenderPreview: React.FC<{ mediaUrl: string; mediaType: MediaType }> = ({
         alt="Uploaded image"
         width={300}
         height={200}
+        priority={true}
         className="mt-2 h-auto w-full rounded-lg"
       />
     )
