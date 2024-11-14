@@ -208,7 +208,7 @@ export default function PostForm({
           action: (
             <ToastAction
               onClick={() => postRoute(post)}
-              altText="Goto schedule to undo"
+              altText="View your created post"
             >
               View
             </ToastAction>
@@ -553,7 +553,13 @@ export default function PostForm({
 
           <div className="flex w-full gap-2">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {operationType === "POST"
+                ? isSubmitting
+                  ? "Submitting..."
+                  : "Submit"
+                : isSubmitting
+                  ? "Updating..."
+                  : "Update"}
             </Button>
             <Button
               variant="secondary"
@@ -582,6 +588,7 @@ const RenderPreview: React.FC<{ mediaUrl: string; mediaType: MediaType }> = ({
         alt="Uploaded image"
         width={300}
         height={200}
+        priority={true}
         className="mt-2 h-auto w-full rounded-lg"
       />
     )

@@ -1,9 +1,10 @@
-"use server";
+"use server"
 
-import { connectToDatabase } from "@/utils/db";
-import { User } from "@/models/user.model";
-import { ProfileFormValues } from "@/components/settings/profile";
-import { reservedUsernames } from "@/lib/constants";
+import { connectToDatabase } from "@/utils/db"
+import { User } from "@/models/user.model"
+import { ProfileFormValues } from "@/components/settings/profile"
+import { reservedUsernames } from "@/lib/constants"
+import { currentUser } from "@/utils/get-user"
 
 export async function isUsernameUnique(
   username: string,
@@ -12,90 +13,83 @@ export async function isUsernameUnique(
     return {
       status: false,
       message: "Username must be more than two characters.",
-    };
+    }
   }
 
   if (reservedUsernames.includes(username.toLowerCase())) {
     return {
       status: false,
       message: "This username is reserved and cannot be used.",
-    };
+    }
   }
 
   try {
-    await connectToDatabase();
-    const user = await User.findOne({ username });
+    await connectToDatabase()
+    const user = await User.findOne({ username })
 
     return {
       status: !user,
       message: !user ? "Username is unique." : "Username is already taken.",
-    };
+    }
   } catch (error) {
-    console.error(error);
+    console.error(error)
     return {
       status: false,
       message: "An error occurred while checking the username.",
-    };
+    }
   }
 }
 
 export async function updateUserData(
-  userId: string,
-  updateData: ProfileFormValues,
+  updatedData: ProfileFormValues & { avatar: string | null },
 ): Promise<{ success: boolean; message: string }> {
   try {
-    await connectToDatabase();
+    await connectToDatabase()
 
-    const updatedData = {
-      ...updateData,
-      social_links: { twitter: updateData.twitter, github: updateData.github },
-    };
+    const user = await currentUser()
+    if (!user) return { success: false, message: "User not found." }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
-      new: true, // Return the updated document
-      runValidators: true, // Validate the update against the schema
-    });
+    const { name, github, twitter, avatar, bio } = updatedData
 
-    if (!updatedUser) {
-      return { success: false, message: "User not found." };
+    if (user.name !== name) user.name = name
+    if (user.social_links) {
+      if (user.social_links.github !== github) user.social_links.github = github
+      if (user.social_links.twitter !== twitter)
+        user.social_links.twitter = twitter
     }
+    if (user.avatar !== avatar) user.avatar = avatar as string
+    if (user.bio !== bio) user.bio = bio
 
-    return { success: true, message: "User data updated successfully." };
+    await user.save()
+
+    return { success: true, message: "User data updated successfully." }
   } catch (error) {
-    console.error(error);
+    console.error(error)
     return {
       success: false,
       message: "An error occurred while updating user data.",
-    };
+    }
   }
 }
 
 export async function updateUsername(
-  userId: string,
   newUsername: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
-    await connectToDatabase();
+    await connectToDatabase()
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { username: newUsername },
-      {
-        new: true, // Return the updated document
-        runValidators: true, // Validate the update against the schema
-      },
-    );
+    const user = await currentUser()
+    if (!user) return { success: false, message: "User not found." }
 
-    if (!updatedUser) {
-      return { success: false, message: "User not found." };
-    }
+    user.username = newUsername
+    await user.save()
 
-    return { success: true, message: "User data updated successfully." };
+    return { success: true, message: "User data updated successfully." }
   } catch (error) {
-    console.error(error);
+    console.error(error)
     return {
       success: false,
       message: "An error occurred while updating user data.",
-    };
+    }
   }
 }

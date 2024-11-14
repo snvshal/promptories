@@ -1,5 +1,5 @@
-import ChangeUsernamePage from "@/components/settings/username";
+import UsernameSettings from "@/components/settings/username"
 
 export default async function UsernameSettingsPage() {
-  return <ChangeUsernamePage />;
+  return <UsernameSettings />
 }

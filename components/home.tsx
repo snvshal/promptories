@@ -656,11 +656,11 @@ export const PostIconButton = React.forwardRef<
 >(({ children, onClick }, ref) => {
   return (
     <Button
+      ref={ref}
       variant="ghost"
       size="sm"
       onClick={onClick}
-      ref={ref} // Forward the ref here
-      className="p-0 text-muted-foreground hover:bg-background"
+      className="flex-start p-0 text-muted-foreground hover:bg-background"
     >
       {children}
     </Button>

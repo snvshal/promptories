@@ -168,6 +168,8 @@ export function ProfileUserContent({
             <div className="mt-4 flex items-center space-x-4">
               {profileUser.social_links?.github && (
                 <Link
+                  target="_blank"
+                  prefetch={false}
                   href={profileUser.social_links?.github as string}
                   className="text-muted-foreground hover:text-primary"
                 >
@@ -176,16 +178,14 @@ export function ProfileUserContent({
               )}
               {profileUser.social_links?.twitter && (
                 <Link
+                  target="_blank"
+                  prefetch={false}
                   href={profileUser.social_links?.twitter as string}
                   className="text-muted-foreground hover:text-primary"
                 >
                   <TwitterLogoIcon className="h-5 w-5" />
                 </Link>
               )}
-
-              {/* <Link href="#" className="text-muted-foreground hover:text-primary">
-              <LinkIcon className="h-5 w-5" />
-            </Link> */}
             </div>
             <div className="mt-4 flex gap-4">
               <div className="flex gap-1">

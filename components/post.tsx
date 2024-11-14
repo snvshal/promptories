@@ -80,6 +80,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies)
 
@@ -373,11 +382,10 @@ export function PostReplyOptions({
 export function PostOptions({ post, type }: PostContentProps) {
   const { data: session } = useSession()
   const user = session?.user
-
+  const router = useRouter()
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  const router = useRouter()
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
 
   const handleDeletePostClick = async () => {
     try {
@@ -403,94 +411,130 @@ export function PostOptions({ post, type }: PostContentProps) {
     } finally {
       setIsDeleting(false)
       setIsAlertOpen(false)
+      setIsSheetOpen(false)
     }
   }
 
   const authorized = post.user._id?.toString() === user?.id
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          size="icon"
-          variant="ghost"
-          className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full`}
-        >
-          <Ellipsis className="h-4 w-4 text-muted-foreground" />
-          <span className="sr-only">Post options</span>
+  const PostOptionItems = () => (
+    <>
+      <Link
+        href={`/${pu(post).username}`}
+        prefetch={false}
+        className="sm:hidden"
+      >
+        <Button variant="ghost" className="w-full justify-start">
+          <User className="mr-2 h-4 w-4" />
+          <span>&#64;{pu(post).username}</span>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="absolute -left-28 -top-8 w-auto shadow-2xl shadow-slate-900">
-        <DropdownMenuLabel>Post Options</DropdownMenuLabel>
-        <DropdownMenuSeparator className="h-[.1mm]" />
-        <Link href={`/${pu(post).username}`} prefetch={false}>
-          <DropdownMenuItem className="cursor-pointer sm:hidden">
-            <User className="mr-2 h-4 w-4" />
-            <span>&#64;{pu(post).username}</span>
-          </DropdownMenuItem>
+      </Link>
+      <Link href={post.model_url} target="_blank" prefetch={false}>
+        <Button variant="ghost" className="w-full justify-start">
+          <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
+          <span>Try it</span>
+        </Button>
+      </Link>
+      {post.chat_link && (
+        <Link href={post.chat_link} target="_blank" prefetch={false}>
+          <Button variant="ghost" className="w-full justify-start">
+            <MessageSquareShare className="mr-2 h-4 w-4" />
+            <span>View chat</span>
+          </Button>
         </Link>
-        <Link href={post.model_url} target="_blank" prefetch={false}>
-          <DropdownMenuItem className="cursor-pointer">
-            <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
-            <span>Try it</span>
-          </DropdownMenuItem>
+      )}
+      {authorized && (
+        <Link
+          href={`/${pu(post).username}/promptories/${post._id as string}/edit`}
+          prefetch={false}
+        >
+          <Button variant="ghost" className="w-full justify-start">
+            <Edit className="mr-2 h-4 w-4" />
+            <span>Edit</span>
+          </Button>
         </Link>
-        {post.chat_link && (
-          <Link href={post.chat_link} target="_blank" prefetch={false}>
-            <DropdownMenuItem className="cursor-pointer">
-              <MessageSquareShare className="mr-2 h-4 w-4" />
-              <span>View chat</span>
-            </DropdownMenuItem>
-          </Link>
-        )}
-        {authorized && (
-          <Link
-            href={`/${pu(post).username}/promptories/${post._id as string}/edit`}
-            prefetch={false}
-          >
-            <DropdownMenuItem className="cursor-pointer">
-              <Edit className="mr-2 h-4 w-4" />
-              <span>Edit</span>
-            </DropdownMenuItem>
-          </Link>
-        )}
-        {authorized && (
-          <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-            <AlertDialogTrigger asChild>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onSelect={(event) => {
-                  event.preventDefault()
-                  setIsAlertOpen(true)
-                }}
+      )}
+      {authorized && (
+        <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-red-500 hover:text-red-500"
+              onClick={(event) => {
+                event.preventDefault()
+                setIsAlertOpen(true)
+              }}
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              <span>Delete</span>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action will permanently delete the promptory. Are you sure
+                you want to proceed? This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeletePostClick}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
               >
-                <Trash className="mr-2 h-4 w-4 text-red-500" />
-                <span className="text-red-500">Delete</span>
-              </DropdownMenuItem>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action will permanently delete the promptory. Are you
-                  sure you want to proceed? This cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDeletePostClick}
-                  disabled={isDeleting}
-                  className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
-                >
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile View */}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetTrigger asChild>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full sm:hidden`}
+          >
+            <Ellipsis className="h-4 w-4 text-muted-foreground" />
+            <span className="sr-only">Post options</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="rounded-t-3xl sm:hidden">
+          <SheetHeader>
+            <SheetTitle>Post Options</SheetTitle>
+            <SheetDescription></SheetDescription>
+          </SheetHeader>
+          <PostOptionItems />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop View */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full max-sm:hidden`}
+          >
+            <Ellipsis className="h-4 w-4 text-muted-foreground" />
+            <span className="sr-only">Post options</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="absolute -left-36 -top-8 w-40 shadow-2xl shadow-slate-900">
+          <DropdownMenuLabel>Post Options</DropdownMenuLabel>
+          <DropdownMenuSeparator className="h-[.1mm]" />
+          <PostOptionItems />
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   )
 }
 
@@ -555,14 +599,14 @@ export function PostContentType({
   content: string
 }) {
   if (type === "post") {
-    return <p className="whitespace-pre-wrap text-lg">{content}</p>
+    return <p className="whitespace-pre-wrap">{content}</p>
   } else {
     return (
       <>
         <p className="whitespace-pre-wrap">
-          {content.split(" ").slice(0, 24).join(" ")}
+          {content.split(" ").slice(0, 40).join(" ")}
         </p>
-        {content.split(" ").length > 24 && (
+        {content.split(" ").length > 40 && (
           <button className="text-blue-500 hover:underline">Show more</button>
         )}
       </>
@@ -659,9 +703,9 @@ export function PostContent({ type, post }: PostContentProps) {
         <PostContentType type={type} content={post.caption} />
       </div>
       <div className="relative overflow-hidden">
-        <div className="rounded-t-lg border border-b-0 bg-secondary p-2">
+        <div className="rounded-t-lg border border-b-0 bg-secondary p-2 px-3">
           {post.prompt.media?.url ? (
-            <div className="flex gap-4">
+            <div className="my-1 flex gap-4">
               <div className="w-auto">
                 <Link
                   href={`/${pu(post).username}/promptories/${post._id as string}/prompt/media`}
@@ -696,7 +740,7 @@ export function PostContent({ type, post }: PostContentProps) {
             />
           </Link>
         ) : (
-          <div className="rounded-b-lg border border-t-0 p-2">
+          <div className="rounded-b-lg border border-t-0 p-2 px-3">
             <PostContentType
               type={type}
               content={post.response.text as string}
@@ -712,14 +756,14 @@ export function PostFooter({ post }: { post: TPost }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <CardFooter className={`flex justify-between p-0 pt-2`}>
-      <div className="flex-between w-2/3">
+    <CardFooter className="p-0 pt-2">
+      <div className="grid w-4/5 grid-cols-4">
         <PostReplyDialog post={post} />
         <LikeButton post={post} />
         <BookmarkButton post={post} />
         <PostViews post={post} />
       </div>
-      <div className="flex gap-4">
+      <div className="flex-end flex-1 gap-4">
         {post.tags.length > 0 && (
           <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
         )}
