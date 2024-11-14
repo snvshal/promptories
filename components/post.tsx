@@ -756,14 +756,14 @@ export function PostFooter({ post }: { post: TPost }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <CardFooter className={`flex justify-between p-0 pt-2`}>
-      <div className="flex-between w-2/3">
+    <CardFooter className="p-0 pt-2">
+      <div className="grid w-4/5 grid-cols-4">
         <PostReplyDialog post={post} />
         <LikeButton post={post} />
         <BookmarkButton post={post} />
         <PostViews post={post} />
       </div>
-      <div className="flex gap-4">
+      <div className="flex-end flex-1 gap-4">
         {post.tags.length > 0 && (
           <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
         )}
