@@ -216,7 +216,7 @@ export default function PostForm({
 
       if (operationType === "POST") {
         const post: TPost = await savePostForm(formData)
-        router.push("/home")
+        router.back()
         toast({
           description: "Your post has been sent.",
           action: (
@@ -230,9 +230,17 @@ export default function PostForm({
         })
       } else if (operationType === "PATCH" && post) {
         await updatePostForm(formData, post._id as string)
-        postRoute(post)
+        router.back()
         toast({
           description: "Your post has been updated.",
+          action: (
+            <ToastAction
+              onClick={() => postRoute(post)}
+              altText="View your updated post"
+            >
+              View
+            </ToastAction>
+          ),
         })
       }
       reset()
