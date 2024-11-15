@@ -1,6 +1,5 @@
 import { FormValues } from "@/components/form"
 import { PostFormMedia } from "@/types/props.type"
-import { PRMedia } from "@/types/schema.type"
 
 export const promptory_types = [
   "text-to-text",
