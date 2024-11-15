@@ -67,7 +67,6 @@ export default function UsernameSettings() {
           },
         })
 
-        console.log(data)
         toast({
           title: "Username updated",
           description: "Your username has been successfully updated.",

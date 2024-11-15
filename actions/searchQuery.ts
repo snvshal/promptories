@@ -17,9 +17,6 @@ export async function search(
     const searchQuery = await filterSearchQuery(query, category)
     const searchUsersQuery = await userSearchQuery(query, category)
 
-    // console.log("Search Query:", JSON.stringify(searchQuery, null, 2))
-    // console.log("User Search Query:", JSON.stringify(searchUsersQuery, null, 2))
-
     const dateRangeFilter = await filterDateRange(dateRange)
 
     const posts = await Post.find({

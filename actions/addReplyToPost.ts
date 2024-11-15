@@ -1,29 +1,22 @@
-"use server";
+"use server"
 
-import { connectToDatabase } from "@/utils/db"; // Make sure you have a DB connection utility
-import { Post } from "@/models/post.model";
-import { currentUser } from "@/utils/get-user";
-import { ps } from "@/utils/ps";
-import { Types } from "mongoose";
-import { commentNotification } from "./notificationActions";
+import { connectToDatabase } from "@/utils/db" // Make sure you have a DB connection utility
+import { Post } from "@/models/post.model"
+import { currentUser } from "@/utils/get-user"
+import { ps } from "@/utils/ps"
+import { Types } from "mongoose"
+import { commentNotification } from "./notificationActions"
 
-// Server action to add a reply to a post
 export async function addReplyToPost(postId: string, replyText: string) {
   try {
-    // Connect to the database
-    await connectToDatabase();
+    await connectToDatabase()
 
-    if (!Types.ObjectId.isValid(postId)) {
-      throw new Error("Invalid post ID!");
-    }
+    if (!Types.ObjectId.isValid(postId)) throw new Error("Invalid post ID!")
 
-    if (!replyText) {
-      throw new Error("Reply is required!");
-    }
+    if (!replyText) throw new Error("Reply is required!")
 
-    const user = await currentUser();
+    const user = await currentUser()
 
-    // Find the post by ID and push the reply to the replies array
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       {
@@ -35,14 +28,14 @@ export async function addReplyToPost(postId: string, replyText: string) {
           },
         },
       },
-      { new: true }, // Return the updated post
-    ).populate("replies.user"); // Populate the 'user' field in replies
+      { new: true },
+    ).populate("replies.user")
 
-    await commentNotification(updatedPost);
+    await commentNotification(updatedPost)
 
-    return ps(updatedPost);
+    return ps(updatedPost)
   } catch (error) {
-    console.error("Error adding reply:", error);
-    throw new Error("Failed to add reply.");
+    console.error("Error adding reply:", error)
+    throw new Error("Failed to add reply.")
   }
 }

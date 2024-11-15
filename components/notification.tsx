@@ -22,8 +22,6 @@ export default function Notifications({
     (notification) => activeTab === "all" || notification.type === activeTab,
   )
 
-  notifications.map((i) => console.log(i.read))
-
   return (
     <div className="min-h-screen w-full">
       <NavigateBackHeader page="Notifications" />

@@ -58,9 +58,8 @@ export function PostReplies({
     try {
       const updatedPost = await addReplyToPost(post._id as string, replyText)
       setPostReplies(updatedPost.replies)
-      console.log("Reply submitted:", replyText)
       setReplyText("")
-      // Here you would typically send the reply to your backend
+
       toast({
         description: "Your reply has been sent.",
       })
@@ -318,14 +317,12 @@ export function PostReplyDialog({
         replyContent,
       )
 
-      console.log(updatedPost)
       if (setPostReplies) setPostReplies(updatedPost.replies)
 
       setRepliesCount((prev) => prev + 1)
-      console.log("Reply submitted:", replyContent)
       setReplyContent("")
       setDialogState(false)
-      // Here you would typically send the reply to your backend
+
       toast({
         description: "Your reply has been sent.",
       })

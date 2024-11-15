@@ -17,7 +17,7 @@ export const getPosts = async () => {
 
     return posts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -32,7 +32,7 @@ export const getPostsByUsername = async (username: string) => {
 
     return posts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -48,7 +48,7 @@ export const getPostById = async (postId: string) => {
 
     return post as TPost
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -62,7 +62,7 @@ export const getLikedPosts = async (profileUser: TUser) => {
 
     return likedPosts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -78,7 +78,7 @@ export const getBookmarkedPosts = async (profileUser: TUser) => {
 
     return bookmarkedPosts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
