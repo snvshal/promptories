@@ -1,0 +1,284 @@
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Bell,
+  Search,
+  Feather,
+  Home,
+  Settings,
+  User,
+  TrendingUp,
+} from "lucide-react"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { fw, iv } from "@/utils/ps"
+import { useSession } from "next-auth/react"
+import { Badge } from "./ui/badge"
+import { ai_platforms, promptory_types } from "@/lib/constants"
+import { ScrollArea } from "./ui/scroll-area"
+import React from "react"
+import { Input } from "./ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select"
+import { getNotificationCount } from "@/actions/notificationActions"
+
+export function Sidebar({ children }: { children: React.ReactNode }) {
+  const { status } = useSession()
+  const pathname = usePathname()
+
+  const [notificationCount, setNotificationCount] = useState(0)
+  const intervalIdRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const count = await getNotificationCount()
+        setNotificationCount(count)
+      } catch (error) {
+        console.error("Failed to get notification count")
+      }
+    }
+
+    fetchNotifications()
+
+    if (pathname === "/notifications" && notificationCount > 0) {
+      intervalIdRef.current = setInterval(() => {
+        setNotificationCount(0)
+      }, 4000)
+    }
+
+    return () => {
+      if (intervalIdRef.current) {
+        clearInterval(intervalIdRef.current)
+        intervalIdRef.current = null
+      }
+    }
+  }, [pathname, notificationCount])
+
+  if (status === "unauthenticated") return children
+  if (pathname.endsWith("/media")) return children
+
+  return (
+    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
+      <aside className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-dvh sm:w-16 sm:border-r md:w-60">
+        <nav className="h-full">
+          <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
+            <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
+              <NavLinks notificationCount={notificationCount} />
+            </div>
+            <UserProfileLink />
+          </div>
+          <div className="flex h-full items-center justify-around sm:hidden">
+            <NavLinks notificationCount={notificationCount} />
+            <UserProfileLink />
+          </div>
+        </nav>
+      </aside>
+
+      <aside
+        id="scrollable-element"
+        className="flex-1 overflow-y-auto xl:pr-40 2xl:pr-80"
+      >
+        <div className="flex">
+          <div className="w-full flex-1 md:w-2/3">{children}</div>
+          <SidePanel />
+        </div>
+      </aside>
+    </div>
+  )
+}
+
+export function NavLinks({ notificationCount }: { notificationCount: number }) {
+  const pathname = usePathname()
+  const router = useRouter()
+
+  return (
+    <>
+      <Button
+        size={"icon"}
+        onClick={() => router.push("/home")}
+        variant={iv(pathname === "/home")}
+        className="nav-button"
+      >
+        <Home className="size-6" />
+        <span className={`${fw(pathname === "/home")} text-base max-md:hidden`}>
+          Home
+        </span>
+      </Button>
+      <Button
+        size={"icon"}
+        variant={iv(pathname.startsWith("/search"))}
+        onClick={() => router.push("/search")}
+        className="nav-button"
+      >
+        <Search className="size-6" />
+        <span
+          className={`${fw(pathname.startsWith("/search"))} text-base max-md:hidden`}
+        >
+          Search
+        </span>
+      </Button>
+      <Button
+        size={"icon"}
+        onClick={() => router.push("/notifications")}
+        variant={iv(pathname === "/notifications")}
+        className="nav-button"
+      >
+        <span className="relative">
+          {notificationCount > 0 && (
+            <Badge className="flex-center absolute -right-1 -top-1 h-4 rounded-full px-1">
+              {notificationCount <= 10 ? notificationCount : "10+"}
+            </Badge>
+          )}
+          <Bell className="size-6" />
+        </span>
+
+        <span
+          className={`${fw(pathname === "/notifications")} text-base max-md:hidden`}
+        >
+          Notifications
+        </span>
+      </Button>
+      <Button
+        size={"icon"}
+        variant={iv(pathname.startsWith("/settings"))}
+        onClick={() => router.push("/settings/profile")}
+        className="nav-button"
+      >
+        <Settings className="size-6" />
+        <span
+          className={`${fw(pathname.startsWith("/settings"))} text-base max-md:hidden`}
+        >
+          Settings
+        </span>
+      </Button>
+    </>
+  )
+}
+
+export function UserProfileLink() {
+  const { data: session } = useSession()
+  const user = session?.user
+  const pathname = usePathname()
+  const router = useRouter()
+
+  return (
+    <div className="flex flex-col gap-2 sm:px-2 md:px-5">
+      <Button
+        onClick={() => router.push("/compose/promptory")}
+        className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
+      >
+        <Feather className="size-5 text-base md:hidden" />
+        <span className="text-base text-lg max-md:hidden">Post</span>
+      </Button>
+
+      <Button
+        size={"icon"}
+        variant={iv(pathname.slice(1) === user?.username)}
+        onClick={() => router.push(`/${user?.username}`)}
+        className="size-10 gap-2 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
+      >
+        <Avatar className="max-sm:size-8">
+          <AvatarImage src={user?.image} alt={user?.username} />
+          <AvatarFallback>
+            <User />
+          </AvatarFallback>
+        </Avatar>
+        <span className="flex flex-col items-start max-md:hidden">
+          <span className="text-base">{user?.name}</span>
+          <span className="font-normal text-muted-foreground">
+            &#64;{user?.username}
+          </span>
+        </span>
+      </Button>
+    </div>
+  )
+}
+
+export function SidePanel() {
+  const [inputValue, setInputValue] = useState("")
+  const [promptoryType, setPromptoryType] = useState("every")
+  const [feedType, setFeedType] = useState("for-you")
+
+  const router = useRouter()
+  const pathname = usePathname()
+
+  if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    router.push(`/search?q=${inputValue}`)
+  }
+
+  return (
+    <aside className="w-1/3 max-lg:hidden">
+      <div className="sticky top-0 h-dvh w-full overflow-hidden border-l px-4 pt-4">
+        {pathname.startsWith("/search") || (
+          <div className="flex-center mt-2">
+            <form onSubmit={onSubmit} className="w-full">
+              <Input
+                name="search"
+                placeholder="Search"
+                value={inputValue}
+                className="w-full"
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+            </form>
+          </div>
+        )}
+        <div className="my-2 flex w-full flex-col gap-2">
+          <Select value={promptoryType} onValueChange={setPromptoryType}>
+            <SelectTrigger>
+              <SelectValue placeholder="Promptory Types" />
+            </SelectTrigger>
+            <SelectContent className="shadow-2xl shadow-slate-900">
+              <ScrollArea className="h-48 rounded-lg">
+                <SelectItem value="every">Every</SelectItem>
+                {promptory_types.map((type, index) => (
+                  <SelectItem key={index} value={type}>
+                    <span className="capitalize">{type}</span>
+                  </SelectItem>
+                ))}
+              </ScrollArea>
+            </SelectContent>
+          </Select>
+          <Select value={feedType} onValueChange={setFeedType}>
+            <SelectTrigger>
+              <SelectValue placeholder="Feed Types" />
+            </SelectTrigger>
+            <SelectContent className="shadow-2xl shadow-slate-900">
+              <SelectItem value="for-you">For You</SelectItem>
+              <SelectItem value="following">Following</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex-center flex-col">
+          <ScrollArea className="h-[17rem] w-full rounded-lg border">
+            <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
+              <TrendingUp />
+              <span>Trending</span>
+            </h2>
+            {ai_platforms.map((type, index) => (
+              <Link
+                key={index}
+                href={"/"}
+                className="flex-start w-full gap-2 px-4 py-1 text-center capitalize hover:bg-accent hover:text-accent-foreground"
+              >
+                <span className="font-mono text-xl">#</span>
+                <span>{type}</span>
+              </Link>
+            ))}
+          </ScrollArea>
+        </div>
+      </div>
+    </aside>
+  )
+}

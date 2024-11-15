@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Heart, MessageCircle, UserPlus, Bell } from "lucide-react"
-import { AvatarComponent, NavigateBackHeader } from "./post"
 import { TNotification, TUser } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { TimeAgo } from "./time-ago"
 import { markAsReadNotification } from "@/actions/notificationActions"
+import { NavigateBackHeader } from "./home"
+import { AvatarComponent } from "./post/content"
 
 export default function Notifications({
   notifications,
