@@ -34,7 +34,7 @@ import { FollowButton, TabsTriggerButton } from "./profile/user"
 export default function SearchComponent() {
   const router = useRouter()
 
-  const [searchState, setSearchState] = useState(validateSearchParams())
+  const [searchState, setSearchState] = useState(useValidatedSearchParams())
 
   const [searchQuery, setSearchQuery] = useState(searchState.query)
   const [results, setResults] = useState<{ posts: TPost[]; users: TUser[] }>({
@@ -48,7 +48,7 @@ export default function SearchComponent() {
     const updatedParams = { ...searchState, ...newParams }
     setSearchState(updatedParams)
     const searchUrl = new URLSearchParams({
-      q: searchState.query,
+      q: searchQuery,
       category: searchState.category,
       tab: searchState.tab,
       dateRange: searchState.dateRange,
@@ -315,7 +315,7 @@ export type SearchDateRange =
   | "thisMonth"
   | "thisYear"
 
-export function validateSearchParams() {
+export function useValidatedSearchParams() {
   const searchParams = useSearchParams()
 
   const validTabs: ("posts" | "users")[] = ["posts", "users"]

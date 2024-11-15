@@ -24,8 +24,8 @@ export default function SignUpPage() {
               Promptories
             </h1>
             <p className="text-lg text-muted-foreground">
-              Your Comprehensive Guide to Mastering the Art of AI Prompting and
-              Interaction.
+              Unlock creative ideas and enhance your prompting skills with our
+              all-in-one platform for AI prompts.
             </p>
           </div>
 
@@ -59,7 +59,7 @@ export default function SignUpPage() {
           </Button>
 
           <p className="text-sm text-muted-foreground">
-            By continuing, you agree to Promptories's{" "}
+            By continuing, you agree to Promptories&#39;s{" "}
             <a
               href="#"
               className="text-muted-foreground transition-colors hover:text-foreground"
