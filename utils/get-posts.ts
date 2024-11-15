@@ -25,7 +25,9 @@ export const getPostsByUsername = async (username: string) => {
     await connectToDatabase()
     const user = await User.findOne({ username })
 
-    const posts: TPost[] = await Post.find({ user }).populate("user")
+    const posts: TPost[] = await Post.find({ user })
+      .populate("user")
+      .sort({ createdAt: -1 })
 
     return posts as TPost[]
   } catch (error) {
@@ -53,9 +55,9 @@ export const getLikedPosts = async (profileUser: TUser) => {
   try {
     await connectToDatabase()
 
-    const likedPosts = await Post.find({ likes: profileUser._id }).populate(
-      "user",
-    )
+    const likedPosts = await Post.find({ likes: profileUser._id })
+      .populate("user")
+      .sort({ createdAt: -1 })
 
     return likedPosts as TPost[]
   } catch (error) {
@@ -69,7 +71,9 @@ export const getBookmarkedPosts = async (profileUser: TUser) => {
 
     const bookmarkedPosts = await Post.find({
       bookmarks: profileUser._id,
-    }).populate("user")
+    })
+      .populate("user")
+      .sort({ createdAt: -1 })
 
     return bookmarkedPosts as TPost[]
   } catch (error) {
