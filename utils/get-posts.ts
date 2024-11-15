@@ -4,6 +4,7 @@ import { PRMedia, TPost, TUser } from "@/types/schema.type"
 import { User } from "@/models/user.model"
 import { seedPostDatabase } from "@/lib/seed"
 import { FormValues } from "@/components/form"
+import { PostFormMedia } from "@/types/props.type"
 
 export const getPosts = async () => {
   try {
@@ -16,7 +17,7 @@ export const getPosts = async () => {
 
     return posts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -25,11 +26,13 @@ export const getPostsByUsername = async (username: string) => {
     await connectToDatabase()
     const user = await User.findOne({ username })
 
-    const posts: TPost[] = await Post.find({ user }).populate("user")
+    const posts: TPost[] = await Post.find({ user })
+      .populate("user")
+      .sort({ createdAt: -1 })
 
     return posts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -45,7 +48,7 @@ export const getPostById = async (postId: string) => {
 
     return post as TPost
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -53,13 +56,13 @@ export const getLikedPosts = async (profileUser: TUser) => {
   try {
     await connectToDatabase()
 
-    const likedPosts = await Post.find({ likes: profileUser._id }).populate(
-      "user",
-    )
+    const likedPosts = await Post.find({ likes: profileUser._id })
+      .populate("user")
+      .sort({ createdAt: -1 })
 
     return likedPosts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -69,40 +72,37 @@ export const getBookmarkedPosts = async (profileUser: TUser) => {
 
     const bookmarkedPosts = await Post.find({
       bookmarks: profileUser._id,
-    }).populate("user")
+    })
+      .populate("user")
+      .sort({ createdAt: -1 })
 
     return bookmarkedPosts as TPost[]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
 export const updatePostValues = (post: TPost) => {
-  const prompt = post.promptory_type.toLowerCase().startsWith("text")
-    ? (post.prompt.text as string)
-    : ""
-  const prompt_media = post.promptory_type.toLowerCase().startsWith("text")
-    ? ""
-    : (post.prompt.media as PRMedia)
-  const response = post.promptory_type.toLowerCase().endsWith("text")
-    ? (post.response.text as string)
-    : ""
-  const response_media = post.promptory_type.toLowerCase().endsWith("text")
-    ? ""
-    : (post.response.media as PRMedia)
+  const isTextPrompt = post.promptory_type.toLowerCase().startsWith("text")
+  const isTextResponse = post.promptory_type.toLowerCase().endsWith("text")
+
   return {
     postValues: {
       caption: post.caption,
       model_url: post.model_url,
       chat_link: post.chat_link,
-      prompt,
-      response,
+      prompt: isTextPrompt ? (post.prompt.text as string) || "" : "",
+      response: isTextResponse ? (post.response.text as string) || "" : "",
       promptory_type: post.promptory_type,
       tags: post.tags.join(" "),
     } as FormValues,
     editPostMedia: {
-      prompt: prompt_media,
-      response: response_media,
-    } as { prompt: PRMedia; response: PRMedia },
+      prompt: isTextPrompt
+        ? { type: "image", url: "" }
+        : (post.prompt.media as PRMedia),
+      response: isTextResponse
+        ? { type: "image", url: "" }
+        : (post.response.media as PRMedia),
+    } as PostFormMedia,
   }
 }

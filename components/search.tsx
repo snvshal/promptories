@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
 import { CheckCircle, Filter, SearchIcon, User } from "lucide-react"
-import { NavigateBackHeader } from "./post"
+import { NavigateBackHeader } from "./home"
 import { search } from "@/actions/searchQuery"
 import { TPost, TUser } from "@/types/schema.type"
 import { PostsComponent } from "./home"
@@ -31,25 +31,12 @@ import {
 import { Label } from "./ui/label"
 import { FollowButton, TabsTriggerButton } from "./profile/user"
 
-export type SearchCategories =
-  | "default"
-  | "response"
-  | "prompt"
-  | "caption"
-  | "user"
-  | "tags"
-
 export default function SearchComponent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
-  const [searchState, setSearchState] = useState({
-    query: searchParams.get("q") ?? "",
-    tab: (searchParams.get("tab") as "posts" | "users") ?? "posts",
-    category: searchParams.get("category") ?? "default",
-    dateRange: searchParams.get("dateRange") ?? "default",
-  })
+  const [searchState, setSearchState] = useState(useValidatedSearchParams())
 
+  const [searchQuery, setSearchQuery] = useState(searchState.query)
   const [results, setResults] = useState<{ posts: TPost[]; users: TUser[] }>({
     posts: [],
     users: [],
@@ -60,17 +47,22 @@ export default function SearchComponent() {
   const updateSearchParams = (newParams: Partial<typeof searchState>) => {
     const updatedParams = { ...searchState, ...newParams }
     setSearchState(updatedParams)
-    const searchUrl = `?q=${updatedParams.query}&category=${updatedParams.category}&tab=${updatedParams.tab}&dateRange=${updatedParams.dateRange}`
-    router.push(searchUrl)
+    const searchUrl = new URLSearchParams({
+      q: searchQuery,
+      category: searchState.category,
+      tab: searchState.tab,
+      dateRange: searchState.dateRange,
+    }).toString()
+    router.push(`/search?${searchUrl}`)
   }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!searchState.query.trim()) {
+    if (!searchQuery.trim()) {
       setEmptyQueryError("Search query cannot be empty")
       return
     }
-    updateSearchParams({ query: searchState.query })
+    updateSearchParams({ query: searchQuery })
   }
 
   useEffect(() => {
@@ -80,7 +72,7 @@ export default function SearchComponent() {
           const results = await search(
             searchState.query,
             searchState.category as SearchCategories,
-            searchState.dateRange,
+            searchState.dateRange as SearchDateRange,
           )
           setResults(results)
         } catch (error) {
@@ -101,13 +93,10 @@ export default function SearchComponent() {
               <div className="flex gap-2">
                 <Input
                   type="text"
-                  placeholder="Search for posts, users, or tags..."
-                  value={searchState.query}
+                  placeholder="Search"
+                  value={searchQuery}
                   onChange={(e) => {
-                    setSearchState((prev) => ({
-                      ...prev,
-                      query: e.target.value,
-                    }))
+                    setSearchQuery(e.target.value)
                     setEmptyQueryError("")
                   }}
                   className="flex-1"
@@ -156,7 +145,7 @@ export default function SearchComponent() {
             </TabsContent>
           </Tabs>
         ) : (
-          <div className="flex-center w-full p-4 max-md:pt-10">
+          <div className="flex-center w-full border-t p-4 max-md:pt-10">
             <p>Searched results will appear here</p>
           </div>
         )}
@@ -207,7 +196,7 @@ function UserProfileCard({ profileUser }: { profileUser: TUser }) {
         <Link href={`/${profileUser.username}`} className="flex-1">
           <h3 className="text-lg font-semibold">{profileUser.name}</h3>
           <p className="text-sm text-muted-foreground">
-            @{profileUser.username}
+            &#64;{profileUser.username}
           </p>
           <p className="mt-1 text-sm">{profileUser.bio}</p>
           <div className="mt-2 flex space-x-4">
@@ -309,4 +298,60 @@ function SearchFilterDialog({
       </DialogContent>
     </Dialog>
   )
+}
+
+export type SearchCategories =
+  | "default"
+  | "response"
+  | "prompt"
+  | "caption"
+  | "user"
+  | "tags"
+
+export type SearchDateRange =
+  | "default"
+  | "today"
+  | "thisWeek"
+  | "thisMonth"
+  | "thisYear"
+
+export function useValidatedSearchParams() {
+  const searchParams = useSearchParams()
+
+  const validTabs: ("posts" | "users")[] = ["posts", "users"]
+  const validCategories: SearchCategories[] = [
+    "default",
+    "response",
+    "prompt",
+    "caption",
+    "user",
+    "tags",
+  ]
+  const validDateRanges: SearchDateRange[] = [
+    "default",
+    "today",
+    "thisWeek",
+    "thisMonth",
+    "thisYear",
+  ]
+
+  const query = searchParams.get("q") ?? ""
+
+  const tab = validTabs.includes(searchParams.get("tab") as "posts" | "users")
+    ? (searchParams.get("tab") as "posts" | "users")
+    : "posts"
+
+  const category = validCategories.includes(
+    searchParams.get("category") as SearchCategories,
+  )
+    ? (searchParams.get("category") as string)
+    : "default"
+
+  const dateRange = validDateRanges.includes(
+    searchParams.get("dateRange") as SearchDateRange,
+  )
+    ? (searchParams.get("dateRange") as string)
+    : "default"
+
+  return { query, tab, category, dateRange }
 }

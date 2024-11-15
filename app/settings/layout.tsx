@@ -1,10 +1,10 @@
-import { NavigateBackHeader } from "@/components/post";
-import SettingsTabs from "@/components/settings/settings-tabs";
+import { NavigateBackHeader } from "@/components/home"
+import SettingsTabs from "@/components/settings/settings-tabs"
 
 export default function SettingsLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <div className="w-full">
@@ -16,5 +16,5 @@ export default function SettingsLayout({
         </div>
       </main>
     </div>
-  );
+  )
 }

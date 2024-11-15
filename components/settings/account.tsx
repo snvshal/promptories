@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -18,28 +18,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { signOut } from "next-auth/react";
+} from "@/components/ui/dialog"
+import { signOut } from "next-auth/react"
 
 export default function AccountSettings() {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const router = useRouter()
 
-  const handleSignOut = () => {
-    // Here you would typically call your sign-out function
-    console.log("Signing out...");
-    // After signing out, redirect to the home page or login page
-    // router.push("/");
-    signOut();
-  };
+  const handleSignOut = () => signOut()
 
   const handleDeleteAccount = () => {
-    // Here you would typically call your delete account function
-    console.log("Deleting account...");
-    setIsDeleteDialogOpen(false);
-    // After deleting the account, redirect to the home page or a goodbye page
-    router.push("/");
-  };
+    setIsDeleteDialogOpen(false)
+    router.push("/")
+  }
 
   return (
     <Card>
@@ -101,5 +92,5 @@ export default function AccountSettings() {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

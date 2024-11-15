@@ -1,8 +1,8 @@
-import { PostMedia } from "@/components/post-media"
+import { PromptoryMedia } from "@/components/post/media"
 import { getPostById } from "@/utils/get-posts"
 import { ps } from "@/utils/ps"
 
-export default async function PhotoPage({
+export default async function PromptoryMediaPage({
   params,
 }: {
   params: {
@@ -20,5 +20,5 @@ export default async function PhotoPage({
   if (!mediaUrl)
     return <div className="flex-center h-screen">Photo not found</div>
 
-  return <PostMedia post={ps(post)} mediaUrl={mediaUrl} />
+  return <PromptoryMedia post={ps(post)} mediaUrl={mediaUrl} />
 }

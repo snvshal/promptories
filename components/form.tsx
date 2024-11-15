@@ -17,10 +17,10 @@ import {
 import { Label } from "@/components/ui/label"
 import { promptory_types } from "@/lib/constants"
 import { savePostForm, updatePostForm } from "@/actions/postFormActions"
-import { NavigateBackHeader } from "./post"
+import { NavigateBackHeader } from "./home"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
-import { pu } from "./home"
+import { pu } from "@/utils/ps"
 import { PostFormProps } from "@/types/props.type"
 import { ToastAction } from "./ui/toast"
 import { TPost } from "@/types/schema.type"
@@ -90,7 +90,7 @@ export type FormValues = z.infer<typeof formSchema>
 export type MediaType = "image" | "video"
 
 export default function PostForm({
-  defaultValues,
+  defaultFormValues,
   operationType,
   post,
   media,
@@ -118,7 +118,21 @@ export default function PostForm({
     setValue,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultFormValues,
+      prompt_media:
+        defaultFormValues.prompt_media ||
+        (!defaultFormValues.prompt &&
+        !defaultFormValues.promptory_type?.startsWith("text")
+          ? media?.prompt
+          : undefined),
+      response_media:
+        defaultFormValues.response_media ||
+        (!defaultFormValues.response &&
+        !defaultFormValues.promptory_type?.endsWith("text")
+          ? media?.response
+          : undefined),
+    },
   })
 
   const promptoryType = watch("promptory_type")
@@ -202,7 +216,7 @@ export default function PostForm({
 
       if (operationType === "POST") {
         const post: TPost = await savePostForm(formData)
-        router.push("/home")
+        router.back()
         toast({
           description: "Your post has been sent.",
           action: (
@@ -216,9 +230,17 @@ export default function PostForm({
         })
       } else if (operationType === "PATCH" && post) {
         await updatePostForm(formData, post._id as string)
-        postRoute(post)
+        router.back()
         toast({
           description: "Your post has been updated.",
+          action: (
+            <ToastAction
+              onClick={() => postRoute(post)}
+              altText="View your updated post"
+            >
+              View
+            </ToastAction>
+          ),
         })
       }
       reset()

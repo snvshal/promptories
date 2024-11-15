@@ -4,12 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
 import { PostsComponent } from "../home"
 import { TPost, TUser } from "@/types/schema.type"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { User } from "lucide-react"
-import { NavigateBackHeader } from "../post"
+import { NavigateBackHeader } from "../home"
 import { addFollower } from "@/actions/addFollower"
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
@@ -19,7 +18,6 @@ import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
 import { Types } from "mongoose"
 
-// Define the Tab type based on isAdmin
 export type Tab = "posts" | "likes" | "saved"
 
 export default function UserProfileComponent({
@@ -41,7 +39,6 @@ export default function UserProfileComponent({
   const searchParams = useSearchParams()
   const query = searchParams.get("tab")
 
-  // Set initial tab based on query or default to "posts"
   const initialTab: Tab =
     isAdmin || query === "posts"
       ? "posts"
@@ -55,9 +52,9 @@ export default function UserProfileComponent({
     if (query === "posts" || query === "likes" || query === "saved") {
       setTab(query as Tab)
     } else {
-      setTab("posts") // Default to posts if query is invalid
+      setTab("posts")
     }
-  }, [query]) // Dependency array includes query
+  }, [query])
 
   const toggleTab = (tab: string) => {
     setTab(tab as Tab)

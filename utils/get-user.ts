@@ -12,7 +12,7 @@ export const currentUser = async () => {
 
     return user as TUser
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -24,11 +24,6 @@ export const getUserByUsername = async (username: string) => {
 
     return user as TUser
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
-
-// export const getUserByPost = async (post: TPost) => {
-//   const user = await User.findOne({ user: post.user });
-//   return user as TUser;
-// };

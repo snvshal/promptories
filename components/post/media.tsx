@@ -1,14 +1,14 @@
 "use client"
 
 import Image from "next/image"
-import { Button } from "./ui/button"
-import { AvatarComponent } from "./post"
-import { pu } from "./home"
+import { AvatarComponent } from "./content"
 import { TPost } from "@/types/schema.type"
 import { X } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { Button } from "../ui/button"
+import { pu } from "@/utils/ps"
 
-export function PostMedia({
+export function PromptoryMedia({
   post,
   mediaUrl,
 }: {

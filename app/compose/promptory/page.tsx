@@ -4,7 +4,7 @@ import { defaultValues, postMedia } from "@/lib/constants"
 export default function CreatePromptory() {
   return (
     <PostForm
-      defaultValues={defaultValues}
+      defaultFormValues={defaultValues}
       operationType="POST"
       media={postMedia}
     />

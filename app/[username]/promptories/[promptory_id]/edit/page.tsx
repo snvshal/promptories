@@ -12,7 +12,7 @@ export default async function UpdatePromptory({
   const { postValues, editPostMedia } = updatePostValues(post as TPost)
   return (
     <PostForm
-      defaultValues={postValues}
+      defaultFormValues={postValues}
       operationType="PATCH"
       post={ps(post as TPost)}
       media={ps(editPostMedia)}

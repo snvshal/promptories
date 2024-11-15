@@ -6,7 +6,7 @@ import { AuthSessionProvider } from "@/components/session-provider"
 import { Session } from "next-auth"
 import { getServerSession } from "next-auth"
 import { Toaster } from "@/components/ui/toaster"
-import { Sidebar } from "@/components/home"
+import { Sidebar } from "@/components/sidebar"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
