@@ -1,4 +1,5 @@
 import { FormValues } from "@/components/form"
+import { PostFormMedia } from "@/types/props.type"
 import { PRMedia } from "@/types/schema.type"
 
 export const promptory_types = [
@@ -47,7 +48,7 @@ export const defaultValues: FormValues = {
   tags: "",
 }
 
-export const postMedia: { prompt: PRMedia; response: PRMedia } = {
+export const postMedia: PostFormMedia = {
   prompt: { type: "image", url: "" },
   response: { type: "image", url: "" },
 }

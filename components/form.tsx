@@ -90,7 +90,7 @@ export type FormValues = z.infer<typeof formSchema>
 export type MediaType = "image" | "video"
 
 export default function PostForm({
-  defaultValues,
+  defaultFormValues,
   operationType,
   post,
   media,
@@ -118,7 +118,21 @@ export default function PostForm({
     setValue,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultFormValues,
+      prompt_media:
+        defaultFormValues.prompt_media ||
+        (!defaultFormValues.prompt &&
+        !defaultFormValues.promptory_type?.startsWith("text")
+          ? media?.prompt
+          : undefined),
+      response_media:
+        defaultFormValues.response_media ||
+        (!defaultFormValues.response &&
+        !defaultFormValues.promptory_type?.endsWith("text")
+          ? media?.response
+          : undefined),
+    },
   })
 
   const promptoryType = watch("promptory_type")
