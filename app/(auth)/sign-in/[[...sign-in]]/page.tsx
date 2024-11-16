@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card } from "@/components/ui/card"
 
-export default function SignUpPage() {
+export default function SignInPage() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/"
   const router = useRouter()
@@ -17,7 +17,7 @@ export default function SignUpPage() {
 
   return (
     <div className="dark flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-xl rounded-3xl bg-card p-12 text-card-foreground">
+      <Card className="w-full max-w-xl rounded-3xl bg-card p-4 text-card-foreground sm:p-12">
         <div className="space-y-8 text-center">
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold text-foreground">
