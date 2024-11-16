@@ -16,6 +16,22 @@ export async function isUsernameUnique(
     }
   }
 
+  if (username.startsWith("_")) {
+    return {
+      status: false,
+      message: "Underscore cannot be the first character.",
+    }
+  }
+
+  const validUsernameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/
+
+  if (!validUsernameRegex.test(username)) {
+    return {
+      status: false,
+      message: "Username can only contain letters, numbers, and underscores.",
+    }
+  }
+
   if (reservedUsernames.includes(username.toLowerCase())) {
     return {
       status: false,
