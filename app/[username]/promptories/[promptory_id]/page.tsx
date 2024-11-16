@@ -1,7 +1,25 @@
 import SinglePostPage from "@/components/post/content"
-import { TPost } from "@/types/schema.type"
+import { TPost, TUser } from "@/types/schema.type"
 import { getPostById } from "@/utils/get-posts"
 import { ps } from "@/utils/ps"
+import { Metadata } from "next"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { username: string; promptory_id: string }
+}): Promise<Metadata> {
+  const { username, promptory_id } = params
+  const promptory = await getPostById(promptory_id)
+  const { name } = promptory?.user as TUser
+
+  return {
+    title: `${name}: ${promptory?.caption || "Promptory"}`,
+    description:
+      promptory?.caption ||
+      `Discover the AI prompt created by @${username} on Promptories.`,
+  }
+}
 
 export default async function PromptoriesPage({
   params,
