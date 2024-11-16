@@ -156,14 +156,21 @@ export default function ProfileSettings() {
                 >
                   {({ open }) => (
                     <Button
+                      type="button"
                       variant="secondary"
                       onClick={() => open()}
-                      type="button"
                     >
                       Upload Profile Picture
                     </Button>
                   )}
                 </CldUploadWidget>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setAvatar("")}
+                >
+                  Remove
+                </Button>
               </div>
             </div>
             <FormField
