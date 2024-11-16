@@ -67,7 +67,7 @@ export function AvatarComponent({
 }) {
   const router = useRouter()
   const { username, name, avatar } = user
-  const goToProfile = () => router.push(`/${username}`)
+  const goToProfile = () => username && router.push(`/${username}`)
 
   return (
     <Avatar
@@ -77,7 +77,7 @@ export function AvatarComponent({
     >
       <AvatarImage src={avatar} alt={name} />
       <AvatarFallback>
-        <User className={clsx(size, "text-muted-foreground")} />
+        <User className={clsx(size ?? "size-5", "text-muted-foreground")} />
       </AvatarFallback>
     </Avatar>
   )

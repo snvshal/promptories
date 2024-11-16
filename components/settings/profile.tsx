@@ -138,7 +138,7 @@ export default function ProfileSettings() {
                 <AvatarComponent
                   user={{ avatar: avatar as string }}
                   size="size-10"
-                  classname="size-20"
+                  classname="size-20 cursor-auto"
                 />
                 <CldUploadWidget
                   uploadPreset={

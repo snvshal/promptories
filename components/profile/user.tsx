@@ -153,7 +153,7 @@ export function ProfileUserContent({
           <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 md:mr-4 md:size-40">
             <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
             <AvatarFallback>
-              <User className="size-16 md:size-20" />
+              <User className="size-16 text-muted-foreground md:size-20" />
             </AvatarFallback>
           </Avatar>
           <div className="flex grow flex-col items-start">
@@ -217,7 +217,7 @@ export function UserNotFound() {
               <Avatar className="mb-4 size-32">
                 <AvatarImage src={""} alt={"user not found!"} />
                 <AvatarFallback>
-                  <User className="size-16" />
+                  <User className="size-16 text-muted-foreground" />
                 </AvatarFallback>
               </Avatar>
               <CardHeader className="text-2xl font-bold">
