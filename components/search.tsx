@@ -6,9 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
-import { CheckCircle, Filter, SearchIcon, User } from "lucide-react"
+import { CheckCircle, Filter, SearchIcon } from "lucide-react"
 import { NavigateBackHeader } from "./home"
 import { search } from "@/actions/searchQuery"
 import { TPost, TUser } from "@/types/schema.type"
@@ -178,7 +177,6 @@ function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 }
 
 function UserProfileCard({ profileUser }: { profileUser: TUser }) {
-  const router = useRouter()
   const [followers, setFollowers] = useState(profileUser.followers.length ?? 0)
 
   return (

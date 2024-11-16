@@ -2,16 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Bell,
-  Search,
-  Feather,
-  Home,
-  Settings,
-  User,
-  TrendingUp,
-} from "lucide-react"
+import { Bell, Search, Feather, Home, Settings, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { fw, iv } from "@/utils/ps"
