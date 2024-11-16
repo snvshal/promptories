@@ -7,13 +7,16 @@ import { X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import { pu } from "@/utils/ps"
+import { MediaType } from "../form"
 
 export function PromptoryMedia({
   post,
   mediaUrl,
+  mediaType,
 }: {
   post: TPost
   mediaUrl: string
+  mediaType: MediaType
 }) {
   const router = useRouter()
 
@@ -34,13 +37,19 @@ export function PromptoryMedia({
         </Button>
       </header>
       <div className="flex-center h-[calc(100vh-4rem)]">
-        <Image
-          src={mediaUrl}
-          alt="Photo"
-          width={800}
-          height={600}
-          className="h-auto max-h-80 w-auto"
-        />
+        {mediaType === "image" ? (
+          <Image
+            src={mediaUrl}
+            alt="Photo"
+            width={800}
+            height={600}
+            className="h-auto max-h-80 w-auto"
+          />
+        ) : (
+          <video src={mediaUrl} className="h-auto max-h-80 w-auto" controls>
+            Your browser does not support the video tag.
+          </video>
+        )}
       </div>
     </div>
   )
