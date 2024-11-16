@@ -128,4 +128,6 @@ export const reservedUsernames = [
   "guest",
   "editor",
   "anonymous",
+  "username",
+  "name",
 ]

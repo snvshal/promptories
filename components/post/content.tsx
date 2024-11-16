@@ -14,6 +14,7 @@ import { PostFooter } from "./footer"
 import { PostOptions } from "./option"
 import { PostReplies, PromptoryReplyButton } from "./reply"
 import { pu } from "@/utils/ps"
+import clsx from "clsx"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies)
@@ -55,17 +56,28 @@ export function PostType({ post, type }: PostContentProps) {
   )
 }
 
-export function AvatarComponent({ user }: { user: TUser }) {
+export function AvatarComponent({
+  user,
+  classname,
+  size,
+}: {
+  user: TUser | { username?: string; name?: string; avatar: string }
+  classname?: string
+  size?: `size-${number}`
+}) {
   const router = useRouter()
+  const { username, name, avatar } = user
+  const goToProfile = () => username && router.push(`/${username}`)
+
   return (
     <Avatar
       role="button"
-      className="cursor-pointer"
-      onClick={() => router.push(`/${user?.username}`)}
+      onClick={goToProfile}
+      className={clsx("cursor-pointer", classname)}
     >
-      <AvatarImage src={user?.avatar} alt={user?.name} />
+      <AvatarImage src={avatar} alt={name} />
       <AvatarFallback>
-        <User className="size-5" />
+        <User className={clsx(size ?? "size-5", "text-muted-foreground")} />
       </AvatarFallback>
     </Avatar>
   )
@@ -170,20 +182,24 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
 export function PostContent({ type, post }: PostContentProps) {
   const router = useRouter()
 
-  const postClick = (post: TPost) =>
-    router.push(`/${pu(post).username}/promptories/${post._id as string}`)
+  const postUrl = `/${pu(post).username}/promptories/${post._id as string}`
+  const postClick = () => router.push(postUrl)
+
+  const mt = ["image", "video", "audio"]
+  const pt = post.promptory_type.toLowerCase()
+  const matchedType = mt.find((type) => pt.startsWith(type))
 
   return (
     <CardContent
       role={type === "posts" ? "button" : undefined}
-      onClick={type === "posts" ? () => postClick(post) : undefined}
+      onClick={type === "posts" ? postClick : undefined}
       className={`border-0 p-0`}
     >
       <div className="relative mb-2 overflow-hidden">
         <PostContentType type={type} content={post.caption} />
       </div>
       <div className="relative overflow-hidden">
-        <div className="rounded-t-lg border border-b-0 bg-secondary p-2 px-3">
+        <div className="rounded-t-lg border border-b-0 bg-primary-foreground p-2 px-3">
           {post.prompt.media?.url ? (
             <div className="my-1 flex gap-4">
               <div className="w-auto">
@@ -199,7 +215,9 @@ export function PostContent({ type, post }: PostContentProps) {
                 </Link>
               </div>
               <div className="flex-1 self-center">
-                <p>Response made with this media</p>
+                <p className="text-muted-foreground">
+                  Response created using this {matchedType}
+                </p>
               </div>
             </div>
           ) : (
@@ -256,8 +274,11 @@ export function PostMedia({
       ) : (
         <video
           src={mediaUrl}
-          className={`${prType === "prompt" ? "rounded-t-lg" : "w-full rounded-b-lg"}`}
-        />
+          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
+          controls={prType === "prompt" ? false : true}
+        >
+          Your browser does not support the video tag.
+        </video>
       )}
     </div>
   )

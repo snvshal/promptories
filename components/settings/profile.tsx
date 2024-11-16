@@ -8,10 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 import { Label } from "@/components/ui/label"
-import { User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { updateUserData } from "@/actions/profileActions"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Card,
   CardContent,
@@ -31,6 +29,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { ACCEPTED_IMAGE_TYPES } from "../form"
+import { AvatarComponent } from "../post/content"
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -134,13 +133,11 @@ export default function ProfileSettings() {
             <div className="space-y-2">
               <Label htmlFor="avatar">Avatar</Label>
               <div className="flex items-center space-x-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={avatar as string} alt="User avatar" />
-                  <AvatarFallback>
-                    <User className="h-10 w-10" />
-                  </AvatarFallback>
-                </Avatar>
-
+                <AvatarComponent
+                  user={{ avatar: avatar as string }}
+                  size="size-10"
+                  classname="size-20 cursor-auto"
+                />
                 <CldUploadWidget
                   uploadPreset={
                     process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
@@ -157,14 +154,21 @@ export default function ProfileSettings() {
                 >
                   {({ open }) => (
                     <Button
+                      type="button"
                       variant="secondary"
                       onClick={() => open()}
-                      type="button"
                     >
                       Upload Profile Picture
                     </Button>
                   )}
                 </CldUploadWidget>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setAvatar("")}
+                >
+                  Remove
+                </Button>
               </div>
             </div>
             <FormField

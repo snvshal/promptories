@@ -2,16 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Bell,
-  Search,
-  Feather,
-  Home,
-  Settings,
-  User,
-  TrendingUp,
-} from "lucide-react"
+import { Bell, Search, Feather, Home, Settings, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { fw, iv } from "@/utils/ps"
@@ -29,6 +20,7 @@ import {
   SelectValue,
 } from "./ui/select"
 import { getNotificationCount } from "@/actions/notificationActions"
+import { AvatarComponent } from "./post/content"
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
@@ -170,6 +162,12 @@ export function UserProfileLink() {
   const pathname = usePathname()
   const router = useRouter()
 
+  const userAvatar = {
+    username: user?.username as string,
+    name: user?.name as string,
+    avatar: user?.image as string,
+  }
+
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
       <Button
@@ -186,12 +184,7 @@ export function UserProfileLink() {
         onClick={() => router.push(`/${user?.username}`)}
         className="size-10 gap-2 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
       >
-        <Avatar className="max-sm:size-8">
-          <AvatarImage src={user?.image} alt={user?.username} />
-          <AvatarFallback>
-            <User />
-          </AvatarFallback>
-        </Avatar>
+        <AvatarComponent user={userAvatar} classname="max-sm:size-8" />
         <span className="flex flex-col items-start max-md:hidden">
           <span className="text-base">{user?.name}</span>
           <span className="font-normal text-muted-foreground">

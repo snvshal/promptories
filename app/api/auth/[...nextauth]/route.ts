@@ -32,7 +32,6 @@ const handler = NextAuth({
     },
     async jwt({ token, user, trigger, session }) {
       if (trigger === "update" && session?.user) {
-        // Update the token with the new session data
         return { ...token, ...session.user }
       }
 

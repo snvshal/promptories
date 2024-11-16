@@ -1,5 +1,8 @@
+import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 
 export default async function Home() {
-  return redirect("/home")
+  const session = await getServerSession()
+  const url = session ? "/home" : "/sign-in"
+  return redirect(url)
 }

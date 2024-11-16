@@ -6,9 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
-import { CheckCircle, Filter, SearchIcon, User } from "lucide-react"
+import { CheckCircle, Filter, SearchIcon } from "lucide-react"
 import { NavigateBackHeader } from "./home"
 import { search } from "@/actions/searchQuery"
 import { TPost, TUser } from "@/types/schema.type"
@@ -30,6 +29,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "./ui/label"
 import { FollowButton, TabsTriggerButton } from "./profile/user"
+import { AvatarComponent } from "./post/content"
 
 export default function SearchComponent() {
   const router = useRouter()
@@ -93,6 +93,7 @@ export default function SearchComponent() {
               <div className="flex gap-2">
                 <Input
                   type="text"
+                  name="search"
                   placeholder="Search"
                   value={searchQuery}
                   onChange={(e) => {
@@ -176,23 +177,16 @@ function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 }
 
 function UserProfileCard({ profileUser }: { profileUser: TUser }) {
-  const router = useRouter()
   const [followers, setFollowers] = useState(profileUser.followers.length ?? 0)
 
   return (
     <Card className="mid-width-card-content">
       <CardContent className="flex items-center space-x-4 p-4">
-        <Avatar
-          role="button"
-          className="size-16 self-start"
-          onClick={() => router.push(`/${profileUser.username}`)}
-        >
-          <AvatarImage src={profileUser.avatar} alt={profileUser.name} />
-          <AvatarFallback>
-            <User className="size-8" />
-          </AvatarFallback>
-        </Avatar>
-
+        <AvatarComponent
+          user={profileUser}
+          size="size-8 "
+          classname="size-16 self-start"
+        />
         <Link href={`/${profileUser.username}`} className="flex-1">
           <h3 className="text-lg font-semibold">{profileUser.name}</h3>
           <p className="text-sm text-muted-foreground">
