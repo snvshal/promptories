@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { ACCEPTED_IMAGE_TYPES } from "../form"
+import { AvatarComponent } from "../post/content"
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -134,13 +135,11 @@ export default function ProfileSettings() {
             <div className="space-y-2">
               <Label htmlFor="avatar">Avatar</Label>
               <div className="flex items-center space-x-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={avatar as string} alt="User avatar" />
-                  <AvatarFallback>
-                    <User className="h-10 w-10" />
-                  </AvatarFallback>
-                </Avatar>
-
+                <AvatarComponent
+                  user={{ avatar: avatar as string }}
+                  size="size-10"
+                  classname="size-20"
+                />
                 <CldUploadWidget
                   uploadPreset={
                     process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET

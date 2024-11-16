@@ -14,6 +14,7 @@ import { PostFooter } from "./footer"
 import { PostOptions } from "./option"
 import { PostReplies, PromptoryReplyButton } from "./reply"
 import { pu } from "@/utils/ps"
+import clsx from "clsx"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies)
@@ -55,17 +56,28 @@ export function PostType({ post, type }: PostContentProps) {
   )
 }
 
-export function AvatarComponent({ user }: { user: TUser }) {
+export function AvatarComponent({
+  user,
+  classname,
+  size,
+}: {
+  user: TUser | { username?: string; name?: string; avatar: string }
+  classname?: string
+  size?: `size-${number}`
+}) {
   const router = useRouter()
+  const { username, name, avatar } = user
+  const goToProfile = () => router.push(`/${username}`)
+
   return (
     <Avatar
       role="button"
-      className="cursor-pointer"
-      onClick={() => router.push(`/${user?.username}`)}
+      onClick={goToProfile}
+      className={clsx("cursor-pointer", classname)}
     >
-      <AvatarImage src={user?.avatar} alt={user?.name} />
+      <AvatarImage src={avatar} alt={name} />
       <AvatarFallback>
-        <User className="size-5" />
+        <User className={clsx(size, "text-muted-foreground")} />
       </AvatarFallback>
     </Avatar>
   )
