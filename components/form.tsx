@@ -20,7 +20,7 @@ import { savePostForm, updatePostForm } from "@/actions/postFormActions"
 import { NavigateBackHeader } from "./home"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
-import { pu } from "@/utils/ps"
+import { postPathname } from "@/utils/ps"
 import { PostFormProps } from "@/types/props.type"
 import { ToastAction } from "./ui/toast"
 import { TPost } from "@/types/schema.type"
@@ -142,8 +142,7 @@ export default function PostForm({
   const router = useRouter()
 
   const postRoute = useCallback(
-    (post: TPost) =>
-      router.push(`/${pu(post).username}/promptories/${post._id as string}`),
+    (post: TPost) => router.push(postPathname(post)),
     [router],
   )
 

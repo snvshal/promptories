@@ -30,6 +30,7 @@ import {
 import { Label } from "./ui/label"
 import { FollowButton, TabsTriggerButton } from "./profile/user"
 import { AvatarComponent } from "./post/content"
+import { cl } from "@/utils/ps"
 
 export default function SearchComponent() {
   const router = useRouter()
@@ -199,7 +200,7 @@ function UserProfileCard({ profileUser }: { profileUser: TUser }) {
           size="size-8 "
           classname="size-16 self-start"
         />
-        <Link href={`/${profileUser.username}`} className="flex-1">
+        <Link href={cl(profileUser.username)} className="flex-1">
           <h3 className="text-lg font-semibold">{profileUser.name}</h3>
           <p className="text-sm text-muted-foreground">
             &#64;{profileUser.username}

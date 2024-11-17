@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
-import { il, pu, st } from "@/utils/ps"
+import { cl, il, pu, st } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Types } from "mongoose"
 import { SetAction } from "@/types/generics.type"
@@ -178,7 +178,7 @@ export function PostRepliesContent({
             <div className="flex-between h-6">
               <div className="flex-start">
                 <Link
-                  href={`/${pu(reply).username}`}
+                  href={cl(pu(reply).username)}
                   className="flex-start gap-1"
                   prefetch={false}
                 >
@@ -278,7 +278,7 @@ export function PostReplyOptions({
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem
-            onClick={() => router.push(`/${pu(reply).username}`)}
+            onClick={() => router.push(cl(pu(reply).username))}
             className="cursor-pointer"
           >
             <User className="mr-2 h-4 w-4" />
@@ -358,7 +358,7 @@ export function PostReplyDialog({
         <DialogHeader>
           <DialogTitle>
             Reply to{" "}
-            <Link href={`/${pu(post).username}`} className="text-blue-500">
+            <Link href={cl(pu(post).username)} className="text-blue-500">
               &#64;{pu(post).username}
             </Link>
           </DialogTitle>

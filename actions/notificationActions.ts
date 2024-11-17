@@ -5,7 +5,7 @@ import { RemoveMongooseFields } from "@/types/generics.type"
 import { TNotification, TPost, TUser } from "@/types/schema.type"
 import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
-import { objId } from "@/utils/ps"
+import { cl, objId, postPathname } from "@/utils/ps"
 import { Types } from "mongoose"
 
 // Helper function to create a notification
@@ -35,7 +35,7 @@ export async function likeNotification(post: TPost) {
 
     if (!actor || objId(actor._id).equals(objId(post.user))) return
 
-    const location = `/${(post.user as TUser)?.username}/promptories/${post._id}`
+    const location = cl(postPathname(post))
     return await createNotification(
       "like",
       objId(post.user),
@@ -55,7 +55,7 @@ export async function commentNotification(post: TPost) {
 
     if (!actor || objId(actor._id).equals(objId(post.user))) return
 
-    const location = `/${(post.user as TUser)?.username}/promptories/${post._id}`
+    const location = cl(postPathname(post))
     return await createNotification(
       "comment",
       objId(post.user),
@@ -75,7 +75,7 @@ export async function followNotification(user: TUser) {
 
     if (!actor || objId(actor._id).equals(objId(user._id))) return
 
-    const location = `/${actor?.username}`
+    const location = cl(actor?.username)
     return await createNotification(
       "follow",
       objId(user._id),

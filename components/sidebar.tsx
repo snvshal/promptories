@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Bell, Search, Feather, Home, Settings, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { fw, iv } from "@/utils/ps"
+import { cl, fw, iv } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
 import { ai_platforms, promptory_types } from "@/lib/constants"
@@ -181,7 +181,7 @@ export function UserProfileLink() {
       <Button
         size={"icon"}
         variant={iv(pathname.slice(1) === user?.username)}
-        onClick={() => router.push(`/${user?.username}`)}
+        onClick={() => router.push(cl(String(user?.username)))}
         className="size-10 gap-2 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
       >
         <AvatarComponent user={userAvatar} classname="max-sm:size-8" />

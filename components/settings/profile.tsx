@@ -30,6 +30,7 @@ import { useSession } from "next-auth/react"
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { ACCEPTED_IMAGE_TYPES } from "../form"
 import { AvatarComponent } from "../post/content"
+import { cl } from "@/utils/ps"
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -106,7 +107,7 @@ export default function ProfileSettings() {
           },
         })
 
-        router.push(`/${user?.username}`)
+        router.push(cl(String(user?.username)))
 
         toast({
           title: "Profile updated",
