@@ -36,7 +36,7 @@ export default function SearchComponent() {
 
   const [searchState, setSearchState] = useState(useValidatedSearchParams())
 
-  const [searchQuery, setSearchQuery] = useState(searchState.query)
+  const [searchQuery, setSearchQuery] = useState(searchState.q)
   const [results, setResults] = useState<{ posts: TPost[]; users: TUser[] }>({
     posts: [],
     users: [],
@@ -48,12 +48,7 @@ export default function SearchComponent() {
   const updateSearchParams = (newParams: Partial<typeof searchState>) => {
     const updatedParams = { ...searchState, ...newParams }
     setSearchState(updatedParams)
-    const searchUrl = new URLSearchParams({
-      q: searchQuery,
-      category: searchState.category,
-      tab: searchState.tab,
-      dateRange: searchState.dateRange,
-    }).toString()
+    const searchUrl = new URLSearchParams(updatedParams).toString()
     router.push(`/search?${searchUrl}`)
   }
 
@@ -63,17 +58,17 @@ export default function SearchComponent() {
       setEmptyQueryError("Search query cannot be empty")
       return
     }
-    updateSearchParams({ query: searchQuery })
+    updateSearchParams({ q: searchQuery })
   }
 
   useEffect(() => {
     const fetchSearchResults = async () => {
-      if (searchState.query.trim()) {
+      if (searchState.q.trim()) {
         try {
           setSearchLoading(true)
 
           const results = await search(
-            searchState.query,
+            searchState.q,
             searchState.category as SearchCategories,
             searchState.dateRange as SearchDateRange,
           )
@@ -86,7 +81,7 @@ export default function SearchComponent() {
       }
     }
     fetchSearchResults()
-  }, [searchState.query, searchState.category, searchState.dateRange])
+  }, [searchState.q, searchState.category, searchState.dateRange])
 
   return (
     <div className="w-full">
@@ -125,7 +120,7 @@ export default function SearchComponent() {
           </CardContent>
         </Card>
 
-        {searchState.query ? (
+        {searchState.q ? (
           <Tabs
             value={searchState.tab}
             onValueChange={(value) =>
@@ -346,7 +341,7 @@ export function useValidatedSearchParams() {
     "thisYear",
   ]
 
-  const query = searchParams.get("q") ?? ""
+  const q = searchParams.get("q") ?? ""
 
   const tab = validTabs.includes(searchParams.get("tab") as "posts" | "users")
     ? (searchParams.get("tab") as "posts" | "users")
@@ -364,5 +359,5 @@ export function useValidatedSearchParams() {
     ? (searchParams.get("dateRange") as string)
     : "default"
 
-  return { query, tab, category, dateRange }
+  return { q, tab, category, dateRange }
 }
