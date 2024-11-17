@@ -47,7 +47,7 @@ const PostSchema = new Schema<TPost>(
     replies: [
       {
         user: { type: Schema.Types.ObjectId, ref: "User" },
-        reply: { type: String, required: true, trim: true },
+        content: { type: String, required: true, trim: true },
         likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
         timestamp: { type: Date, default: Date.now },
       },

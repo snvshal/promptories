@@ -9,7 +9,7 @@ import { MessageCircle, Send, Heart, Trash, Ellipsis, User } from "lucide-react"
 import Link from "next/link"
 import { TimeAgo } from "../time-ago"
 import { TPost, TReplies } from "@/types/schema.type"
-import { addReplyToPost } from "@/actions/addReplyToPost"
+import { addReplyToPost } from "@/actions/replyActions"
 import { Separator } from "../ui/separator"
 import { deleteReply, handleLikeReply } from "@/actions/replyActions"
 import {
@@ -203,7 +203,7 @@ export function PostRepliesContent({
             </div>
 
             <div className="flex items-start justify-between gap-2">
-              <p>{reply.reply}</p>
+              <p>{reply.content}</p>
               <div className="flex-start flex-col">
                 <Button
                   variant="ghost"
