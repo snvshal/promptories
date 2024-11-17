@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
-import { CheckCircle, Filter, SearchIcon } from "lucide-react"
+import { CheckCircle, Filter, Loader2, SearchIcon } from "lucide-react"
 import { NavigateBackHeader } from "./home"
 import { search } from "@/actions/searchQuery"
 import { TPost, TUser } from "@/types/schema.type"
@@ -43,6 +43,7 @@ export default function SearchComponent() {
   })
   const [emptyQueryError, setEmptyQueryError] = useState("")
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
+  const [searchLoading, setSearchLoading] = useState(false)
 
   const updateSearchParams = (newParams: Partial<typeof searchState>) => {
     const updatedParams = { ...searchState, ...newParams }
@@ -69,12 +70,16 @@ export default function SearchComponent() {
     const fetchSearchResults = async () => {
       if (searchState.query.trim()) {
         try {
+          setSearchLoading(true)
+
           const results = await search(
             searchState.query,
             searchState.category as SearchCategories,
             searchState.dateRange as SearchDateRange,
           )
+
           setResults(results)
+          setSearchLoading(false)
         } catch (error) {
           console.error("Error fetching search results:", error)
         }
@@ -139,10 +144,22 @@ export default function SearchComponent() {
               </TabsList>
             </div>
             <TabsContent value="posts" className="m-0">
-              <PostsComponent posts={results.posts} />
+              {searchLoading ? (
+                <div className="flex-center mt-20 size-full">
+                  <Loader2 className="animate-spin" />
+                </div>
+              ) : (
+                <PostsComponent posts={results.posts} />
+              )}
             </TabsContent>
             <TabsContent value="users" className="m-0">
-              <MatchedUsers matchedUsers={results.users} />
+              {searchLoading ? (
+                <div className="flex-center mt-20 size-full">
+                  <Loader2 className="animate-spin" />
+                </div>
+              ) : (
+                <MatchedUsers matchedUsers={results.users} />
+              )}
             </TabsContent>
           </Tabs>
         ) : (
