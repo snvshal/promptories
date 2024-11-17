@@ -60,16 +60,25 @@ export function DynamicHeader({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function NavigateBackHeader({ page }: { page: string }) {
+export function NavigateBackHeader({
+  page,
+  rsC,
+}: {
+  page: string
+  rsC?: React.ReactNode
+}) {
   const router = useRouter()
 
   return (
     <DynamicHeader>
-      <div className="mx-auto flex max-w-4xl items-center justify-start p-4">
-        <button onClick={() => router.back()} className="flex-start">
-          <ArrowLeft className="mr-6 size-6" />
-        </button>
-        <h1 className="text-xl font-bold">{page}</h1>
+      <div className="flex-between w-full p-4">
+        <div className="flex max-w-4xl items-center justify-start">
+          <button onClick={() => router.back()} className="flex-start">
+            <ArrowLeft className="mr-6 size-6" />
+          </button>
+          <h1 className="text-xl font-bold">{page}</h1>
+        </div>
+        <div>{rsC}</div>
       </div>
     </DynamicHeader>
   )

@@ -53,7 +53,7 @@ export type PromptoryType = `${PromptoryContentType}-to-${PromptoryContentType}`
 // Post Replies Type
 export type TReplies = Document & {
   user: Types.ObjectId | TUser
-  reply: string
+  content: string
   likes: (Types.ObjectId | TUser)[]
   timestamp: Date
 }
@@ -80,6 +80,19 @@ export type TNotification = Document & {
   content: string
   location: string
   read: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+// AI Chats Model Type
+export type TAIChat = {
+  user: Types.ObjectId | TUser
+  title: string
+  description: string
+  model: string
+  chat_link: string
+  likes: Types.ObjectId[]
+  replies: TReplies[]
   createdAt?: Date
   updatedAt?: Date
 }

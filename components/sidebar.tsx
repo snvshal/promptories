@@ -2,7 +2,16 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Bell, Search, Feather, Home, Settings, TrendingUp } from "lucide-react"
+import {
+  Bell,
+  Search,
+  Feather,
+  Home,
+  Settings,
+  TrendingUp,
+  LucideProps,
+  Bot,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cl, fw, iv } from "@/utils/ps"
@@ -88,70 +97,76 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
   )
 }
 
+export type NavItems = {
+  name: string
+  url: string
+  icon: React.ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+  >
+}
+
+export const navItems: NavItems[] = [
+  {
+    name: "Home",
+    url: "/home",
+    icon: Home,
+  },
+  {
+    name: "Search",
+    url: "/search",
+    icon: Search,
+  },
+  {
+    name: "AI Chats",
+    url: "/ai-chats",
+    icon: Bot,
+  },
+  {
+    name: "Notifications",
+    url: "/notifications",
+    icon: Bell,
+  },
+  {
+    name: "Settings",
+    url: "/settings",
+    icon: Settings,
+  },
+]
+
 export function NavLinks({ notificationCount }: { notificationCount: number }) {
   const pathname = usePathname()
   const router = useRouter()
 
   return (
     <>
-      <Button
-        size={"icon"}
-        onClick={() => router.push("/home")}
-        variant={iv(pathname === "/home")}
-        className="nav-button"
-      >
-        <Home className="size-6" />
-        <span className={`${fw(pathname === "/home")} text-base max-md:hidden`}>
-          Home
-        </span>
-      </Button>
-      <Button
-        size={"icon"}
-        variant={iv(pathname.startsWith("/search"))}
-        onClick={() => router.push("/search")}
-        className="nav-button"
-      >
-        <Search className="size-6" />
-        <span
-          className={`${fw(pathname.startsWith("/search"))} text-base max-md:hidden`}
+      {navItems.map((item) => (
+        <Button
+          key={item.name}
+          size="icon"
+          variant={iv(pathname.startsWith(item.url))}
+          onClick={() => router.push(item.url)}
+          className="nav-button"
         >
-          Search
-        </span>
-      </Button>
-      <Button
-        size={"icon"}
-        onClick={() => router.push("/notifications")}
-        variant={iv(pathname === "/notifications")}
-        className="nav-button"
-      >
-        <span className="relative">
-          {notificationCount > 0 && (
-            <Badge className="flex-center absolute -right-1 -top-1 h-4 rounded-full px-1">
-              {notificationCount <= 10 ? notificationCount : "10+"}
-            </Badge>
+          {item.url === "/notification" ? (
+            <span className="relative">
+              {notificationCount > 0 && (
+                <Badge className="flex-center absolute -right-1 -top-1 h-4 rounded-full px-1">
+                  {notificationCount <= 10 ? notificationCount : "10+"}
+                </Badge>
+              )}
+              <Bell className="size-6" />
+            </span>
+          ) : (
+            <item.icon className="size-6" />
           )}
-          <Bell className="size-6" />
-        </span>
 
-        <span
-          className={`${fw(pathname === "/notifications")} text-base max-md:hidden`}
-        >
-          Notifications
-        </span>
-      </Button>
-      <Button
-        size={"icon"}
-        variant={iv(pathname.startsWith("/settings"))}
-        onClick={() => router.push("/settings/profile")}
-        className="nav-button"
-      >
-        <Settings className="size-6" />
-        <span
-          className={`${fw(pathname.startsWith("/settings"))} text-base max-md:hidden`}
-        >
-          Settings
-        </span>
-      </Button>
+          <span
+            className={`${fw(pathname.startsWith(item.url))} text-base max-md:hidden`}
+          >
+            {item.name}
+          </span>
+        </Button>
+      ))}
     </>
   )
 }
