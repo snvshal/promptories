@@ -1,20 +1,18 @@
-"use client";
+"use client"
 
-import { usePathname, useRouter } from "next/navigation";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { usePathname, useRouter } from "next/navigation"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { ScrollArea, ScrollBar } from "../ui/scroll-area"
+import { cl } from "@/utils/ps"
 
 export default function SettingsTabs() {
-  const pathname = usePathname();
-  const router = useRouter();
+  const pathname = usePathname()
+  const router = useRouter()
 
-  const tabs = ["appearance", "username", "account"];
-  const currentTab =
-    tabs.find((tab) => pathname.includes(`/${tab}`)) || "profile";
+  const tabs = ["appearance", "username", "account"]
+  const currentTab = tabs.find((tab) => pathname.includes(cl(tab))) || "profile"
 
-  const handleTabChange = (value: string) => {
-    router.push(`/settings/${value}`);
-  };
+  const handleTabChange = (value: string) => router.push(cl("settings", value))
 
   return (
     <Tabs
@@ -37,5 +35,5 @@ export default function SettingsTabs() {
       <TabsContent value="appearance"></TabsContent>
       <TabsContent value="account"></TabsContent>
     </Tabs>
-  );
+  )
 }

@@ -13,7 +13,7 @@ import Image from "next/image"
 import { PostFooter } from "./footer"
 import { PostOptions } from "./option"
 import { PostReplies, PromptoryReplyButton } from "./reply"
-import { pu } from "@/utils/ps"
+import { cl, postPathname, pu } from "@/utils/ps"
 import clsx from "clsx"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
@@ -36,8 +36,13 @@ export default function SinglePostPage({ post }: { post: TPost }) {
 }
 
 export function PostType({ post, type }: PostContentProps) {
+  const router = useRouter()
+  const visitPost = () => router.push(postPathname(post))
+
   return (
     <Card
+      role={type === "posts" ? "button" : undefined}
+      onClick={type === "posts" ? visitPost : undefined}
       className="mid-width-card-content flex px-4 py-3"
       data-key={post._id?.toString() as string}
     >
@@ -67,12 +72,12 @@ export function AvatarComponent({
 }) {
   const router = useRouter()
   const { username, name, avatar } = user
-  const goToProfile = () => username && router.push(`/${username}`)
+  const visitProfile = () => username && router.push(cl(username))
 
   return (
     <Avatar
       role="button"
-      onClick={goToProfile}
+      onClick={visitProfile}
       className={clsx("cursor-pointer", classname)}
     >
       <AvatarImage src={avatar} alt={name} />
@@ -110,7 +115,7 @@ export type PostContentProps = { type: "post" | "posts"; post: TPost }
 
 export function PostHeader({ type, post }: PostContentProps) {
   return (
-    <CardHeader className="p-0">
+    <CardHeader onClick={(e) => e.stopPropagation()} className="p-0">
       <div className={`${type === "post" && "mb-4"} flex-between relative`}>
         <div className="flex-start">
           {type === "post" && (
@@ -141,14 +146,20 @@ export function PostAuthorName({
 }) {
   if (type === "post") {
     return (
-      <div className="flex cursor-pointer flex-col gap-0">
+      <Link
+        href={cl(postAuthor.username)}
+        className="flex cursor-pointer flex-col gap-0"
+      >
         <p className="font-semibold hover:underline">{postAuthor.name}</p>
         <p className="text-muted-foreground">&#64;{postAuthor.username}</p>
-      </div>
+      </Link>
     )
   } else {
     return (
-      <div className="flex cursor-pointer items-center justify-start gap-1">
+      <Link
+        href={cl(postAuthor.username)}
+        className="flex cursor-pointer items-center justify-start gap-1"
+      >
         <p className="font-semibold hover:underline max-sm:hidden">
           {postAuthor.name}
         </p>
@@ -156,7 +167,7 @@ export function PostAuthorName({
           <span className="max-sm:hidden">&#64;</span>
           {postAuthor.username}
         </p>
-      </div>
+      </Link>
     )
   }
 }
@@ -180,21 +191,12 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
 }
 
 export function PostContent({ type, post }: PostContentProps) {
-  const router = useRouter()
-
-  const postUrl = `/${pu(post).username}/promptories/${post._id as string}`
-  const postClick = () => router.push(postUrl)
-
   const mt = ["image", "video", "audio"]
   const pt = post.promptory_type.toLowerCase()
   const matchedType = mt.find((type) => pt.startsWith(type))
 
   return (
-    <CardContent
-      role={type === "posts" ? "button" : undefined}
-      onClick={type === "posts" ? postClick : undefined}
-      className={`border-0 p-0`}
-    >
+    <CardContent className={`border-0 p-0`}>
       <div className="relative mb-2 overflow-hidden">
         <PostContentType type={type} content={post.caption} />
       </div>
@@ -204,7 +206,7 @@ export function PostContent({ type, post }: PostContentProps) {
             <div className="my-1 flex gap-4">
               <div className="w-auto">
                 <Link
-                  href={`/${pu(post).username}/promptories/${post._id as string}/prompt/media`}
+                  href={postPathname(post, "prompt", "media")}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <PostMedia
@@ -228,7 +230,7 @@ export function PostContent({ type, post }: PostContentProps) {
       <div className="relative overflow-hidden">
         {post.response.media?.url ? (
           <Link
-            href={`/${pu(post).username}/promptories/${post._id as string}/response/media`}
+            href={postPathname(post, "prompt", "media")}
             onClick={(e) => e.stopPropagation()}
           >
             <PostMedia

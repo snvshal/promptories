@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { handleDeletePost } from "@/actions/postActions"
-import { pu } from "@/utils/ps"
+import { cl, postPathname, pu } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { toast } from "@/hooks/use-toast"
 import { PostContentProps } from "./content"
@@ -85,11 +85,7 @@ export function PostOptions({ post, type }: PostContentProps) {
 
   const PostOptionItems = () => (
     <>
-      <Link
-        href={`/${pu(post).username}`}
-        prefetch={false}
-        className="sm:hidden"
-      >
+      <Link href={cl(pu(post).username)} prefetch={false} className="sm:hidden">
         <Button variant="ghost" className="w-full justify-start">
           <User className="mr-2 h-4 w-4" />
           <span>&#64;{pu(post).username}</span>
@@ -110,10 +106,7 @@ export function PostOptions({ post, type }: PostContentProps) {
         </Link>
       )}
       {authorized && (
-        <Link
-          href={`/${pu(post).username}/promptories/${post._id as string}/edit`}
-          prefetch={false}
-        >
+        <Link href={postPathname(post, "edit")} prefetch={false}>
           <Button variant="ghost" className="w-full justify-start">
             <Edit className="mr-2 h-4 w-4" />
             <span>Edit</span>

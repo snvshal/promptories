@@ -99,7 +99,7 @@ export const users = [
     followers: [],
     following: [],
   },
-];
+]
 
 export const posts = [
   {
@@ -232,4 +232,74 @@ export const posts = [
     tags: ["AI", "Creative Industry"],
     views: [],
   },
-];
+]
+
+// import { Types } from "mongoose"
+
+// Mock user data
+// const users2 = [
+//   { _id: new Types.ObjectId(), username: 'AliceJohnson', name: "Alice Johnson" },
+//   { _id: new Types.ObjectId(),username: 'AliceJohnson', name: "Bob Smith" },
+//   { _id: new Types.ObjectId(),username: 'AliceJohnson',avatar: name: "Charlie Brown" },
+// ]
+
+// // Mock reply data
+// const createReply = (userId:Types.ObjectId) => ({
+//   _id: new Types.ObjectId(),
+//   user: userId,
+//   content: `This is a reply from ${users2.find(u => u._id.equals(userId)).name}`,
+//   createdAt: new Date(),
+// });
+
+// Generate sample AI chat data
+export const aiChatData = [
+  {
+    user: "67093e834579d067db1795df",
+    title: "Exploring Quantum Computing",
+    description:
+      "A fascinating discussion about the principles of quantum computing and its potential applications.",
+    model: "GPT-4",
+    chat_link: "https://ai-chat.com/quantum-computing",
+    likes: [],
+    replies: [],
+    createdAt: new Date("2023-10-15T10:30:00Z"),
+    updatedAt: new Date("2023-10-15T14:45:00Z"),
+  },
+  {
+    user: "67093e834579d067db1795df",
+    title: "Future of Sustainable Energy",
+    description:
+      "Analyzing various sustainable energy sources and their impact on climate change mitigation.",
+    model: "Claude-2",
+    chat_link: "https://ai-chat.com/sustainable-energy",
+    likes: [],
+    replies: [],
+    createdAt: new Date("2023-10-16T09:15:00Z"),
+    updatedAt: new Date("2023-10-16T11:20:00Z"),
+  },
+  {
+    user: "6707e79e60cfbb71bbcb888b",
+    title: "AI in Healthcare",
+    description:
+      "Discussing the potential applications and ethical considerations of AI in modern healthcare.",
+    model: "GPT-3.5",
+    chat_link: "https://ai-chat.com/ai-healthcare",
+    likes: [],
+    replies: [],
+    createdAt: new Date("2023-10-17T13:45:00Z"),
+    updatedAt: new Date("2023-10-17T16:30:00Z"),
+  },
+]
+
+// Display the generated data
+console.log(JSON.stringify(aiChatData, null, 2))
+
+// Log some statistics
+console.log(`\nGenerated ${aiChatData.length} AI chat entries`)
+console.log(`Total users: ${users.length}`)
+console.log(
+  `Total replies: ${aiChatData.reduce((sum, chat) => sum + chat.replies.length, 0)}`,
+)
+console.log(
+  `Total likes: ${aiChatData.reduce((sum, chat) => sum + chat.likes.length, 0)}`,
+)

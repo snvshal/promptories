@@ -6,8 +6,9 @@ import { TPost } from "@/types/schema.type"
 import { X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "../ui/button"
-import { pu } from "@/utils/ps"
+import { cl, pu } from "@/utils/ps"
 import { MediaType } from "../form"
+import Link from "next/link"
 
 export function PromptoryMedia({
   post,
@@ -25,7 +26,12 @@ export function PromptoryMedia({
       <header className="flex-between z-20 border-b bg-background px-4 py-2">
         <div className="flex-start gap-2">
           <AvatarComponent user={pu(post)} />
-          <p className="font-semibold">{pu(post).name}</p>
+          <Link
+            href={cl(pu(post).username)}
+            className="font-semibold hover:underline"
+          >
+            {pu(post).name}
+          </Link>
         </div>
         <Button
           variant="ghost"
