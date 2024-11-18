@@ -13,6 +13,7 @@ Promptories is a prompt library and social media-like application built with Nex
 - **Media Uploads**: Upload and share media (images/videos) as part of your prompt content using Cloudinary.
 - **Real-time Updates**: Enjoy a dynamic experience with real-time updates and interactions.
 - **Admin Features**: Manage your own profile and view detailed user analytics.
+- **AI Chats**: Share and explore detailed conversations with AI.
 
 ## Tech Stack
 
