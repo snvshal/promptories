@@ -26,7 +26,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
 import { ScrollArea } from "../ui/scroll-area"
 import { saveAIChat } from "@/actions/aiChatActions"
 
@@ -73,8 +72,6 @@ export type AIChatFormValue = z.infer<typeof aiChatFormSchema>
 export default function AIChatDialogForm() {
   const [open, setOpen] = useState(false)
 
-  const router = useRouter()
-
   const form = useForm<AIChatFormValue>({
     resolver: zodResolver(aiChatFormSchema),
     defaultValues: {
@@ -91,7 +88,9 @@ export default function AIChatDialogForm() {
     toast({
       description: "Your AI chat has been sent.",
     })
+
     setOpen(false)
+    form.reset()
   }
 
   return (
@@ -110,7 +109,7 @@ export default function AIChatDialogForm() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 px-2"
+              className="space-y-6 px-2"
             >
               <FormField
                 control={form.control}
