@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Promptories
 
-## Getting Started
+Promptories is a prompt library and social media-like application built with Next.js (App Router), Vercel, shadcn-ui, and Tailwind CSS. The app is designed to help users store, share, and learn effective prompting techniques by showcasing various AI-generated responses based on different prompts. It includes features for storing, sharing, tagging, and categorizing prompts, making it a useful tool for prompt engineers, AI enthusiasts, and anyone looking to refine their skills in AI interactions.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Prompt Library**: Store and manage prompts with AI-generated responses.
+- **Social Media Integration**: Like, comment, and share prompts with the community.
+- **Tagging and Categorization**: Organize prompts using tags and categories like 'tags', 'prompt', 'response', and 'caption'.
+- **User Profiles**: Follow other users and view their prompt collections.
+- **Notification System**: Stay updated with notifications for interactions like follows, likes, and comments.
+- **Search Functionality**: Search through prompts using various filters and categories.
+- **Media Uploads**: Upload and share media (images/videos) as part of your prompt content using Cloudinary.
+- **Real-time Updates**: Enjoy a dynamic experience with real-time updates and interactions.
+- **Admin Features**: Manage your own profile and view detailed user analytics.
+
+## Tech Stack
+
+- **Frontend**: Next.js (App Router), shadcn-ui, Tailwind CSS
+- **Backend**: Next.js Server Actions, MongoDB (via Mongoose)
+- **Storage**: Cloudinary (for media uploads)
+- **Deployment**: Vercel
+
+## Installation
+
+To run the project locally, follow these steps:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-username/promptories.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd promptories
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Create a `.env` file based on `.env.example` and set your environment variables.
+
+5. Run the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+6. Open your browser at [http://localhost:3000](http://localhost:3000) to see the app in action.
+
+## Folder Structure
+
+```
+.
+├── app/
+│   ├── actions/            # Server actions for data handling
+│   ├── components/         # Reusable components
+│   ├── styles/             # Global styles with Tailwind CSS
+│   ├── utils/              # Utility functions and helpers
+├── lib/                    # Library functions (e.g., MongoDB/mongoose setup)
+├── public/                 # Public assets
+├── types/                  # TypeScript types
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Creating a Prompt**:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   - Navigate to the 'New Prompt' page and enter your prompt details.
+   - Optionally add tags, category, and media (image/video).
+   - Click 'Save' to store your prompt.
 
-## Learn More
+2. **Interacting with Prompts**:
 
-To learn more about Next.js, take a look at the following resources:
+   - Browse and search prompts by tags, category, or user.
+   - Like, comment, and share prompts within the community.
+   - Follow other users to see their latest prompts in your feed.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Managing Notifications**:
+   - View new notifications from the notifications page.
+   - Mark notifications as 'seen' or 'read' to stay organized.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Contributions are welcome! Please fork the repository and submit a pull request.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License.
