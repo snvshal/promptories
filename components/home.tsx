@@ -109,9 +109,11 @@ export function ComposePromptoryButton() {
   const router = useRouter()
   return (
     <Button
-      size={"icon"}
+      size="icon"
+      name="Compose Promptory"
       onClick={() => router.push("/compose/promptory")}
       className="compose-button"
+      aria-label="Compose Promptory"
     >
       <Feather size={24} />
     </Button>

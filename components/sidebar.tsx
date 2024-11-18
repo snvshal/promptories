@@ -143,9 +143,11 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
         <Button
           key={item.name}
           size="icon"
+          name={item.name}
           variant={iv(pathname.startsWith(item.url))}
           onClick={() => router.push(item.url)}
           className="nav-button"
+          aria-label={item.name}
         >
           {item.url === "/notification" ? (
             <span className="relative">
@@ -186,18 +188,22 @@ export function UserProfileLink() {
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
       <Button
+        name="Compose Promptory"
         onClick={() => router.push("/compose/promptory")}
         className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
+        aria-label="Compose Promptory"
       >
         <Feather className="size-5 text-base md:hidden" />
         <span className="text-base text-lg max-md:hidden">Post</span>
       </Button>
 
       <Button
-        size={"icon"}
+        size="icon"
+        name="Profile"
         variant={iv(pathname.slice(1) === user?.username)}
         onClick={() => router.push(cl(String(user?.username)))}
         className="size-10 gap-2 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
+        aria-label="Profile"
       >
         <AvatarComponent user={userAvatar} classname="max-sm:size-8" />
         <span className="flex flex-col items-start max-md:hidden">
