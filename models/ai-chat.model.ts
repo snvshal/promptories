@@ -1,7 +1,7 @@
 import { Schema, models, model } from "mongoose"
 import { TAIChat } from "@/types/schema.type"
 
-const aiChatSchema = new Schema<TAIChat>(
+const aiChatSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
