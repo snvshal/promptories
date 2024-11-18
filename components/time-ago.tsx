@@ -18,6 +18,7 @@ export function TimeAgo({ timestamp }: { timestamp: Date }) {
       const months = Math.round(days / 30)
       const years = Math.round(days / 365)
 
+      if (seconds <= 0) return `Now`
       if (seconds < 60) return `${seconds}s ago`
       if (minutes < 60) return `${minutes}m ago`
       if (hours < 24) return `${hours}h ago`
@@ -27,15 +28,13 @@ export function TimeAgo({ timestamp }: { timestamp: Date }) {
       return `${years}y ago`
     }
 
-    // Set the initial time ago
     setTimeAgo(calculateTimeAgo())
 
-    // Update the time every second
     const interval = setInterval(() => {
       setTimeAgo(calculateTimeAgo())
-    }, 10000)
+    }, 1e5)
 
-    return () => clearInterval(interval) // Cleanup interval on component unmount
+    return () => clearInterval(interval)
   }, [timestamp])
 
   return <span>{timeAgo}</span>
