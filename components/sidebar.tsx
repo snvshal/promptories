@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
 import {
   Bell,
   Search,
@@ -14,7 +13,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { cl, fw, iv } from "@/utils/ps"
+import { cl } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
 import { ai_platforms, promptory_types } from "@/lib/constants"
@@ -135,18 +134,14 @@ export const navItems: NavItems[] = [
 
 export function NavLinks({ notificationCount }: { notificationCount: number }) {
   const pathname = usePathname()
-  const router = useRouter()
 
   return (
     <>
       {navItems.map((item) => (
-        <Button
+        <Link
           key={item.name}
-          size="icon"
-          name={item.name}
-          variant={iv(pathname.startsWith(item.url))}
-          onClick={() => router.push(item.url)}
-          className="nav-button"
+          href={item.url}
+          className={`nav-button flex-center hover:bg-accent ${pathname.startsWith(item.url) ? "bg-accent" : "bg-background"}`}
           aria-label={item.name}
         >
           {item.url === "/notification" ? (
@@ -163,11 +158,11 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
           )}
 
           <span
-            className={`${fw(pathname.startsWith(item.url))} text-base max-md:hidden`}
+            className={`${pathname.startsWith(item.url) ? "font-bold" : "font-medium"} text-base max-md:hidden`}
           >
             {item.name}
           </span>
-        </Button>
+        </Link>
       ))}
     </>
   )
@@ -177,7 +172,6 @@ export function UserProfileLink() {
   const { data: session } = useSession()
   const user = session?.user
   const pathname = usePathname()
-  const router = useRouter()
 
   const userAvatar = {
     username: user?.username as string,
@@ -187,22 +181,18 @@ export function UserProfileLink() {
 
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
-      <Button
-        name="Compose Promptory"
-        onClick={() => router.push("/compose/promptory")}
-        className="w-full self-center rounded-full p-2 max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
+      <Link
+        href={"/compose/promptory"}
+        className="flex-center w-full self-center rounded-full bg-foreground p-2 text-background max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
         aria-label="Compose Promptory"
       >
         <Feather className="size-5 text-base md:hidden" />
-        <span className="text-base text-lg max-md:hidden">Post</span>
-      </Button>
+        <span className="text-lg font-medium max-md:hidden">Post</span>
+      </Link>
 
-      <Button
-        size="icon"
-        name="Profile"
-        variant={iv(pathname.slice(1) === user?.username)}
-        onClick={() => router.push(cl(String(user?.username)))}
-        className="size-10 gap-2 rounded-full p-1 sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2"
+      <Link
+        href={cl(user?.username as string)}
+        className={`${pathname.slice(1) === user?.username ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
         aria-label="Profile"
       >
         <AvatarComponent user={userAvatar} classname="max-sm:size-8" />
@@ -212,7 +202,7 @@ export function UserProfileLink() {
             &#64;{user?.username}
           </span>
         </span>
-      </Button>
+      </Link>
     </div>
   )
 }
