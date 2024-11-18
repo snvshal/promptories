@@ -1,8 +1,6 @@
 import Notifications from "@/components/notification"
-import { Notification } from "@/models/notification.model"
 import { TNotification } from "@/types/schema.type"
-import { connectToDatabase } from "@/utils/db"
-import { currentUser } from "@/utils/get-user"
+import { getNotifications } from "@/utils/get-notifications"
 import { ps } from "@/utils/ps"
 import { Metadata } from "next"
 
@@ -24,20 +22,6 @@ export const metadata: Metadata = {
       "Keep track of your notifications and never miss an update on Promptories.",
     card: "summary",
   },
-}
-
-export const getNotifications = async () => {
-  try {
-    await connectToDatabase()
-
-    const user = await currentUser()
-    const notifications = await Notification.find({ user })
-      .populate("actor")
-      .sort({ createdAt: -1 })
-    return notifications
-  } catch (error) {
-    console.error(error)
-  }
 }
 
 export default async function NotificationsPage() {

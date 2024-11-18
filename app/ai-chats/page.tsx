@@ -1,7 +1,6 @@
 import AIChatsComponent from "@/components/ai-chat/component"
-import { AIChat } from "@/models/ai-chat.model"
 import { AIChatPT } from "@/types/generics.type"
-import { connectToDatabase } from "@/utils/db"
+import { getAIChats } from "@/utils/get-aichats"
 import { ps } from "@/utils/ps"
 import { Metadata } from "next"
 
@@ -23,19 +22,6 @@ export const metadata: Metadata = {
       "Discover user conversations with various AI models like ChatGPT, Claude, Gemini, and v0 on Promptories. Get inspired by real examples.",
     card: "summary",
   },
-}
-
-export const getAIChats = async () => {
-  try {
-    await connectToDatabase()
-
-    const aiChats: AIChatPT[] = await AIChat.find()
-      .populate("user")
-      .sort({ createdAt: -1 })
-    return aiChats
-  } catch (error) {
-    console.error(error)
-  }
 }
 
 export default async function AIChatsPage() {
