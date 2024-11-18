@@ -85,7 +85,7 @@ export type TNotification = Document & {
 }
 
 // AI Chats Model Type
-export type TAIChat = {
+export type TAIChat = Document & {
   user: Types.ObjectId | TUser
   title: string
   description: string
