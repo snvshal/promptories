@@ -14,13 +14,14 @@ export function PromptoryMedia({
   post,
   mediaUrl,
   mediaType,
+  prompt_response,
 }: {
   post: TPost
   mediaUrl: string
   mediaType: MediaType
+  prompt_response: "prompt" | "response"
 }) {
   const router = useRouter()
-
   return (
     <div className="flex h-screen w-full flex-col">
       <header className="flex-between z-20 border-b bg-background px-4 py-2">
@@ -34,27 +35,48 @@ export function PromptoryMedia({
           </Link>
         </div>
         <Button
-          variant="ghost"
           size="icon"
+          variant="ghost"
           onClick={() => router.back()}
           className="rounded-full"
+          aria-label="Close Media"
+          name="CloseButton"
         >
           <X size={20} />
         </Button>
       </header>
       <div className="flex-center h-[calc(100vh-4rem)]">
         {mediaType === "image" ? (
-          <Image
-            src={mediaUrl}
-            alt="Photo"
-            width={800}
-            height={600}
-            className="h-auto max-h-80 w-auto"
-          />
+          <>
+            <Image
+              role="img"
+              src={mediaUrl}
+              width={800}
+              height={600}
+              priority={true}
+              className="h-auto max-h-80 w-auto"
+              alt={`This is a ${prompt_response} ${mediaType} created by @${pu(post).username}`}
+              aria-describedby="image-description"
+            />
+            <span id="image-description" className="sr-only">
+              {post.caption}
+            </span>
+          </>
         ) : (
-          <video src={mediaUrl} className="h-auto max-h-80 w-auto" controls>
-            Your browser does not support the video tag.
-          </video>
+          <>
+            <video
+              src={mediaUrl}
+              className="h-auto max-h-80 w-auto"
+              controls
+              aria-describedby="video-description"
+              aria-label={`${prompt_response} ${mediaType}`}
+            >
+              Your browser does not support the video tag.
+            </video>
+            <span id="video-description" className="sr-only">
+              {post.caption}
+            </span>
+          </>
         )}
       </div>
     </div>
