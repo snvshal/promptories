@@ -9,35 +9,18 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { MoreHorizontal, MessageSquare, Clock } from "lucide-react"
-import { TAIChat, TUser } from "@/types/schema.type"
-import { TimeAgo } from "./time-ago"
-import { AvatarComponent } from "./post/content"
-import { NavigateBackHeader } from "./home"
+import { TimeAgo } from "../time-ago"
+import { AvatarComponent } from "../post/content"
+import { NavigateBackHeader } from "../home"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { cl } from "@/utils/ps"
+import { AIChatPT } from "@/types/generics.type"
+import AIChatDialogForm from "./create"
 
-// interface ChatCardProps {
-//   title: string
-//   description: string
-//   aiModel: string
-//   time: string
-//   userName: string
-//   userAvatar: string
-// }
-
-export default function AIChatsComponent({ aiChats }: { aiChats: TAIChat[] }) {
-  const router = useRouter()
-
+export default function AIChatsComponent({ aiChats }: { aiChats: AIChatPT[] }) {
   return (
     <div className="min-h-screen w-full">
-      <NavigateBackHeader
-        page="AI Chats"
-        rsC={
-          <Button onClick={() => router.push("/ai-chats/create")}>
-            Create
-          </Button>
-        }
-      />
+      <NavigateBackHeader page="AI Chats" rsC={<AIChatDialogForm />} />
       <main className="main-content">
         {aiChats.map((aiChat, index) => (
           <AIChatComponent key={index} aiChat={aiChat} />
@@ -47,18 +30,20 @@ export default function AIChatsComponent({ aiChats }: { aiChats: TAIChat[] }) {
   )
 }
 
-export function AIChatComponent({ aiChat }: { aiChat: TAIChat }) {
+export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
   const { title, description, user, updatedAt, model, chat_link } = aiChat
   return (
     <Card className="m-4 overflow-hidden">
       <Link href={chat_link} target="_blank">
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 self-start text-primary" />
-              <h2 className="text-lg font-semibold leading-none">{title}</h2>
+              <h2 className="flex-1 text-lg font-semibold leading-none">
+                {title}
+              </h2>
             </div>
-            <div className="flex items-center text-xs text-muted-foreground">
+            <div className="flex items-center text-nowrap text-xs text-muted-foreground">
               <Clock className="mr-1 h-3 w-3" />
               <TimeAgo timestamp={updatedAt as Date} />
             </div>
@@ -76,8 +61,13 @@ export function AIChatComponent({ aiChat }: { aiChat: TAIChat }) {
       <div className="mx-6 h-px bg-border" />
       <CardFooter className="flex items-center justify-between py-3">
         <div className="flex items-center space-x-2">
-          <AvatarComponent user={user as TUser} />
-          <span className="text-sm font-medium">{(user as TUser)?.name}</span>
+          <AvatarComponent user={user} />
+          <Link
+            href={cl(user.username)}
+            className="text-sm font-medium hover:underline"
+          >
+            {user?.name}
+          </Link>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

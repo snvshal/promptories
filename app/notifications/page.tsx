@@ -1,6 +1,7 @@
 import Notifications from "@/components/notification"
 import { Notification } from "@/models/notification.model"
 import { TNotification } from "@/types/schema.type"
+import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
 import { ps } from "@/utils/ps"
 import { Metadata } from "next"
@@ -25,10 +26,21 @@ export const metadata: Metadata = {
   },
 }
 
+export const getNotifications = async () => {
+  try {
+    await connectToDatabase()
+
+    const user = await currentUser()
+    const notifications = await Notification.find({ user })
+      .populate("actor")
+      .sort({ createdAt: -1 })
+    return notifications
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export default async function NotificationsPage() {
-  const user = await currentUser()
-  const notifications = await Notification.find({ user })
-    .populate("actor")
-    .sort({ createdAt: -1 })
+  const notifications = await getNotifications()
   return <Notifications notifications={ps(notifications as TNotification[])} />
 }

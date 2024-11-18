@@ -11,26 +11,24 @@ const aiChatSchema = new Schema<TAIChat>(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
     description: {
       type: String,
       required: true,
+      trim: true,
     },
     model: {
       type: String,
       required: true,
+      trim: true,
     },
     chat_link: {
       type: String,
       required: true,
+      trim: true,
     },
-    likes: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        default: [],
-      },
-    ],
+    likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
     replies: [
       {
         user: { type: Schema.Types.ObjectId, ref: "User" },

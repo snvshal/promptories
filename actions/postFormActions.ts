@@ -5,6 +5,7 @@ import { Post } from "@/models/post.model"
 import { currentUser } from "@/utils/get-user"
 import { parseTags, ps } from "@/utils/ps"
 import { FormValues } from "@/components/form"
+import { revalidatePath } from "next/cache"
 
 export async function savePostForm(data: FormValues) {
   try {
@@ -26,6 +27,9 @@ export async function savePostForm(data: FormValues) {
 
     user?.posts.push(post)
     await user?.save()
+
+    revalidatePath("/home")
+
     return ps(post)
   } catch (error) {
     console.error("Error saving post:", error)
@@ -75,6 +79,8 @@ export async function updatePostForm(data: FormValues, postId: string) {
     post.tags = parseTags(tags as string)
 
     await post.save()
+
+    revalidatePath("/home")
   } catch (error) {
     console.error("Error saving post:", error)
   }
