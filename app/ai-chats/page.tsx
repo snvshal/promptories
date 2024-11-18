@@ -1,23 +1,30 @@
-import AIChatsComponent from "@/components/ai-chat"
-// import { seedAIChatDatabase } from "@/lib/seed"
-import { AIChat } from "@/models/ai-chat.model"
-import { TAIChat } from "@/types/schema.type"
-import { connectToDatabase } from "@/utils/db"
+import AIChatsComponent from "@/components/ai-chat/component"
+import { AIChatPT } from "@/types/generics.type"
+import { getAIChats } from "@/utils/get-aichats"
 import { ps } from "@/utils/ps"
-import { Types } from "mongoose"
+import { Metadata } from "next"
 
-type Populate<T, K extends keyof T> = Omit<T, K> & {
-  [P in K]: Exclude<T[P], Types.ObjectId>
+export const metadata: Metadata = {
+  title: "AI Chats",
+  description:
+    "Explore user-shared conversations with popular AI models like ChatGPT, Claude, Gemini, and v0. Get inspired and learn from diverse examples on Promptories.",
+  openGraph: {
+    title: "AI Chats — Promptories",
+    description:
+      "Browse a collection of AI-driven chats shared by users, featuring models like ChatGPT, Claude, Gemini, and v0. Discover and learn from real conversations.",
+    url: `${process.env.METADATA_BASE_URL}/ai-chats`,
+    siteName: "Promptories",
+    type: "website",
+  },
+  twitter: {
+    title: "AI Chats — Promptories",
+    description:
+      "Discover user conversations with various AI models like ChatGPT, Claude, Gemini, and v0 on Promptories. Get inspired by real examples.",
+    card: "summary",
+  },
 }
 
-export type TAIChatPopulated = Populate<TAIChat, "user">
-
 export default async function AIChatsPage() {
-  await connectToDatabase()
-
-  //   await seedAIChatDatabase()
-  const aiChats: TAIChatPopulated[] = await AIChat.find()
-    .populate("user")
-    .sort({ createdAt: -1 })
-  return <AIChatsComponent aiChats={ps(aiChats)} />
+  const aiChats = await getAIChats()
+  return <AIChatsComponent aiChats={ps(aiChats as AIChatPT[])} />
 }

@@ -79,6 +79,7 @@ export function AvatarComponent({
       role="button"
       onClick={visitProfile}
       className={clsx("cursor-pointer", classname)}
+      aria-label={user.name}
     >
       <AvatarImage src={avatar} alt={name} />
       <AvatarFallback>
@@ -212,6 +213,7 @@ export function PostContent({ type, post }: PostContentProps) {
                   <PostMedia
                     mediaType={post.prompt.media?.type}
                     mediaUrl={post.prompt.media?.url}
+                    caption={post.caption}
                     prType="prompt"
                   />
                 </Link>
@@ -236,6 +238,7 @@ export function PostContent({ type, post }: PostContentProps) {
             <PostMedia
               mediaType={post.response.media?.type}
               mediaUrl={post.response.media?.url}
+              caption={post.caption}
               prType="response"
             />
           </Link>
@@ -256,31 +259,46 @@ export function PostMedia({
   mediaType,
   mediaUrl,
   prType,
+  caption,
 }: {
   mediaType: "image" | "video"
   mediaUrl: string
   prType: "prompt" | "response"
+  caption: string
 }) {
   return (
     <div className="w-full">
       {mediaType === "image" ? (
-        <Image
-          src={mediaUrl}
-          width={500}
-          height={500}
-          quality={75}
-          priority={true}
-          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
-          alt="promptory image"
-        />
+        <>
+          <Image
+            src={mediaUrl}
+            width={500}
+            height={500}
+            quality={75}
+            priority={true}
+            className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
+            alt="promptory image"
+            aria-describedby="image-description"
+          />
+          <span id="image-description" className="sr-only">
+            {caption}
+          </span>
+        </>
       ) : (
-        <video
-          src={mediaUrl}
-          className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
-          controls={prType === "prompt" ? false : true}
-        >
-          Your browser does not support the video tag.
-        </video>
+        <>
+          <video
+            src={mediaUrl}
+            className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
+            controls={prType === "prompt" ? false : true}
+            aria-describedby="video-description"
+            aria-label={`${prType} ${mediaType}`}
+          >
+            Your browser does not support the video tag.
+          </video>
+          <span id="video-description" className="sr-only">
+            {caption}
+          </span>
+        </>
       )}
     </div>
   )

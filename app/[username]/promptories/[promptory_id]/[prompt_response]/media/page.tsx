@@ -9,7 +9,7 @@ export default async function PromptoryMediaPage({
   params: {
     username: string
     promptory_id: string
-    prompt_response: "response" | "prompt"
+    prompt_response: "prompt" | "response"
   }
 }) {
   const { promptory_id, prompt_response } = params
@@ -27,6 +27,7 @@ export default async function PromptoryMediaPage({
       post={ps(post)}
       mediaUrl={mediaUrl}
       mediaType={mediaType as MediaType}
+      prompt_response={prompt_response}
     />
   )
 }
