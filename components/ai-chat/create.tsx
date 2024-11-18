@@ -103,7 +103,8 @@ export default function AIChatDialogForm() {
           <DialogHeader className="px-2">
             <DialogTitle>Create AI Chat Entry</DialogTitle>
             <DialogDescription>
-              Enter the details for your AI chat. Click save when you're done.
+              Enter the details for your AI chat. Click save when you&#39;re
+              done.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>

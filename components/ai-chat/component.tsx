@@ -8,14 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import {
-  MoreHorizontal,
-  MessageSquare,
-  Clock,
-  Trash,
-  Pencil,
-  User,
-} from "lucide-react"
+import { MoreHorizontal, MessageSquare, Clock, Trash, User } from "lucide-react"
 import { TimeAgo } from "../time-ago"
 import { AvatarComponent } from "../post/content"
 import { NavigateBackHeader } from "../home"
@@ -25,6 +18,7 @@ import { AIChatPT } from "@/types/generics.type"
 import AIChatDialogForm from "./create"
 import { deleteAIChat } from "@/actions/aiChatActions"
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 export default function AIChatsComponent({ aiChats }: { aiChats: AIChatPT[] }) {
   return (
@@ -42,6 +36,8 @@ export default function AIChatsComponent({ aiChats }: { aiChats: AIChatPT[] }) {
 export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
   const { data: session } = useSession()
   const currentUser = session?.user
+
+  const router = useRouter()
 
   const { title, description, user, updatedAt, model, chat_link, _id } = aiChat
   return (
@@ -101,7 +97,7 @@ export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
                 <span className="text-red-500 hover:text-red-500">Delete</span>
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(cl(user.username))}>
                 <User className="mr-2 h-4 w-4" />
                 <span>&#64;{user.username}</span>
               </DropdownMenuItem>
