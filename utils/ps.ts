@@ -1,7 +1,9 @@
 import { TPost, TReplies, TUser } from "@/types/schema.type"
 import { Types } from "mongoose"
 
-export const ps = (obj: object) => JSON.parse(JSON.stringify(obj))
+export const ps = (obj: object) =>
+  obj === undefined ? [] : JSON.parse(JSON.stringify(obj))
+
 export const st = (t: Types.ObjectId[]) => t?.map((i) => i.toString())
 
 export const pu = (post: TPost | TReplies) => post.user as TUser
