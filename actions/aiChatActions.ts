@@ -51,7 +51,7 @@ export async function validateAIChatFormData(data: AIChatFormValue) {
 
     if (!user) throw new Error("User not found!")
 
-    const { title, description, model, chat_link } = data
+    const { title, description, model_name, chat_link } = data
 
     if (!title || title.length < 2 || title.length > 50) {
       throw new Error("Title must be between 2 and 40 characters.")
@@ -61,8 +61,8 @@ export async function validateAIChatFormData(data: AIChatFormValue) {
       throw new Error("Description must be between 25 and 240 characters.")
     }
 
-    if (!model || model.length < 2 || model.length > 25) {
-      throw new Error("Model must be between 2 and 20 characters.")
+    if (!model_name || model_name.length < 2 || model_name.length > 25) {
+      throw new Error("Model name must be between 2 and 20 characters.")
     }
 
     if (
@@ -80,7 +80,7 @@ export async function validateAIChatFormData(data: AIChatFormValue) {
       user: user._id,
       title,
       description,
-      model,
+      model_name,
       chat_link,
       likes: [],
       replies: [],

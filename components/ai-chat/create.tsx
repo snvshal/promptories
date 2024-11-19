@@ -46,13 +46,13 @@ const aiChatFormSchema = z.object({
     .max(240, {
       message: "Description must not exceed 240 characters.",
     }),
-  model: z
+  model_name: z
     .string()
     .min(2, {
-      message: "Model must be at least 2 characters.",
+      message: "Model name must be at least 2 characters.",
     })
     .max(25, {
-      message: "Model must not exceed 20 characters.",
+      message: "Model name must not exceed 20 characters.",
     }),
   chat_link: z
     .string()
@@ -77,7 +77,7 @@ export default function AIChatDialogForm() {
     defaultValues: {
       title: "",
       description: "",
-      model: "",
+      model_name: "",
       chat_link: "",
     },
   })
@@ -150,7 +150,7 @@ export default function AIChatDialogForm() {
               />
               <FormField
                 control={form.control}
-                name="model"
+                name="model_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>AI Model</FormLabel>
@@ -161,7 +161,7 @@ export default function AIChatDialogForm() {
                       />
                     </FormControl>
                     <FormDescription>
-                      The AI model used for this chat (2-20 characters).
+                      The AI model name used for this chat (2-20 characters).
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
