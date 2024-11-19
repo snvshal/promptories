@@ -35,7 +35,7 @@ export async function likeNotification(post: TPost) {
 
     if (!actor || objId(actor._id).equals(objId(post.user))) return
 
-    const location = cl(postPathname(post))
+    const location = postPathname(post)
     return await createNotification(
       "like",
       objId(post.user),
@@ -55,7 +55,7 @@ export async function commentNotification(post: TPost) {
 
     if (!actor || objId(actor._id).equals(objId(post.user))) return
 
-    const location = cl(postPathname(post))
+    const location = postPathname(post)
     return await createNotification(
       "comment",
       objId(post.user),

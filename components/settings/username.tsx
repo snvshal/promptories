@@ -108,7 +108,15 @@ export default function UsernameSettings() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Change Username</Button>
+            <Button
+              type="submit"
+              disabled={
+                user?.username === usernameForm.getValues("username") ||
+                usernameForm.watch("username") === ""
+              }
+            >
+              Change Username
+            </Button>
           </form>
         </Form>
       </CardContent>

@@ -5,6 +5,8 @@ import { User } from "@/models/user.model"
 import { ProfileFormValues } from "@/components/settings/profile"
 import { reservedUsernames } from "@/lib/constants"
 import { currentUser } from "@/utils/get-user"
+import { revalidatePath } from "next/cache"
+import { cl } from "@/utils/ps"
 
 export async function isUsernameUnique(
   username: string,
@@ -99,6 +101,8 @@ export async function updateUsername(
 
     user.username = newUsername
     await user.save()
+
+    revalidatePath(cl(user.username))
 
     return { success: true, message: "User data updated successfully." }
   } catch (error) {

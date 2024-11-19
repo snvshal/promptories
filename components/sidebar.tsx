@@ -198,7 +198,7 @@ export function UserProfileLink() {
         <AvatarComponent user={userAvatar} classname="max-sm:size-8" />
         <span className="flex flex-col items-start max-md:hidden">
           <span className="text-base">{user?.name}</span>
-          <span className="font-normal text-muted-foreground">
+          <span className="text-sm font-normal text-muted-foreground">
             &#64;{user?.username}
           </span>
         </span>
