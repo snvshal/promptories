@@ -39,7 +39,8 @@ export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
 
   const router = useRouter()
 
-  const { title, description, user, updatedAt, model, chat_link, _id } = aiChat
+  const { title, description, user, updatedAt, model_name, chat_link, _id } =
+    aiChat
   return (
     <Card className="m-4 overflow-hidden">
       <Link href={chat_link} target="_blank">
@@ -61,7 +62,7 @@ export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
           <p className="text-sm text-muted-foreground">{description}</p>
           <div className="mt-4 flex items-center justify-start">
             <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-              {model}
+              {model_name}
             </span>
           </div>
         </CardContent>

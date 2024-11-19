@@ -89,7 +89,7 @@ export type TAIChat = Document & {
   user: Types.ObjectId | TUser
   title: string
   description: string
-  model: string
+  model_name: string
   chat_link: string
   likes: Types.ObjectId[]
   replies: TReplies[]
