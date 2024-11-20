@@ -31,6 +31,7 @@ import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { ACCEPTED_IMAGE_TYPES } from "../form"
 import { AvatarComponent } from "../post/content"
 import { cl } from "@/utils/ps"
+import { TUser } from "@/types/schema.type"
 
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
@@ -59,11 +60,10 @@ const profileSchema = z.object({
 
 export type ProfileFormValues = z.infer<typeof profileSchema>
 
-export default function ProfileSettings() {
+export default function ProfileSettings({ user }: { user: TUser }) {
   const { data: session, update } = useSession()
-  const user = session?.user
 
-  const [avatar, setAvatar] = useState<string | null>(user?.image as string)
+  const [avatar, setAvatar] = useState<string | null>(user?.avatar as string)
 
   const handleUpload = (result: CloudinaryUploadWidgetResults) => {
     const info = result?.info as {

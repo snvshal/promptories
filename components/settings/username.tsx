@@ -25,6 +25,7 @@ import {
 import { toast } from "@/hooks/use-toast"
 import { isUsernameUnique, updateUsername } from "@/actions/profileActions"
 import { useSession } from "next-auth/react"
+import { TUser } from "@/types/schema.type"
 
 const usernameSchema = z.object({
   username: z
@@ -44,9 +45,8 @@ const usernameSchema = z.object({
 
 export type UsernameFormValues = z.infer<typeof usernameSchema>
 
-export default function UsernameSettings() {
+export default function UsernameSettings({ user }: { user: TUser }) {
   const { data: session, update } = useSession()
-  const user = session?.user
 
   const usernameForm = useForm<UsernameFormValues>({
     resolver: zodResolver(usernameSchema),
