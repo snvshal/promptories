@@ -1,4 +1,6 @@
 import UsernameSettings from "@/components/settings/username"
+import { TUser } from "@/types/schema.type"
+import { currentUser } from "@/utils/get-user"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -20,5 +22,6 @@ export const metadata: Metadata = {
 }
 
 export default async function UsernameSettingsPage() {
-  return <UsernameSettings />
+  const user = await currentUser()
+  return <UsernameSettings user={user as TUser} />
 }
