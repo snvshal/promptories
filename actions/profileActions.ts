@@ -80,6 +80,8 @@ export async function updateUserData(
 
     await user.save()
 
+    revalidatePath(cl(user.username))
+
     return { success: true, message: "User data updated successfully." }
   } catch (error) {
     console.error(error)

@@ -115,7 +115,6 @@ export const reservedUsernames = [
   "store",
   "production",
   "testuser",
-  "promptories",
   "updates",
   "feedback",
   "friends",

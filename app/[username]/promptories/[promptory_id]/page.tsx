@@ -11,10 +11,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { username, promptory_id } = params
   const promptory = await getPostById(promptory_id)
-  const { name } = promptory?.user as TUser
+  const user = promptory?.user as TUser
 
   return {
-    title: `${name}: ${promptory?.caption || "Promptory"}`,
+    title: `${user?.name}: ${promptory?.caption || "Promptory"}`,
     description:
       promptory?.caption ||
       `Discover the AI prompt created by @${username} on Promptories.`,

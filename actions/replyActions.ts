@@ -4,9 +4,10 @@ import { Post } from "@/models/post.model"
 import { TReplies } from "@/types/schema.type"
 import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
-import { ps } from "@/utils/ps"
+import { postPathname, ps } from "@/utils/ps"
 import { Types } from "mongoose"
 import { commentNotification } from "./notificationActions"
+import { revalidatePath } from "next/cache"
 
 export async function addReplyToPost(postId: string, replyText: string) {
   try {
@@ -33,6 +34,8 @@ export async function addReplyToPost(postId: string, replyText: string) {
     ).populate("replies.user")
 
     await commentNotification(updatedPost)
+
+    revalidatePath(postPathname(updatedPost))
 
     return ps(updatedPost)
   } catch (error) {
@@ -62,6 +65,8 @@ export async function handleLikeReply(postId: string, replyId: string) {
 
     await post.save()
 
+    revalidatePath(postPathname(post))
+
     return ps(reply.likes as Types.ObjectId[])
   } catch (error) {
     console.error("Error toggling like:", error)
@@ -89,6 +94,8 @@ export async function deleteReply(postId: string, replyId: string) {
     post.replies.remove(replyId)
 
     await post.save()
+
+    revalidatePath(postPathname(post))
 
     return ps(post.replies as TReplies[])
   } catch (error) {

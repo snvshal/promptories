@@ -77,7 +77,10 @@ export function AvatarComponent({
   return (
     <Avatar
       role="button"
-      onClick={visitProfile}
+      onClick={(e) => {
+        e.stopPropagation()
+        visitProfile()
+      }}
       className={clsx("cursor-pointer", classname)}
       aria-label={user.name}
     >
@@ -105,7 +108,7 @@ export function PostContentType({
           {content.split(" ").slice(0, 40).join(" ")}
         </p>
         {content.split(" ").length > 40 && (
-          <button className="text-blue-500 hover:underline">Show more</button>
+          <span className="text-blue-500 hover:underline">Show more</span>
         )}
       </>
     )
@@ -192,64 +195,53 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
 }
 
 export function PostContent({ type, post }: PostContentProps) {
-  const mt = ["image", "video", "audio"]
-  const pt = post.promptory_type.toLowerCase()
-  const matchedType = mt.find((type) => pt.startsWith(type))
-
   return (
     <CardContent className={`border-0 p-0`}>
       <div className="relative mb-2 overflow-hidden">
         <PostContentType type={type} content={post.caption} />
       </div>
-      <div className="relative overflow-hidden">
-        <div className="rounded-t-lg border border-b-0 bg-primary-foreground p-2 px-3">
+      <div
+        className={`relative flex flex-col gap-4 overflow-hidden rounded-lg bg-primary-foreground p-4`}
+      >
+        <div>
+          <h2 className="font-bold">Prompt:</h2>
           {post.prompt.media?.url ? (
-            <div className="my-1 flex gap-4">
-              <div className="w-auto">
-                <Link
-                  href={postPathname(post, "prompt", "media")}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <PostMedia
-                    mediaType={post.prompt.media?.type}
-                    mediaUrl={post.prompt.media?.url}
-                    caption={post.caption}
-                    prType="prompt"
-                  />
-                </Link>
-              </div>
-              <div className="flex-1 self-center">
-                <p className="text-muted-foreground">
-                  Response created using this {matchedType}
-                </p>
-              </div>
-            </div>
+            <Link
+              href={postPathname(post, "prompt", "media")}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PostMedia
+                mediaType={post.prompt.media?.type}
+                mediaUrl={post.prompt.media?.url}
+                caption={post.caption}
+                prType="prompt"
+              />
+            </Link>
           ) : (
             <PostContentType type={type} content={post.prompt.text as string} />
           )}
         </div>
-      </div>
-      <div className="relative overflow-hidden">
-        {post.response.media?.url ? (
-          <Link
-            href={postPathname(post, "prompt", "media")}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <PostMedia
-              mediaType={post.response.media?.type}
-              mediaUrl={post.response.media?.url}
-              caption={post.caption}
-              prType="response"
-            />
-          </Link>
-        ) : (
-          <div className="rounded-b-lg border border-t-0 p-2 px-3">
+        <div>
+          <h2 className="font-bold">Response:</h2>
+          {post.response.media?.url ? (
+            <Link
+              href={postPathname(post, "prompt", "media")}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PostMedia
+                mediaType={post.response.media?.type}
+                mediaUrl={post.response.media?.url}
+                caption={post.caption}
+                prType="response"
+              />
+            </Link>
+          ) : (
             <PostContentType
               type={type}
               content={post.response.text as string}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </CardContent>
   )
@@ -276,7 +268,7 @@ export function PostMedia({
             height={500}
             quality={75}
             priority={true}
-            className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
+            className="mt-1.5 w-full rounded-lg"
             alt="promptory image"
             aria-describedby="image-description"
           />
@@ -288,8 +280,8 @@ export function PostMedia({
         <>
           <video
             src={mediaUrl}
-            className={`${prType === "prompt" ? "h-20 w-auto rounded-lg" : "w-full rounded-b-lg border-t-0"} border`}
-            controls={prType === "prompt" ? false : true}
+            controls={true}
+            className="mt-1.5 w-full rounded-lg"
             aria-describedby="video-description"
             aria-label={`${prType} ${mediaType}`}
           >
