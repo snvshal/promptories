@@ -27,7 +27,7 @@ export default function Notifications({
       <NavigateBackHeader page="Notifications" />
 
       <main className="main-content">
-        <Card className="mid-width-card-content">
+        <Card className="mb-0 w-full rounded-none border-0 shadow-none">
           <CardContent className="p-4">
             <Tabs
               defaultValue="all"

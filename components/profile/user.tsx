@@ -121,7 +121,7 @@ export function TabsTriggerButton({
     <TabsTrigger
       role="button"
       value={tabValue}
-      className="flex-center relative h-full w-full flex-col rounded-none p-0 px-4 hover:bg-accent"
+      className="flex-center relative h-full w-full flex-col rounded-none p-0 px-4 hover:bg-accent data-[state=active]:shadow-none"
     >
       {children}
       <span
@@ -141,7 +141,7 @@ export function ProfileUserContent({
   const [followers, setFollowers] = useState(profileUser?.following.length)
 
   return (
-    <Card className="mb-0 w-full rounded-none border-0">
+    <Card className="mb-0 w-full rounded-none border-0 shadow-none">
       <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
         <div className="flex w-full justify-end space-x-4">
           <ProfileOptionButton
@@ -211,7 +211,7 @@ export function UserNotFound() {
     <div className="min-h-screen">
       <NavigateBackHeader page="User not found" />
       <div className="main-content">
-        <Card className="mb-0 mt-8 w-full rounded-none border-0">
+        <Card className="mb-0 mt-8 w-full rounded-none border-0 shadow-none">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
               <Avatar className="mb-4 size-32">

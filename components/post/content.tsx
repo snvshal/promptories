@@ -43,7 +43,7 @@ export function PostType({ post, type }: PostContentProps) {
     <Card
       role={type === "posts" ? "button" : undefined}
       onClick={type === "posts" ? visitPost : undefined}
-      className="mid-width-card-content flex px-4 py-3"
+      className="mid-width-card-content flex px-4 py-3 shadow-none"
       data-key={post._id?.toString() as string}
     >
       {type === "posts" && (
@@ -100,7 +100,7 @@ export function PostContentType({
   content: string
 }) {
   if (type === "post") {
-    return <p className="whitespace-pre-wrap">{content}</p>
+    return <p className="whitespace-pre-wrap text-lg">{content}</p>
   } else {
     return (
       <>
@@ -155,7 +155,9 @@ export function PostAuthorName({
         className="flex cursor-pointer flex-col gap-0"
       >
         <p className="font-semibold hover:underline">{postAuthor.name}</p>
-        <p className="text-muted-foreground">&#64;{postAuthor.username}</p>
+        <p className="leading-4 text-muted-foreground">
+          &#64;{postAuthor.username}
+        </p>
       </Link>
     )
   } else {
@@ -178,7 +180,7 @@ export function PostAuthorName({
 
 export function PostTime({ createdAt }: { createdAt: Date }) {
   return (
-    <div className="flex-start border-b py-2 text-sm text-muted-foreground">
+    <div className="flex-start border-b py-3 text-muted-foreground">
       {new Date(createdAt as Date).toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
@@ -204,7 +206,9 @@ export function PostContent({ type, post }: PostContentProps) {
         className={`relative flex flex-col gap-4 overflow-hidden rounded-lg bg-primary-foreground p-4`}
       >
         <div>
-          <h2 className="font-bold">Prompt:</h2>
+          <h2 className={`${type === "post" && "text-lg"} font-bold`}>
+            Prompt:
+          </h2>
           {post.prompt.media?.url ? (
             <Link
               href={postPathname(post, "prompt", "media")}
@@ -222,7 +226,9 @@ export function PostContent({ type, post }: PostContentProps) {
           )}
         </div>
         <div>
-          <h2 className="font-bold">Response:</h2>
+          <h2 className={`${type === "post" && "text-lg"} font-bold`}>
+            Response:
+          </h2>
           {post.response.media?.url ? (
             <Link
               href={postPathname(post, "prompt", "media")}
