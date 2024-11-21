@@ -20,16 +20,28 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { signOut } from "next-auth/react"
+import { deleteAccount } from "@/actions/profileActions"
 
 export default function AccountSettings() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deletingAccount, setDeletingAccount] = useState(false)
+
   const router = useRouter()
 
   const handleSignOut = () => signOut()
 
-  const handleDeleteAccount = () => {
-    setIsDeleteDialogOpen(false)
-    router.push("/")
+  const handleDeleteAccount = async () => {
+    try {
+      setDeletingAccount(true)
+      await deleteAccount()
+      setIsDeleteDialogOpen(false)
+      handleSignOut()
+      router.push("/")
+    } catch (error) {
+      console.error("Error deleting account:", error)
+    } finally {
+      setDeletingAccount(false)
+    }
   }
 
   return (
@@ -83,8 +95,12 @@ export default function AccountSettings() {
                 >
                   Cancel
                 </Button>
-                <Button variant="destructive" onClick={handleDeleteAccount}>
-                  Delete Account
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount}
+                >
+                  {deletingAccount ? "Deleting Account..." : "Delete Account"}
                 </Button>
               </DialogFooter>
             </DialogContent>
