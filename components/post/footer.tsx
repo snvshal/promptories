@@ -30,7 +30,7 @@ export function PostFooter({ post }: { post: TPost }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <CardFooter onClick={(e) => e.stopPropagation()} className="p-0 pt-2">
+    <CardFooter onClick={(e) => e.stopPropagation()} className="p-0 pt-3">
       <div className="grid w-4/5 grid-cols-4">
         <PostReplyDialog post={post} />
         <LikeButton post={post} />

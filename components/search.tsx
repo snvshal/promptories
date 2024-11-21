@@ -88,7 +88,7 @@ export default function SearchComponent() {
     <div className="w-full">
       <NavigateBackHeader page="Search" />
       <main className="main-content">
-        <Card className="mb-0 w-full rounded-none border-0">
+        <Card className="mb-0 w-full rounded-none border-0 shadow-none">
           <CardContent className="p-4">
             <form onSubmit={handleSearchSubmit}>
               <div className="flex gap-2">
@@ -193,7 +193,7 @@ function UserProfileCard({ profileUser }: { profileUser: TUser }) {
   const [followers, setFollowers] = useState(profileUser.followers.length ?? 0)
 
   return (
-    <Card className="mid-width-card-content">
+    <Card className="mid-width-card-content shadow-none">
       <CardContent className="flex items-center space-x-4 p-4">
         <AvatarComponent
           user={profileUser}

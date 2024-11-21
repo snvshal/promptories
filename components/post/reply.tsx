@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "../ui/textarea"
 import { PostFooterIconButton } from "./footer"
+import { AvatarComponent } from "./content"
 
 export function PostReplies({
   post,
@@ -72,7 +73,7 @@ export function PostReplies({
     }
   }
   return (
-    <Card className="mid-width-card-content">
+    <Card className="mb-0 w-full rounded-none border-0 shadow-none">
       <CardHeader className="p-4">
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
@@ -168,12 +169,7 @@ export function PostRepliesContent({
     <div className="space-y-4">
       {replies.map((reply, index) => (
         <div key={index} className="flex space-x-2">
-          <Avatar>
-            <AvatarImage src={pu(reply).avatar} alt={pu(reply).name} />
-            <AvatarFallback>
-              <User className="size-4" />
-            </AvatarFallback>
-          </Avatar>
+          <AvatarComponent user={pu(reply)} />
           <div className="flex-1">
             <div className="flex-between h-6">
               <div className="flex-start">

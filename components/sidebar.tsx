@@ -68,7 +68,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
-      <aside className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-dvh sm:w-16 sm:border-r md:w-60">
+      <aside className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
         <nav className="h-full">
           <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
             <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
@@ -127,7 +127,7 @@ export const navItems: NavItems[] = [
   },
   {
     name: "Settings",
-    url: "/settings",
+    url: "/settings/profile",
     icon: Settings,
   },
 ]
@@ -197,8 +197,8 @@ export function UserProfileLink() {
       >
         <AvatarComponent user={userAvatar} classname="max-sm:size-8" />
         <span className="flex flex-col items-start max-md:hidden">
-          <span className="text-base font-medium">{user?.name}</span>
-          <span className="text-sm font-normal text-muted-foreground">
+          <span className="font-semibold">{user?.name}</span>
+          <span className="leading-4 text-muted-foreground">
             &#64;{user?.username}
           </span>
         </span>
@@ -224,7 +224,7 @@ export function SidePanel() {
 
   return (
     <aside className="w-1/3 max-lg:hidden">
-      <div className="sticky top-0 h-dvh w-full overflow-hidden border-l px-4 pt-4">
+      <div className="sticky top-0 h-screen w-full overflow-hidden border-l px-4 pt-4">
         {pathname.startsWith("/search") || (
           <div className="flex-center mt-2">
             <form onSubmit={onSubmit} className="w-full">
@@ -265,7 +265,7 @@ export function SidePanel() {
           </Select>
         </div>
         <div className="flex-center flex-col">
-          <ScrollArea className="h-[17rem] w-full rounded-lg border">
+          <ScrollArea className="h-[17rem] w-full rounded-lg border shadow">
             <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
               <TrendingUp />
               <span>Trending</span>

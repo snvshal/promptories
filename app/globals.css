@@ -104,10 +104,6 @@ html {
   @apply mb-0 w-full rounded-none border-x-0 border-b border-t-0;
 }
 
-/* .main-content {
-  @apply bottom-navbar container mx-auto box-border max-w-4xl py-8;
-} */
-
 .compose-button {
   @apply fixed bottom-20 right-10 h-12 w-12 rounded-full border bg-primary p-2 sm:bottom-10 sm:hidden;
 }
