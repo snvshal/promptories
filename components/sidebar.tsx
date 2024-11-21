@@ -144,7 +144,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
           className={`nav-button flex-center hover:bg-accent ${pathname.startsWith(item.url) ? "bg-accent" : "bg-background"}`}
           aria-label={item.name}
         >
-          {item.url === "/notification" ? (
+          {item.url === "/notifications" ? (
             <span className="relative">
               {notificationCount > 0 && (
                 <Badge className="flex-center absolute -right-1 -top-1 h-4 rounded-full px-1">
