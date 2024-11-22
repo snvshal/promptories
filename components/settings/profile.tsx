@@ -159,7 +159,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
                       variant="secondary"
                       onClick={() => open()}
                     >
-                      Upload Profile Picture
+                      Upload
                     </Button>
                   )}
                 </CldUploadWidget>
