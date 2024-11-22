@@ -255,7 +255,7 @@ export function PostReplyOptions({
     }
   }
 
-  const authorized = reply.user._id?.toString() === session?.user.id
+  const authorized = pu(reply).email === session?.user.email
 
   return (
     <DropdownMenu>

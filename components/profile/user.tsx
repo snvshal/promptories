@@ -34,7 +34,7 @@ export default function UserProfileComponent({
   const router = useRouter()
   const { data: session } = useSession()
 
-  const isAdmin = profileUser._id?.toString() === session?.user?.id
+  const isAdmin = profileUser.email === session?.user?.email
 
   const searchParams = useSearchParams()
   const query = searchParams.get("tab")
@@ -251,7 +251,7 @@ export function ProfileOptionButton({
   const user = session?.user
   const router = useRouter()
 
-  const isAdmin = profileUser._id?.toString() === user?.id
+  const isAdmin = profileUser.email === user?.email
 
   if (isAdmin) {
     return (
@@ -279,7 +279,7 @@ export function FollowButton({
   const { data: session, update } = useSession()
   const user = session?.user
 
-  const isAdmin = profileUser._id?.toString() === user?.id
+  const isAdmin = profileUser.email === user?.email
   const [follow, setFollow] = useState<"Follow" | "Following">()
 
   useEffect(() => {
