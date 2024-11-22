@@ -7,6 +7,9 @@ import { Session } from "next-auth"
 import { getServerSession } from "next-auth"
 import { Toaster } from "@/components/ui/toaster"
 import { Sidebar } from "@/components/sidebar"
+import { currentUser } from "@/utils/get-user"
+import { TUser } from "@/types/schema.type"
+import { ps } from "@/utils/ps"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -81,6 +84,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const session: Session | null = await getServerSession()
+  const user = await currentUser()
 
   return (
     <html lang="en">
@@ -94,7 +98,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Sidebar>{children}</Sidebar>
+            <Sidebar user={ps(user as TUser)}>{children}</Sidebar>
           </ThemeProvider>
           <Toaster />
         </AuthSessionProvider>
