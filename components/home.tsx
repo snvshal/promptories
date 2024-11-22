@@ -9,7 +9,7 @@ import { PostType } from "./post/content"
 
 export function HomePageComponent({ posts }: { posts: TPost[] }) {
   return (
-    <div className="w-full sm:min-h-screen">
+    <div className="w-full">
       <DynamicHeader>
         <div className="mx-auto flex max-w-7xl items-center justify-between p-4">
           <div className="flex items-center">

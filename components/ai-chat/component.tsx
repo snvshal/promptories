@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation"
 
 export default function AIChatsComponent({ aiChats }: { aiChats: AIChatPT[] }) {
   return (
-    <div className="w-full sm:min-h-screen">
+    <div className="w-full">
       <NavigateBackHeader page="AI Chats" rsC={<AIChatDialogForm />} />
       <main className="main-content">
         {aiChats.map((aiChat, index) => (
