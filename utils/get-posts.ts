@@ -2,14 +2,12 @@ import { Post } from "@/models/post.model"
 import { connectToDatabase } from "./db"
 import { PRMedia, TPost, TUser } from "@/types/schema.type"
 import { User } from "@/models/user.model"
-import { seedPostDatabase } from "@/lib/seed"
 import { FormValues } from "@/components/form"
 import { PostFormMedia } from "@/types/props.type"
 
 export const getPosts = async () => {
   try {
     await connectToDatabase()
-    // await seedPostDatabase();
 
     const posts: TPost[] = await Post.find({})
       .populate("user")

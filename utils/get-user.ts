@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth"
 import { connectToDatabase } from "./db"
 import { User } from "@/models/user.model"
-import { TPost, TUser } from "@/types/schema.type"
+import { TUser } from "@/types/schema.type"
 
 export const currentUser = async () => {
   try {
