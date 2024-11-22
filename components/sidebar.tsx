@@ -68,7 +68,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
-      <aside className="z-50 h-[var(--navbar-height)] border-t border-border bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
+      <aside className="z-50 border-t border-border bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
         <nav className="h-full">
           <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
             <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
@@ -76,7 +76,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
             </div>
             <UserProfileLink />
           </div>
-          <div className="flex h-full items-center justify-around sm:hidden">
+          <div className="flex h-[var(--navbar-height)] items-center justify-around sm:hidden">
             <NavLinks notificationCount={notificationCount} />
             <UserProfileLink />
           </div>
@@ -85,12 +85,10 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
 
       <aside
         id="scrollable-element"
-        className="flex-1 overflow-y-auto xl:pr-40 2xl:pr-80"
+        className="flex-1 overflow-y-auto max-sm:h-[calc(100vh-var(--navbar-height))] xl:pr-40 2xl:pr-80"
       >
         <div className="flex">
-          <div className="w-full flex-1 sm:h-[calc(100vh-var(--navbar-height))] md:w-2/3">
-            {children}
-          </div>
+          <div className="w-full flex-1 md:w-2/3">{children}</div>
           <SidePanel />
         </div>
       </aside>
