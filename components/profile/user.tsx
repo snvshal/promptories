@@ -61,7 +61,7 @@ export default function UserProfileComponent({
     router.push(`?tab=${tab}`)
   }
   return (
-    <div className="w-full sm:min-h-screen">
+    <div className="w-full">
       <NavigateBackHeader page={profileUser.name} />
 
       <main className="main-content">
@@ -208,7 +208,7 @@ export function ProfileUserContent({
 export function UserNotFound() {
   const { username } = useParams()
   return (
-    <div className="sm:min-h-screen">
+    <div>
       <NavigateBackHeader page="User not found" />
       <div className="main-content">
         <Card className="mb-0 mt-8 w-full rounded-none border-0 shadow-none">
