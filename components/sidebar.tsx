@@ -77,7 +77,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
             <UserProfileLink />
           </div>
           <div className="max-sm:h-[var(--navbar-height)]"></div>
-          <div className="absolute bottom-0 flex h-[var(--navbar-height)] w-full items-center justify-around bg-background sm:hidden">
+          <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around bg-background sm:hidden">
             <NavLinks notificationCount={notificationCount} />
             <UserProfileLink />
           </div>
@@ -86,7 +86,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
 
       <aside
         id="scrollable-element"
-        className="flex-1 overflow-y-auto xl:pr-40 2xl:pr-80"
+        className="flex-1 overflow-y-auto max-sm:pb-[var(--navbar-height)] xl:pr-40 2xl:pr-80"
       >
         <div className="flex">
           <div className="w-full flex-1 md:w-2/3">{children}</div>
