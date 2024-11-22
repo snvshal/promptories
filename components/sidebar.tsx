@@ -76,7 +76,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
             </div>
             <UserProfileLink />
           </div>
-          <div className="flex h-[var(--navbar-height)] items-center justify-around sm:hidden">
+          <div className="sticky bottom-0 flex h-[var(--navbar-height)] items-center justify-around sm:hidden">
             <NavLinks notificationCount={notificationCount} />
             <UserProfileLink />
           </div>
@@ -143,6 +143,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
           href={item.url}
           className={`nav-button flex-center hover:bg-accent ${pathname.startsWith(item.url) ? "bg-accent" : "bg-background"}`}
           aria-label={item.name}
+          prefetch={false}
         >
           {item.url === "/notifications" ? (
             <span className="relative">
