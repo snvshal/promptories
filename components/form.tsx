@@ -263,7 +263,7 @@ export default function PostForm({
   }
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="w-full sm:min-h-screen">
       <NavigateBackHeader
         page={operationType === "POST" ? "Create Promptory" : "Edit Promptory"}
       />

@@ -23,7 +23,7 @@ export default function Notifications({
   )
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="w-full sm:min-h-screen">
       <NavigateBackHeader page="Notifications" />
 
       <main className="main-content">

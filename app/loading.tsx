@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react"
 
 export default function Loading() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+    <div className="flex flex-col items-center justify-center bg-background sm:min-h-screen">
       <div className="space-y-4 text-center">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
         <h2 className="text-2xl font-semibold tracking-tight">

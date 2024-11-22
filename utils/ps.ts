@@ -4,7 +4,7 @@ import { Types } from "mongoose"
 export const ps = (obj: object) =>
   obj === undefined ? [] : JSON.parse(JSON.stringify(obj))
 
-export const st = (t: Types.ObjectId[]) => t?.map((i) => i.toString())
+export const st = (t: Types.ObjectId[]) => t?.map((i) => (i ? i.toString() : i))
 
 export const pu = (post: TPost | TReplies) => post.user as TUser
 
