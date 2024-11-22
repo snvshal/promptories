@@ -29,8 +29,14 @@ import {
 } from "./ui/select"
 import { getNotificationCount } from "@/actions/notificationActions"
 import { AvatarComponent } from "./post/content"
+import { TUser } from "@/types/schema.type"
 
-export function Sidebar({ children }: { children: React.ReactNode }) {
+export type SidebarProps = {
+  user: TUser
+  children: React.ReactNode
+}
+
+export function Sidebar({ user, children }: SidebarProps) {
   const { status } = useSession()
   const pathname = usePathname()
 
@@ -74,12 +80,12 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
             <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
               <NavLinks notificationCount={notificationCount} />
             </div>
-            <UserProfileLink />
+            <UserProfileLink user={user} />
           </div>
           <div className="max-sm:h-[var(--navbar-height)]"></div>
-          <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around bg-background sm:hidden">
+          <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
             <NavLinks notificationCount={notificationCount} />
-            <UserProfileLink />
+            <UserProfileLink user={user} />
           </div>
         </nav>
       </aside>
@@ -170,16 +176,8 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
   )
 }
 
-export function UserProfileLink() {
-  const { data: session } = useSession()
-  const user = session?.user
+export function UserProfileLink({ user }: { user: TUser }) {
   const pathname = usePathname()
-
-  const userAvatar = {
-    username: user?.username as string,
-    name: user?.name as string,
-    avatar: user?.image as string,
-  }
 
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
@@ -197,7 +195,7 @@ export function UserProfileLink() {
         className={`${pathname.slice(1) === user?.username ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
         aria-label="Profile"
       >
-        <AvatarComponent user={userAvatar} classname="max-sm:size-8" />
+        <AvatarComponent user={user} classname="max-sm:size-8" />
         <span className="flex flex-col items-start max-md:hidden">
           <span className="font-semibold">{user?.name}</span>
           <span className="leading-4 text-muted-foreground">

@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card } from "@/components/ui/card"
+import Image from "next/image"
 
 export default function SignInComponent() {
   const searchParams = useSearchParams()
@@ -17,12 +18,21 @@ export default function SignInComponent() {
 
   return (
     <div className="dark flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-xl rounded-3xl bg-card p-5 text-card-foreground sm:p-12">
+      <Card className="w-full max-w-xl rounded-3xl bg-card px-5 py-8 text-card-foreground sm:p-12">
         <div className="space-y-8 text-center">
           <div className="space-y-4">
-            <h1 className="text-4xl font-semibold text-foreground">
-              Promptories
-            </h1>
+            <div className="flex-center gap-4">
+              <Image
+                src="/pi.png"
+                width={500}
+                height={500}
+                alt="promptories icon"
+                className="size-10 rounded-lg"
+              />
+              <h1 className="text-4xl font-semibold text-foreground">
+                Promptories
+              </h1>
+            </div>
             <p className="text-lg text-muted-foreground">
               Unlock creative ideas and enhance your prompting skills with our
               all-in-one platform for AI prompts.
