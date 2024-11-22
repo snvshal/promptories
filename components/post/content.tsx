@@ -20,7 +20,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
   const [postReplies, setPostReplies] = useState(post.replies)
 
   return (
-    <div className="w-full sm:min-h-screen">
+    <div className="h-[calc(100vh-var(--navbar-height))] w-full sm:min-h-screen">
       <NavigateBackHeader page="Post" />
       <main className="main-content">
         <PostType post={post} type="post" />
