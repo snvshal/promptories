@@ -69,14 +69,15 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
       <aside className="z-50 border-t border-border bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
-        <nav className="h-full">
+        <nav className="relative h-full">
           <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
             <div className="flex h-full w-full flex-col items-center justify-start gap-4 sm:px-2 md:px-5">
               <NavLinks notificationCount={notificationCount} />
             </div>
             <UserProfileLink />
           </div>
-          <div className="sticky bottom-0 flex h-[var(--navbar-height)] items-center justify-around sm:hidden">
+          <div className="max-sm:h-[var(--navbar-height)]"></div>
+          <div className="absolute bottom-0 flex h-[var(--navbar-height)] w-full items-center justify-around bg-background sm:hidden">
             <NavLinks notificationCount={notificationCount} />
             <UserProfileLink />
           </div>
