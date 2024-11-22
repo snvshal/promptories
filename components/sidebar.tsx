@@ -86,7 +86,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
 
       <aside
         id="scrollable-element"
-        className="flex-1 overflow-y-auto max-sm:h-[calc(100vh-var(--navbar-height))] xl:pr-40 2xl:pr-80"
+        className="flex-1 overflow-y-auto xl:pr-40 2xl:pr-80"
       >
         <div className="flex">
           <div className="w-full flex-1 md:w-2/3">{children}</div>
