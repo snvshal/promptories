@@ -16,7 +16,7 @@ export default function SignInComponent() {
   }
 
   return (
-    <div className="dark flex items-center justify-center bg-background p-4 sm:min-h-screen">
+    <div className="dark flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-xl rounded-3xl bg-card p-5 text-card-foreground sm:p-12">
         <div className="space-y-8 text-center">
           <div className="space-y-4">
