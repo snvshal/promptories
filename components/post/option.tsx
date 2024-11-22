@@ -81,7 +81,7 @@ export function PostOptions({ post, type }: PostContentProps) {
     }
   }
 
-  const authorized = post.user._id?.toString() === user?.id
+  const authorized = pu(post).email === user?.email
 
   const PostOptionItems = () => (
     <>
