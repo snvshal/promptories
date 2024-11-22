@@ -29,7 +29,7 @@ To run the project locally, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/promptories.git
+   git clone https://github.com/snvshal/promptories.git
    ```
 
 2. Navigate to the project directory:
@@ -44,7 +44,7 @@ To run the project locally, follow these steps:
    npm install
    ```
 
-4. Create a `.env` file based on `.env.example` and set your environment variables.
+4. Create a `.env.local` file and set your environment variables.
 
 5. Run the development server:
 
@@ -53,21 +53,6 @@ To run the project locally, follow these steps:
    ```
 
 6. Open your browser at [http://localhost:3000](http://localhost:3000) to see the app in action.
-
-## Folder Structure
-
-```
-.
-├── app/
-│   ├── actions/            # Server actions for data handling
-│   ├── components/         # Reusable components
-│   ├── styles/             # Global styles with Tailwind CSS
-│   ├── utils/              # Utility functions and helpers
-├── lib/                    # Library functions (e.g., MongoDB/mongoose setup)
-├── public/                 # Public assets
-├── types/                  # TypeScript types
-└── README.md
-```
 
 ## Usage
 
