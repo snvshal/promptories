@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"
 
-export default async function UsernameSettingsPage() {
-  return redirect("/settings/profile");
+export default async function SettingsPage() {
+  return redirect("/settings/profile")
 }
