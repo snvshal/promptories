@@ -12,7 +12,7 @@ import {
   Bot,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { useParams, usePathname, useRouter } from "next/navigation"
 import { cl } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
@@ -177,7 +177,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
 }
 
 export function UserProfileLink({ user }: { user: TUser }) {
-  const pathname = usePathname()
+  const params = useParams()
   const router = useRouter()
 
   return (
@@ -193,7 +193,7 @@ export function UserProfileLink({ user }: { user: TUser }) {
 
       <div
         onClick={() => router.push(cl(user?.username))}
-        className={`${pathname.slice(1) === user?.username ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
+        className={`${params.username === user?.username ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
         aria-label="Profile"
         role="button"
       >
