@@ -86,29 +86,35 @@ export function PostOptions({ post, type }: PostContentProps) {
   const PostOptionItems = () => (
     <>
       <Link href={cl(pu(post).username)} prefetch={false} className="sm:hidden">
-        <Button variant="ghost" className="w-full justify-start">
-          <User className="mr-2 h-4 w-4" />
+        <Button variant="ghost" className="w-full justify-start max-sm:text-lg">
+          <User className="mr-2 size-5 sm:size-4" />
           <span>&#64;{pu(post).username}</span>
         </Button>
       </Link>
       <Link href={post.model_url} target="_blank" prefetch={false}>
-        <Button variant="ghost" className="w-full justify-start">
-          <SquareArrowOutUpRight className="mr-2 h-4 w-4" />
-          <span>Try it</span>
+        <Button variant="ghost" className="w-full justify-start max-sm:text-lg">
+          <SquareArrowOutUpRight className="mr-2 size-5 sm:size-4" />
+          <span>Test it</span>
         </Button>
       </Link>
       {post.chat_link && (
         <Link href={post.chat_link} target="_blank" prefetch={false}>
-          <Button variant="ghost" className="w-full justify-start">
-            <MessageSquareShare className="mr-2 h-4 w-4" />
+          <Button
+            variant="ghost"
+            className="w-full justify-start max-sm:text-lg"
+          >
+            <MessageSquareShare className="mr-2 size-5 sm:size-4" />
             <span>View chat</span>
           </Button>
         </Link>
       )}
       {authorized && (
         <Link href={postPathname(post, "edit")} prefetch={false}>
-          <Button variant="ghost" className="w-full justify-start">
-            <Edit className="mr-2 h-4 w-4" />
+          <Button
+            variant="ghost"
+            className="w-full justify-start max-sm:text-lg"
+          >
+            <Edit className="mr-2 size-5 sm:size-4" />
             <span>Edit</span>
           </Button>
         </Link>
@@ -118,13 +124,13 @@ export function PostOptions({ post, type }: PostContentProps) {
           <AlertDialogTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full justify-start text-red-500 hover:text-red-500"
+              className="w-full justify-start text-red-500 hover:text-red-500 max-sm:text-lg"
               onClick={(event) => {
                 event.preventDefault()
                 setIsAlertOpen(true)
               }}
             >
-              <Trash className="mr-2 h-4 w-4" />
+              <Trash className="mr-2 size-5 sm:size-4" />
               <span>Delete</span>
             </Button>
           </AlertDialogTrigger>
@@ -168,7 +174,7 @@ export function PostOptions({ post, type }: PostContentProps) {
         </SheetTrigger>
         <SheetContent side="bottom" className="rounded-t-3xl sm:hidden">
           <SheetHeader>
-            <SheetTitle>Post Options</SheetTitle>
+            <SheetTitle className="mb-4 text-xl">Post Options</SheetTitle>
             <SheetDescription></SheetDescription>
           </SheetHeader>
           <PostOptionItems />
