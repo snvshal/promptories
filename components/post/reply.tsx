@@ -198,7 +198,7 @@ export function PostRepliesContent({
             </div>
 
             <div className="flex items-start justify-between gap-2">
-              <p>{reply.content}</p>
+              <p className="max-sm:text-sm">{reply.content}</p>
               <div className="flex-start flex-col">
                 <Button
                   variant="ghost"

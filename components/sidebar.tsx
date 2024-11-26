@@ -12,7 +12,7 @@ import {
   Bot,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { useParams, usePathname, useRouter } from "next/navigation"
 import { cl } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
@@ -69,8 +69,12 @@ export function Sidebar({ user, children }: SidebarProps) {
     }
   }, [pathname, notificationCount])
 
-  if (status === "unauthenticated") return children
-  if (pathname.endsWith("/media")) return children
+  const noSidebar =
+    status === "unauthenticated" ||
+    pathname.endsWith("/media") ||
+    pathname === "/"
+
+  if (noSidebar) return <div className="h-screen overflow-auto">{children}</div>
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
@@ -177,7 +181,8 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
 }
 
 export function UserProfileLink({ user }: { user: TUser }) {
-  const pathname = usePathname()
+  const params = useParams()
+  const router = useRouter()
 
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
@@ -190,10 +195,11 @@ export function UserProfileLink({ user }: { user: TUser }) {
         <span className="text-lg font-medium max-md:hidden">Post</span>
       </Link>
 
-      <Link
-        href={cl(user?.username as string)}
-        className={`${pathname.slice(1) === user?.username ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
+      <div
+        onClick={() => router.push(cl(user?.username))}
+        className={`${params.username === user?.username ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
         aria-label="Profile"
+        role="button"
       >
         <AvatarComponent user={user} classname="max-sm:size-8" />
         <span className="flex flex-col items-start max-md:hidden">
@@ -202,7 +208,7 @@ export function UserProfileLink({ user }: { user: TUser }) {
             &#64;{user?.username}
           </span>
         </span>
-      </Link>
+      </div>
     </div>
   )
 }
