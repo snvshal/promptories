@@ -20,7 +20,7 @@ export default async function PromptoryMediaPage({
   const mediaUrl = post[prompt_response]?.media?.url
   const mediaType = post[prompt_response]?.media?.type
   if (!mediaUrl)
-    return <div className="flex-center h-screen">Photo not found</div>
+    return <div className="flex-center h-screen">Media not found!</div>
 
   return (
     <PromptoryMedia

@@ -69,8 +69,12 @@ export function Sidebar({ user, children }: SidebarProps) {
     }
   }, [pathname, notificationCount])
 
-  if (status === "unauthenticated") return children
-  if (pathname.endsWith("/media")) return children
+  const noSidebar =
+    status === "unauthenticated" ||
+    pathname.endsWith("/media") ||
+    pathname === "/"
+
+  if (noSidebar) return <div className="h-screen overflow-auto">{children}</div>
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">

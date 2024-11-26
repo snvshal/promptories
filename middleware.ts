@@ -17,11 +17,11 @@ export async function middleware(req: NextRequest) {
   // Return next for API auth routes
   if (pathname.startsWith("/api/auth")) return NextResponse.next()
 
-  // Handle root ("/") redirection
-  if (pathname === "/") {
-    const redirectUrl = token ? "/home" : "/sign-in"
-    return NextResponse.redirect(new URL(redirectUrl, req.url))
-  }
+  // // Handle root ("/") redirection
+  // if (pathname === "/") {
+  //   const redirectUrl = token ? "/home" : "/sign-in"
+  //   return NextResponse.redirect(new URL(redirectUrl, req.url))
+  // }
 
   // Redirect unauthenticated users trying to access protected routes
   if (!token && !isPublicRoute && !isAuthRoute) {
