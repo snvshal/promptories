@@ -16,7 +16,6 @@ import { st } from "@/utils/ps"
 import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
-import { Types } from "mongoose"
 
 export type Tab = "posts" | "likes" | "saved"
 

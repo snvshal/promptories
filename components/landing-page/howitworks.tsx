@@ -36,7 +36,7 @@ const HowItWorks = () => {
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-between">
-            {steps.map((step, index) => (
+            {steps.map((step) => (
               <div key={step.title} className="bg-gray-50 px-4">
                 <div className="relative">
                   <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
