@@ -100,15 +100,17 @@ export function PostContentType({
   content: string
 }) {
   if (type === "post") {
-    return <p className="whitespace-pre-wrap text-lg">{content}</p>
+    return <p className="whitespace-pre-wrap sm:text-lg">{content}</p>
   } else {
     return (
       <>
-        <p className="whitespace-pre-wrap">
+        <p className="whitespace-pre-wrap max-sm:text-sm">
           {content.split(" ").slice(0, 40).join(" ")}
         </p>
         {content.split(" ").length > 40 && (
-          <span className="text-blue-500 hover:underline">Show more</span>
+          <span className="text-blue-500 hover:underline max-sm:text-sm">
+            Show more
+          </span>
         )}
       </>
     )
@@ -206,7 +208,7 @@ export function PostContent({ type, post }: PostContentProps) {
         className={`relative flex flex-col gap-4 overflow-hidden rounded-lg bg-primary-foreground p-4`}
       >
         <div>
-          <h2 className={`${type === "post" && "text-lg"} font-bold`}>
+          <h2 className={`${type === "post" && "sm:text-lg"} font-bold`}>
             Prompt:
           </h2>
           {post.prompt.media?.url ? (
@@ -226,7 +228,7 @@ export function PostContent({ type, post }: PostContentProps) {
           )}
         </div>
         <div>
-          <h2 className={`${type === "post" && "text-lg"} font-bold`}>
+          <h2 className={`${type === "post" && "sm:text-lg"} font-bold`}>
             Response:
           </h2>
           {post.response.media?.url ? (
