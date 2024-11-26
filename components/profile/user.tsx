@@ -280,7 +280,11 @@ export function FollowButton({
   const user = session?.user
 
   const isAdmin = profileUser.email === user?.email
-  const [follow, setFollow] = useState<"Follow" | "Following">()
+  const [follow, setFollow] = useState<"Follow" | "Following">(() =>
+    st(profileUser.followers).includes(user?.id as string)
+      ? "Following"
+      : "Follow",
+  )
 
   useEffect(() => {
     setFollow(
@@ -292,22 +296,16 @@ export function FollowButton({
 
   const handleAddFollower = async () => {
     try {
-      type AFRV = {
-        updatedState: "Follow" | "Following"
-        following: Types.ObjectId[]
-      }
-      const { updatedState, following }: AFRV = await addFollower(
-        profileUser._id as string,
-      )
-
+      setFollow(follow === "Follow" ? "Following" : "Follow")
       setFollowers((f) => (follow === "Follow" ? f + 1 : Math.max(f - 1, 0)))
 
-      setFollow(updatedState)
+      const { newFollowing } = await addFollower(profileUser._id as string)
+
       await update({
         ...session,
         user: {
           ...session?.user,
-          following: [...following],
+          following: newFollowing,
         },
       })
     } catch (error) {
