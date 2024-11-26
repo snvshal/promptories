@@ -7,15 +7,32 @@ import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
 import { cl, objId, postPathname } from "@/utils/ps"
 import { Types } from "mongoose"
+import { revalidatePath } from "next/cache"
 
 // Helper function to create a notification
 async function createNotification(
-  type: "like" | "comment" | "follow",
+  type: "like" | "comment" | "follow" | "mention",
   userId: Types.ObjectId,
   actorId: Types.ObjectId,
   content: string,
   location: string,
 ) {
+  const existingNotification = await Notification.findOne({
+    type,
+    user: userId,
+    actor: actorId,
+    content,
+    location,
+  })
+
+  if (existingNotification) {
+    await Notification.updateOne(
+      { _id: existingNotification._id },
+      { $set: { updatedAt: new Date() } },
+    )
+    return existingNotification
+  }
+
   const notification: RemoveMongooseFields<TNotification> = {
     type,
     user: userId,
@@ -114,6 +131,7 @@ export async function getNotificationCount() {
       read: false,
     })
 
+    revalidatePath("/notifications")
     return notifications
   } catch (error) {
     console.error("Error getting notification count:", error)
