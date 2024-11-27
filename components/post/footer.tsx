@@ -10,7 +10,7 @@ import {
   handleBookmarkPost,
   handlePostView,
 } from "@/actions/postActions"
-import { TPost } from "@/types/schema.type"
+import { TPost, TReplies } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { handlePostShare, ib, il, objId, st } from "@/utils/ps"
 import { useSession } from "next-auth/react"
@@ -26,13 +26,19 @@ import {
 } from "@/components/ui/dialog"
 import { PostReplyDialog } from "./reply"
 
-export function PostFooter({ post }: { post: TPost }) {
+export function PostFooter({
+  post,
+  setPostReplies,
+}: {
+  post: TPost
+  setPostReplies?: SetAction<TReplies[]>
+}) {
   const [open, setOpen] = useState(false)
 
   return (
     <CardFooter onClick={(e) => e.stopPropagation()} className="p-0 pt-3">
       <div className="grid w-4/5 grid-cols-4">
-        <PostReplyDialog post={post} />
+        <PostReplyDialog post={post} setPostReplies={setPostReplies} />
         <LikeButton post={post} />
         <BookmarkButton post={post} />
         <PostViews post={post} />

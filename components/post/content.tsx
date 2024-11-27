@@ -7,35 +7,44 @@ import { User } from "lucide-react"
 import Link from "next/link"
 import { NavigateBackHeader } from "../home"
 import { TimeAgo } from "../time-ago"
-import { TPost, TUser } from "@/types/schema.type"
+import { TPost, TReplies, TUser } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { PostFooter } from "./footer"
 import { PostOptions } from "./option"
-import { PostReplies, PromptoryReplyButton } from "./reply"
-import { cl, postPathname, pu } from "@/utils/ps"
+import { PostReplies } from "./reply"
+import { cl, getSortedReplies, postPathname, pu } from "@/utils/ps"
 import clsx from "clsx"
+import { SetAction } from "@/types/generics.type"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
-  const [postReplies, setPostReplies] = useState(post.replies)
+  const sortedReplies = getSortedReplies(post.replies)
+  const [postReplies, setPostReplies] = useState(sortedReplies)
 
   return (
     <div className="w-full">
       <NavigateBackHeader page="Post" />
       <main className="main-content">
-        <PostType post={post} type="post" />
+        <PostType post={post} type="post" setPostReplies={setPostReplies} />
         <PostReplies
           post={post}
           postReplies={postReplies}
           setPostReplies={setPostReplies}
         />
       </main>
-      <PromptoryReplyButton post={post} setPostReplies={setPostReplies} />
     </div>
   )
 }
 
-export function PostType({ post, type }: PostContentProps) {
+export function PostType({
+  post,
+  type,
+  setPostReplies,
+}: {
+  type: "post" | "posts"
+  post: TPost
+  setPostReplies?: SetAction<TReplies[]>
+}) {
   const router = useRouter()
   const visitPost = () => router.push(postPathname(post))
 
@@ -55,7 +64,7 @@ export function PostType({ post, type }: PostContentProps) {
         <PostHeader type={type} post={post} />
         <PostContent type={type} post={post} />
         {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
-        <PostFooter post={post} />
+        <PostFooter post={post} setPostReplies={setPostReplies} />
       </div>
     </Card>
   )
