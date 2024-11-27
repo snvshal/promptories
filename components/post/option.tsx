@@ -84,7 +84,7 @@ export function PostOptions({ post, type }: PostContentProps) {
   const authorized = pu(post).email === user?.email
 
   const PostOptionItems = () => (
-    <>
+    <div className="flex flex-col max-sm:gap-2">
       <Link href={cl(pu(post).username)} prefetch={false} className="sm:hidden">
         <Button variant="ghost" className="w-full justify-start max-sm:text-lg">
           <User className="mr-2 size-5 sm:size-4" />
@@ -155,7 +155,7 @@ export function PostOptions({ post, type }: PostContentProps) {
           </AlertDialogContent>
         </AlertDialog>
       )}
-    </>
+    </div>
   )
 
   return (
