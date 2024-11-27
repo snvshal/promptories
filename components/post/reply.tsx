@@ -362,7 +362,7 @@ export function PostReplyDialog({
           </PostFooterIconButton>
         )}
       </DialogTrigger>
-      <DialogContent className="max-sm:top-40 sm:max-w-[425px]">
+      <DialogContent className="max-sm:top-56 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             Reply to{" "}
