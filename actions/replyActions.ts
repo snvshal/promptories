@@ -1,10 +1,10 @@
 "use server"
 
 import { Post } from "@/models/post.model"
-import { TReplies } from "@/types/schema.type"
+import { TPost } from "@/types/schema.type"
 import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
-import { postPathname, ps } from "@/utils/ps"
+import { getSortedReplies, postPathname, ps } from "@/utils/ps"
 import { Types } from "mongoose"
 import { commentNotification } from "./notificationActions"
 import { revalidatePath } from "next/cache"
@@ -19,7 +19,7 @@ export async function addReplyToPost(postId: string, replyText: string) {
 
     const user = await currentUser()
 
-    const updatedPost = await Post.findByIdAndUpdate(
+    const updatedPost: TPost = await Post.findByIdAndUpdate(
       postId,
       {
         $push: {
@@ -31,13 +31,16 @@ export async function addReplyToPost(postId: string, replyText: string) {
         },
       },
       { new: true },
-    ).populate("replies.user")
+    )
+      .populate("replies.user")
+      .populate("user")
 
     await commentNotification(updatedPost)
 
     revalidatePath(postPathname(updatedPost))
 
-    return ps(updatedPost)
+    const updatedReplies = getSortedReplies(updatedPost.replies)
+    return ps(updatedReplies)
   } catch (error) {
     console.error("Error adding reply:", error)
     throw new Error("Failed to add reply.")
@@ -97,7 +100,8 @@ export async function deleteReply(postId: string, replyId: string) {
 
     revalidatePath(postPathname(post))
 
-    return ps(post.replies as TReplies[])
+    const updatedReplies = getSortedReplies(post.replies)
+    return ps(updatedReplies)
   } catch (error) {
     console.error("Error deleting reply:", error)
     throw new Error("Failed to delete the reply.")

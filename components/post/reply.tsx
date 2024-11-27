@@ -46,9 +46,12 @@ export function PostReplies({
 }) {
   const [replyText, setReplyText] = useState("")
   const [emptyReplyError, setEmptyReplyError] = useState("")
+  const [sendingReply, setSendingReply] = useState(false)
 
   const handleReplySubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    setSendingReply(true)
 
     if (!replyText) {
       setEmptyReplyError("Reply is required!")
@@ -56,8 +59,8 @@ export function PostReplies({
     }
 
     try {
-      const updatedPost = await addReplyToPost(post._id as string, replyText)
-      setPostReplies(updatedPost.replies)
+      const updatedReplies = await addReplyToPost(post._id as string, replyText)
+      setPostReplies(updatedReplies)
       setReplyText("")
 
       toast({
@@ -69,6 +72,8 @@ export function PostReplies({
         description: "There was a problem sending your reply.",
         variant: "destructive",
       })
+    } finally {
+      setSendingReply(false)
     }
   }
   return (
@@ -87,10 +92,11 @@ export function PostReplies({
               onChange={(e) => {
                 setReplyText(e.target.value)
                 setEmptyReplyError("")
+                setSendingReply(false)
               }}
               className="flex-1"
             />
-            <Button type="submit">
+            <Button type="submit" disabled={sendingReply}>
               <Send className="h-4 w-4" />
               <span className="sr-only">Send reply</span>
             </Button>
@@ -165,11 +171,11 @@ export function PostRepliesContent({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-4">
       {replies.map((reply, index) => (
-        <div key={index} className="flex space-x-2">
+        <div key={index} className="flex w-full space-x-2">
           <AvatarComponent user={pu(reply)} />
-          <div className="flex-1">
+          <div className="w-[calc(100%-48px)] flex-1">
             <div className="flex-between h-6">
               <div className="flex-start">
                 <Link
@@ -177,7 +183,7 @@ export function PostRepliesContent({
                   className="flex-start gap-1"
                   prefetch={false}
                 >
-                  <p className="font-semibold max-sm:hidden">
+                  <p className="font-semibold hover:underline max-sm:hidden">
                     {pu(reply).name}
                   </p>
                   <p className="max-sm:font-semibold sm:text-muted-foreground">
@@ -198,7 +204,9 @@ export function PostRepliesContent({
             </div>
 
             <div className="flex items-start justify-between gap-2">
-              <p className="max-sm:text-sm">{reply.content}</p>
+              <p className="flex-1 overflow-hidden text-ellipsis max-sm:text-sm">
+                {reply.content}
+              </p>
               <div className="flex-start flex-col">
                 <Button
                   variant="ghost"
@@ -211,7 +219,7 @@ export function PostRepliesContent({
                       color: il(hasLiked[reply._id?.toString() as string]),
                     }}
                     fill={il(hasLiked[reply._id?.toString() as string])}
-                    className="h-4 w-4"
+                    className="size-4 text-muted-foreground"
                   />
                 </Button>
                 <p className="text-sm text-muted-foreground">
@@ -241,8 +249,8 @@ export function PostReplyOptions({
 
   const handleDeleteReplyClick = async () => {
     try {
-      const newReplies = await deleteReply(postId, reply._id as string)
-      setPostReplies(newReplies as TReplies[])
+      const updatedReplies = await deleteReply(postId, reply._id as string)
+      setPostReplies(updatedReplies as TReplies[])
       toast({
         description: "Your reply has been deleted.",
       })
@@ -298,21 +306,24 @@ export function PostReplyDialog({
   const [replyContent, setReplyContent] = useState("")
   const [emptyReplyError, setEmptyReplyError] = useState("")
   const [repliesCount, setRepliesCount] = useState(post.replies.length)
+  const [sendingReply, setSendingReply] = useState(false)
 
   const handleReplySubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    setSendingReply(true)
 
     if (!replyContent) {
       setEmptyReplyError("Reply is required!")
       return
     }
     try {
-      const updatedPost: TPost = await addReplyToPost(
+      const updatedReplies = await addReplyToPost(
         post._id as string,
         replyContent,
       )
 
-      if (setPostReplies) setPostReplies(updatedPost.replies)
+      if (setPostReplies) setPostReplies(updatedReplies)
 
       setRepliesCount((prev) => prev + 1)
       setReplyContent("")
@@ -327,6 +338,8 @@ export function PostReplyDialog({
         description: "There was a problem sending your reply.",
         variant: "destructive",
       })
+    } finally {
+      setSendingReply(false)
     }
   }
 
@@ -349,13 +362,11 @@ export function PostReplyDialog({
           </PostFooterIconButton>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-sm:top-56 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             Reply to{" "}
-            <Link href={cl(pu(post).username)} className="text-blue-500">
-              &#64;{pu(post).username}
-            </Link>
+            <span className="text-blue-500">&#64;{pu(post).username}</span>
           </DialogTitle>
           <DialogDescription>
             Type your reply to this post. Click submit when you&#39;re done.
@@ -369,6 +380,7 @@ export function PostReplyDialog({
               onChange={(e) => {
                 setReplyContent(e.target.value)
                 setEmptyReplyError("")
+                setSendingReply(false)
               }}
               className="col-span-3"
             />
@@ -376,28 +388,16 @@ export function PostReplyDialog({
               <p className="mt-1 text-sm text-red-500">{emptyReplyError}</p>
             )}
           </div>
-          <Button className="w-full" aria-label="Submit Reply">
+          <Button
+            className="w-full"
+            aria-label="Submit Reply"
+            disabled={sendingReply}
+          >
             <Send className="mr-2 size-4" />
             Submit Reply
           </Button>
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
-
-export function PromptoryReplyButton({
-  post,
-  setPostReplies,
-}: {
-  post: TPost
-  setPostReplies: SetAction<TReplies[]>
-}) {
-  return (
-    <PostReplyDialog post={post} setPostReplies={setPostReplies}>
-      <Button size={"icon"} className="compose-button">
-        <MessageCircle size={24} />
-      </Button>
-    </PostReplyDialog>
   )
 }

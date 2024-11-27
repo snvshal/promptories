@@ -69,7 +69,7 @@ export default function SearchComponent() {
           setSearchLoading(true)
 
           const results = await search(
-            searchState.q,
+            searchState.q.trim(),
             searchState.category as SearchCategories,
             searchState.dateRange as SearchDateRange,
           )
@@ -190,7 +190,7 @@ function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 }
 
 function UserProfileCard({ profileUser }: { profileUser: TUser }) {
-  const [followers, setFollowers] = useState(profileUser.followers.length ?? 0)
+  const [followers, setFollowers] = useState(profileUser.followers.length)
 
   return (
     <Card className="mid-width-card-content shadow-none">
@@ -201,7 +201,9 @@ function UserProfileCard({ profileUser }: { profileUser: TUser }) {
           classname="size-16 self-start"
         />
         <Link href={cl(profileUser.username)} className="flex-1">
-          <h3 className="text-lg font-semibold">{profileUser.name}</h3>
+          <h3 className="text-lg font-semibold hover:underline">
+            {profileUser.name}
+          </h3>
           <p className="text-sm text-muted-foreground">
             &#64;{profileUser.username}
           </p>

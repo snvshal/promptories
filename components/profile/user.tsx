@@ -137,7 +137,7 @@ export function ProfileUserContent({
   profileUser: TUser
   postCount: number
 }) {
-  const [followers, setFollowers] = useState(profileUser?.following.length)
+  const [followers, setFollowers] = useState(profileUser?.followers.length)
 
   return (
     <Card className="mb-0 w-full rounded-none border-0 shadow-none">
@@ -278,6 +278,8 @@ export function FollowButton({
   const { data: session, update } = useSession()
   const user = session?.user
 
+  const [hover, setHover] = useState(false)
+
   const isAdmin = profileUser.email === user?.email
   const [follow, setFollow] = useState<"Follow" | "Following">(() =>
     st(profileUser.followers).includes(user?.id as string)
@@ -285,20 +287,13 @@ export function FollowButton({
       : "Follow",
   )
 
-  useEffect(() => {
-    setFollow(
-      st(profileUser.followers).includes(user?.id as string)
-        ? "Following"
-        : "Follow",
-    )
-  }, [profileUser.followers, user?.id])
-
   const handleAddFollower = async () => {
     try {
-      setFollow(follow === "Follow" ? "Following" : "Follow")
-      setFollowers((f) => (follow === "Follow" ? f + 1 : Math.max(f - 1, 0)))
+      const { newFollowing, newFollowersCount, updatedState } =
+        await addFollower(profileUser._id as string)
 
-      const { newFollowing } = await addFollower(profileUser._id as string)
+      setFollow(updatedState)
+      setFollowers(newFollowersCount)
 
       await update({
         ...session,
@@ -316,10 +311,14 @@ export function FollowButton({
 
   return (
     <Button
-      variant={follow === "Follow" ? "default" : "secondary"}
+      variant={
+        follow === "Follow" ? "default" : hover ? "destructive" : "secondary"
+      }
       onClick={handleAddFollower}
+      onMouseEnter={() => follow === "Following" && setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
-      {follow}
+      {hover && follow === "Following" ? "Unfollow" : follow}
     </Button>
   )
 }

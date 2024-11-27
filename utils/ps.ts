@@ -42,3 +42,8 @@ export const parseTags = (tags: string): string[] => {
     .map((tag) => tag.trim())
     .filter((tag) => tag.length)
 }
+
+export const getSortedReplies = (replies: TReplies[]) =>
+  replies.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  )

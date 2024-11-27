@@ -42,8 +42,14 @@ export async function addFollower(userId: string) {
     await profileUser.save()
     await user.save()
 
-    return ps({ newFollowing: st(user.following) }) as {
+    return ps({
+      updatedState: isFollowing ? "Follow" : "Following",
+      newFollowing: st(user.following),
+      newFollowersCount: profileUser.followers.length,
+    }) as {
+      updatedState: "Follow" | "Following"
       newFollowing: string[]
+      newFollowersCount: number
     }
   } catch (error) {
     console.error("Error adding follower:", error)
