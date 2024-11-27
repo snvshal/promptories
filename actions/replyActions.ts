@@ -31,7 +31,9 @@ export async function addReplyToPost(postId: string, replyText: string) {
         },
       },
       { new: true },
-    ).populate("replies.user")
+    )
+      .populate("replies.user")
+      .populate("user")
 
     await commentNotification(updatedPost)
 
