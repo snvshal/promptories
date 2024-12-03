@@ -16,6 +16,12 @@ import { st } from "@/utils/ps"
 import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { AvatarComponent } from "../post/content"
 
 export type Tab = "posts" | "likes" | "saved"
 
@@ -320,5 +326,54 @@ export function FollowButton({
     >
       {hover && follow === "Following" ? "Unfollow" : follow}
     </Button>
+  )
+}
+
+export function ProfileHoverCard({
+  profileUser,
+  children,
+}: {
+  profileUser: TUser
+  children: React.ReactNode
+}) {
+  const [followers, setFollowers] = useState(profileUser.followers.length)
+
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>{children}</HoverCardTrigger>
+      <HoverCardContent className="w-64 rounded-lg shadow-2xl shadow-slate-900">
+        <div className="flex flex-col gap-3">
+          <div className="flex justify-between">
+            <AvatarComponent user={profileUser} classname="size-16" />
+            <FollowButton
+              profileUser={profileUser}
+              setFollowers={setFollowers}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <h4 className="font-semibold leading-none">{profileUser.name}</h4>
+            <p className="text-sm text-muted-foreground">
+              @{profileUser.username}
+            </p>
+          </div>
+
+          {profileUser.bio && <p className="text-sm">{profileUser.bio}</p>}
+
+          <div className="flex gap-4 text-sm">
+            <div className="flex gap-1">
+              <span className="font-semibold">
+                {profileUser.following.length}
+              </span>
+              <span className="text-muted-foreground">Following</span>
+            </div>
+            <div className="flex gap-1">
+              <span className="font-semibold">{followers}</span>
+              <span className="text-muted-foreground">Followers</span>
+            </div>
+          </div>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
   )
 }

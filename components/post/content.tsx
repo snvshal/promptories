@@ -16,6 +16,7 @@ import { PostReplies } from "./reply"
 import { cl, getSortedReplies, postPathname, pu } from "@/utils/ps"
 import clsx from "clsx"
 import { SetAction } from "@/types/generics.type"
+import { ProfileHoverCard } from "../profile/user"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const sortedReplies = getSortedReplies(post.replies)
@@ -136,7 +137,7 @@ export function PostHeader({ type, post }: PostContentProps) {
               <AvatarComponent user={pu(post)} />
             </div>
           )}
-          <PostAuthorName type={type} postAuthor={pu(post)} />
+          <PostAuthorName type={type} post={post} />
           {type === "posts" && (
             <p className="text-muted-foreground">
               <span className="px-1">&#183;</span>
@@ -152,37 +153,41 @@ export function PostHeader({ type, post }: PostContentProps) {
 
 export function PostAuthorName({
   type,
-  postAuthor,
+  post,
 }: {
   type: "post" | "posts"
-  postAuthor: TUser
+  post: TPost
 }) {
   if (type === "post") {
     return (
-      <Link
-        href={cl(postAuthor.username)}
-        className="flex cursor-pointer flex-col gap-0"
-      >
-        <p className="font-semibold hover:underline">{postAuthor.name}</p>
-        <p className="leading-4 text-muted-foreground">
-          &#64;{postAuthor.username}
-        </p>
-      </Link>
+      <ProfileHoverCard profileUser={pu(post)}>
+        <Link
+          href={cl(pu(post).username)}
+          className="flex cursor-pointer flex-col gap-0"
+        >
+          <p className="font-semibold hover:underline">{pu(post).name}</p>
+          <p className="leading-4 text-muted-foreground">
+            &#64;{pu(post).username}
+          </p>
+        </Link>
+      </ProfileHoverCard>
     )
   } else {
     return (
-      <Link
-        href={cl(postAuthor.username)}
-        className="flex cursor-pointer items-center justify-start gap-1"
-      >
-        <p className="font-semibold hover:underline max-sm:hidden">
-          {postAuthor.name}
-        </p>
-        <p className="max-sm:font-semibold sm:text-muted-foreground">
-          <span className="max-sm:hidden">&#64;</span>
-          {postAuthor.username}
-        </p>
-      </Link>
+      <ProfileHoverCard profileUser={pu(post)}>
+        <Link
+          href={cl(pu(post).username)}
+          className="flex cursor-pointer items-center justify-start gap-1"
+        >
+          <p className="font-semibold hover:underline max-sm:hidden">
+            {pu(post).name}
+          </p>
+          <p className="max-sm:font-semibold sm:text-muted-foreground">
+            <span className="max-sm:hidden">&#64;</span>
+            {pu(post).username}
+          </p>
+        </Link>
+      </ProfileHoverCard>
     )
   }
 }
