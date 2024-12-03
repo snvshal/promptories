@@ -12,7 +12,7 @@ import { NavigateBackHeader } from "../home"
 import { addFollower } from "@/actions/addFollower"
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
-import { st } from "@/utils/ps"
+import { cl, st } from "@/utils/ps"
 import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
@@ -342,7 +342,7 @@ export function ProfileHoverCard({
     <HoverCard>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
       <HoverCardContent className="w-64 rounded-lg shadow-2xl shadow-slate-900">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col">
           <div className="flex justify-between">
             <AvatarComponent user={profileUser} classname="size-16" />
             <FollowButton
@@ -351,16 +351,19 @@ export function ProfileHoverCard({
             />
           </div>
 
-          <div className="space-y-1">
-            <h4 className="font-semibold leading-none">{profileUser.name}</h4>
-            <p className="text-sm text-muted-foreground">
-              @{profileUser.username}
+          <Link
+            href={cl(profileUser.username)}
+            className="mt-2 flex cursor-pointer flex-col gap-0"
+          >
+            <p className="text-lg font-semibold leading-4 hover:underline">
+              {profileUser.name}
             </p>
-          </div>
+            <p className="text-muted-foreground">&#64;{profileUser.username}</p>
+          </Link>
 
-          {profileUser.bio && <p className="text-sm">{profileUser.bio}</p>}
+          {profileUser.bio && <p className="mt-3 text-sm">{profileUser.bio}</p>}
 
-          <div className="flex gap-4 text-sm">
+          <div className="mt-3 flex gap-4 text-sm">
             <div className="flex gap-1">
               <span className="font-semibold">
                 {profileUser.following.length}
