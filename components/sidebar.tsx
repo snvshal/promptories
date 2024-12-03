@@ -238,7 +238,7 @@ export function SidePanel() {
                 name="search"
                 placeholder="Search"
                 value={inputValue}
-                className="w-full"
+                className="w-full rounded-lg"
                 onChange={(e) => setInputValue(e.target.value)}
               />
             </form>
@@ -246,10 +246,10 @@ export function SidePanel() {
         )}
         <div className="my-2 flex w-full flex-col gap-2">
           <Select value={promptoryType} onValueChange={setPromptoryType}>
-            <SelectTrigger>
+            <SelectTrigger className="rounded-lg">
               <SelectValue placeholder="Promptory Types" />
             </SelectTrigger>
-            <SelectContent className="shadow-2xl shadow-slate-900">
+            <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
               <ScrollArea className="h-48 rounded-lg">
                 <SelectItem value="every">Every</SelectItem>
                 {promptory_types.map((type, index) => (
@@ -261,10 +261,10 @@ export function SidePanel() {
             </SelectContent>
           </Select>
           <Select value={feedType} onValueChange={setFeedType}>
-            <SelectTrigger>
+            <SelectTrigger className="rounded-lg">
               <SelectValue placeholder="Feed Types" />
             </SelectTrigger>
-            <SelectContent className="shadow-2xl shadow-slate-900">
+            <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
               <SelectItem value="for-you">For You</SelectItem>
               <SelectItem value="following">Following</SelectItem>
             </SelectContent>
