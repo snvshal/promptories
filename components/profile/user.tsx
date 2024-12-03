@@ -341,7 +341,7 @@ export function ProfileHoverCard({
   return (
     <HoverCard>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
-      <HoverCardContent className="w-64 rounded-lg shadow-2xl shadow-slate-900">
+      <HoverCardContent className="w-64 rounded-lg shadow-2xl shadow-slate-900 max-sm:hidden">
         <div className="flex flex-col">
           <div className="flex justify-between">
             <AvatarComponent user={profileUser} classname="size-16" />
