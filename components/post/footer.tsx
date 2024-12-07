@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -121,12 +121,11 @@ export function LikeButton({ post }: { post: TPost }) {
   const [likes, setLikes] = useState(initialLikes)
   const [hasLiked, setHasLiked] = useState<boolean>(false)
 
+  const processedLikes = useMemo(() => st(post.likes), [post.likes])
+
   useEffect(() => {
-    if (user?.id) {
-      const hasLikedInitial = st(post.likes).includes(user.id as string)
-      setHasLiked(hasLikedInitial)
-    }
-  }, [user, post.likes])
+    if (user?.id) setHasLiked(processedLikes.includes(user.id))
+  }, [user?.id, processedLikes])
 
   const handleLikeClick = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -167,12 +166,11 @@ export function BookmarkButton({ post }: { post: TPost }) {
   const [bookmarks, setBookmarks] = useState(initialBookmarks)
   const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial)
 
+  const processedBookmarks = useMemo(() => st(post.bookmarks), [post.bookmarks])
+
   useEffect(() => {
-    if (user?.id) {
-      const initialBookmarks = st(post.bookmarks).includes(user.id as string)
-      setHasBookmarked(initialBookmarks)
-    }
-  }, [user, post.bookmarks])
+    if (user?.id) setHasBookmarked(processedBookmarks.includes(user.id))
+  }, [user?.id, processedBookmarks])
 
   const handleBookmarkClick = async (e: React.FormEvent) => {
     e.preventDefault()
