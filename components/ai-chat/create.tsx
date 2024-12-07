@@ -71,6 +71,7 @@ export type AIChatFormValue = z.infer<typeof aiChatFormSchema>
 
 export default function AIChatDialogForm() {
   const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const form = useForm<AIChatFormValue>({
     resolver: zodResolver(aiChatFormSchema),
@@ -83,14 +84,23 @@ export default function AIChatDialogForm() {
   })
 
   const onSubmit = async (values: AIChatFormValue) => {
-    await saveAIChat(values)
+    try {
+      setLoading(true)
+      await saveAIChat(values)
 
-    toast({
-      description: "Your AI chat has been sent.",
-    })
-
-    setOpen(false)
-    form.reset()
+      setOpen(false)
+      form.reset()
+      toast({
+        description: "Your AI chat has been sent.",
+      })
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Something went wrong.",
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -110,7 +120,7 @@ export default function AIChatDialogForm() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6 px-2"
+              className="mt-6 space-y-6 px-2"
             >
               <FormField
                 control={form.control}
@@ -137,7 +147,7 @@ export default function AIChatDialogForm() {
                     <FormControl>
                       <Textarea
                         placeholder="Enter chat description"
-                        className="resize-none"
+                        className="h-24 resize-none"
                         {...field}
                       />
                     </FormControl>
@@ -187,7 +197,9 @@ export default function AIChatDialogForm() {
                 )}
               />
               <DialogFooter>
-                <Button type="submit">Save changes</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Submitting..." : "Submit"}
+                </Button>
               </DialogFooter>
             </form>
           </Form>

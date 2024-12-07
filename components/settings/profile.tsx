@@ -63,6 +63,7 @@ export type ProfileFormValues = z.infer<typeof profileSchema>
 export default function ProfileSettings({ user }: { user: TUser }) {
   const { data: session, update } = useSession()
 
+  const [loading, setLoading] = useState(false)
   const [avatar, setAvatar] = useState<string | null>(user?.avatar as string)
 
   const handleUpload = (result: CloudinaryUploadWidgetResults) => {
@@ -89,6 +90,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
+      setLoading(true)
       const dataWithAvatar = { ...data, avatar }
       const { success } = await updateUserData(dataWithAvatar)
 
@@ -107,7 +109,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
           },
         })
 
-        router.push(cl(String(user?.username)))
+        router.back()
 
         toast({
           title: "Profile updated",
@@ -120,6 +122,8 @@ export default function ProfileSettings({ user }: { user: TUser }) {
         description: "There was a problem updating your profile.",
         variant: "destructive",
       })
+    } finally {
+      setLoading(false)
     }
   }
   return (
@@ -230,7 +234,9 @@ export default function ProfileSettings({ user }: { user: TUser }) {
                 </FormItem>
               )}
             />
-            <Button type="submit">Save Profile</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Saving..." : "Save Profile"}
+            </Button>
           </form>
         </Form>
       </CardContent>

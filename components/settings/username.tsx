@@ -26,6 +26,7 @@ import { toast } from "@/hooks/use-toast"
 import { isUsernameUnique, updateUsername } from "@/actions/profileActions"
 import { useSession } from "next-auth/react"
 import { TUser } from "@/types/schema.type"
+import { useState } from "react"
 
 const usernameSchema = z.object({
   username: z
@@ -48,6 +49,8 @@ export type UsernameFormValues = z.infer<typeof usernameSchema>
 export default function UsernameSettings({ user }: { user: TUser }) {
   const { data: session, update } = useSession()
 
+  const [loading, setLoading] = useState(false)
+
   const usernameForm = useForm<UsernameFormValues>({
     resolver: zodResolver(usernameSchema),
     defaultValues: {
@@ -57,6 +60,7 @@ export default function UsernameSettings({ user }: { user: TUser }) {
 
   const onUsernameSubmit = async (data: UsernameFormValues) => {
     try {
+      setLoading(true)
       const { success } = await updateUsername(data.username)
       if (success) {
         await update({
@@ -78,6 +82,8 @@ export default function UsernameSettings({ user }: { user: TUser }) {
         description: "There was a problem updating your username.",
         variant: "destructive",
       })
+    } finally {
+      setLoading(false)
     }
   }
   return (
@@ -112,10 +118,11 @@ export default function UsernameSettings({ user }: { user: TUser }) {
               type="submit"
               disabled={
                 user?.username === usernameForm.getValues("username") ||
-                usernameForm.watch("username") === ""
+                usernameForm.watch("username") === "" ||
+                loading
               }
             >
-              Change Username
+              {loading ? "Changing..." : "Change Username"}
             </Button>
           </form>
         </Form>

@@ -13,7 +13,7 @@ export const ib = (isSaved: boolean) => (isSaved ? "#3b82f6" : "none")
 
 export const cl = (...paths: string[]) => "/" + paths.join("/")
 export const postPathname = (post: TPost, ...et: string[]) =>
-  cl(pu(post).username, "promptories", String(post._id), ...et)
+  cl(pu(post).username, "promptories", post._id as string, ...et)
 
 export const objId = (id: string | undefined | unknown) =>
   new Types.ObjectId(id as string)
