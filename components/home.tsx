@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Feather, ArrowLeft } from "lucide-react"
+import { Feather } from "lucide-react"
 import { TPost } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { PostType } from "./post/content"
+import { ArrowBack } from "./ui/svg-icons"
 
 export function HomePageComponent({ posts }: { posts: TPost[] }) {
   return (
@@ -75,8 +76,8 @@ export function NavigateBackHeader({
     <DynamicHeader>
       <div className={`flex-between w-full p-4 ${classNames}`}>
         <div className="flex max-w-4xl items-center justify-start">
-          <button onClick={() => router.back()} className="flex-start">
-            <ArrowLeft className="mr-6 size-6" />
+          <button onClick={() => router.back()} className="flex-start mr-6">
+            <ArrowBack />
           </button>
           <h1 className="text-xl font-bold">{page}</h1>
         </div>
