@@ -285,6 +285,7 @@ export function FollowButton({
   const user = session?.user
 
   const [hover, setHover] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const isAdmin = profileUser.email === user?.email
   const [follow, setFollow] = useState<"Follow" | "Following">(() =>
@@ -295,6 +296,7 @@ export function FollowButton({
 
   const handleAddFollower = async () => {
     try {
+      setLoading(true)
       const { newFollowing, newFollowersCount, updatedState } =
         await addFollower(profileUser._id as string)
 
@@ -310,10 +312,12 @@ export function FollowButton({
       })
     } catch (error) {
       console.error("Error updating follower state:", error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  if (isAdmin) return
+  if (isAdmin) return null
 
   return (
     <Button
@@ -323,6 +327,7 @@ export function FollowButton({
       onClick={handleAddFollower}
       onMouseEnter={() => follow === "Following" && setHover(true)}
       onMouseLeave={() => setHover(false)}
+      disabled={loading}
     >
       {hover && follow === "Following" ? "Unfollow" : follow}
     </Button>

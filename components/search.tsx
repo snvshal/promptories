@@ -75,9 +75,10 @@ export default function SearchComponent() {
           )
 
           setResults(results)
-          setSearchLoading(false)
         } catch (error) {
           console.error("Error fetching search results:", error)
+        } finally {
+          setSearchLoading(false)
         }
       }
     }
@@ -103,9 +104,11 @@ export default function SearchComponent() {
                   }}
                   className="flex-1"
                 />
-                <Button type="submit">
+                <Button type="submit" disabled={searchLoading}>
                   <SearchIcon className="h-4 w-4" />
-                  <span className="ml-2 max-sm:hidden">Search</span>
+                  <span className="ml-2 max-sm:hidden">
+                    {searchLoading ? "Searching..." : "Search"}
+                  </span>
                 </Button>
                 <SearchFilterDialog
                   open={isFilterDialogOpen}
@@ -130,7 +133,7 @@ export default function SearchComponent() {
             className="w-full"
           >
             <div className="border-b">
-              <TabsList className="mt-4 grid h-12 w-full grid-cols-2 rounded-none border-b bg-background p-0">
+              <TabsList className="grid h-12 w-full grid-cols-2 rounded-none border-b bg-background p-0">
                 <TabsTriggerButton tabValue="posts" tab={searchState.tab}>
                   Posts
                 </TabsTriggerButton>
