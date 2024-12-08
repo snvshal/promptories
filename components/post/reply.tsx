@@ -77,7 +77,7 @@ export function PostReplies({
     }
   }
   return (
-    <Card className="mb-0 w-full rounded-none border-0 shadow-none">
+    <Card className="mb-0 min-h-screen w-full rounded-none border-0 shadow-none">
       <CardHeader className="p-4">
         <CardTitle className="text-lg font-semibold">Replies</CardTitle>
       </CardHeader>
