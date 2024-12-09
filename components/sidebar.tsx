@@ -16,7 +16,7 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { cl } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
-import { ai_platforms, promptory_types } from "@/lib/constants"
+import { promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
 import { Input } from "./ui/input"
@@ -30,6 +30,7 @@ import {
 import { getNotificationCount } from "@/actions/notificationActions"
 import { AvatarComponent } from "./post/content"
 import { TUser } from "@/types/schema.type"
+import { getTrendingTags } from "@/actions/getTrendingTags"
 
 export type SidebarProps = {
   user: TUser
@@ -217,11 +218,22 @@ export function SidePanel() {
   const [inputValue, setInputValue] = useState("")
   const [promptoryType, setPromptoryType] = useState("every")
   const [feedType, setFeedType] = useState("for-you")
+  const [trendingTags, setTrendingTags] = useState<
+    { tag: string; count: number }[]
+  >([])
 
   const router = useRouter()
   const pathname = usePathname()
 
-  if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return
+  useEffect(() => {
+    const fetchTags = async () => {
+      const tags = await getTrendingTags()
+      setTrendingTags(tags)
+    }
+    fetchTags()
+  }, [])
+
+  if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return null
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -276,14 +288,20 @@ export function SidePanel() {
               <TrendingUp />
               <span>Trending</span>
             </h2>
-            {ai_platforms.map((type, index) => (
+            {trendingTags.map((tag, index) => (
               <Link
                 key={index}
-                href={"/"}
-                className="flex-start w-full gap-2 px-4 py-1 text-center capitalize hover:bg-accent hover:text-accent-foreground"
+                href={`/search?q=${tag.tag}&category=tags`}
+                className="flex-between w-full gap-2 px-4 py-1 hover:bg-accent hover:text-accent-foreground"
               >
-                <span className="font-mono text-xl">#</span>
-                <span>{type}</span>
+                <span className="flex-start gap-2">
+                  <span className="font-mono text-xl">#</span>
+                  <span>{tag.tag}</span>
+                </span>
+
+                <span className="text-sm text-muted-foreground">
+                  {tag.count}
+                </span>
               </Link>
             ))}
           </ScrollArea>
