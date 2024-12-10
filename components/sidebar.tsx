@@ -79,29 +79,31 @@ export function Sidebar({ user, children }: SidebarProps) {
   if (noSidebar) return <div className="h-screen overflow-auto">{children}</div>
 
   return (
-    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse xl:pl-40 2xl:pl-80">
-      <aside className="z-50 border-t border-border bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
-        <nav className="relative h-full">
-          <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
-            <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
-              <NavLinks notificationCount={notificationCount} />
+    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
+      <div className="flex-end lg:w-[calc(22%)] xl:w-[calc(28%)] 2xl:w-[calc(35%)]">
+        <aside className="z-50 border-t bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
+          <nav className="relative h-full">
+            <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
+              <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
+                <NavLinks notificationCount={notificationCount} />
+              </div>
+              <UserProfileLink user={user} />
             </div>
-            <UserProfileLink user={user} />
-          </div>
-          <div className="max-sm:h-[var(--navbar-height)]"></div>
-          <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
-            <NavLinks notificationCount={notificationCount} />
-            <UserProfileLink user={user} />
-          </div>
-        </nav>
-      </aside>
+            <div className="max-sm:h-[var(--navbar-height)]"></div>
+            <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
+              <NavLinks notificationCount={notificationCount} />
+              <UserProfileLink user={user} />
+            </div>
+          </nav>
+        </aside>
+      </div>
 
       <aside
         id="scrollable-element"
-        className="flex-1 overflow-y-auto max-sm:pb-[var(--navbar-height)] xl:pr-40 2xl:pr-80"
+        className="flex-start flex-1 overflow-y-auto max-sm:pb-[var(--navbar-height)]"
       >
         <div className="flex">
-          <div className="w-full flex-1 md:w-2/3">{children}</div>
+          <div className="w-full border-r md:w-[32rem]">{children}</div>
           <SidePanel />
         </div>
       </aside>
@@ -251,8 +253,8 @@ export function SidePanel() {
   }
 
   return (
-    <aside className="w-1/3 max-lg:hidden">
-      <div className="sticky top-0 h-screen w-full overflow-hidden border-l px-4 pt-4">
+    <aside className="w-[18rem] max-lg:hidden">
+      <div className="sticky top-0 h-screen w-full overflow-hidden px-4 pt-4">
         {pathname.startsWith("/search") || (
           <div className="flex-center mt-2">
             <form onSubmit={onSubmit} className="w-full">
