@@ -15,7 +15,8 @@ export const getPosts = async () => {
 
     return posts as TPost[]
   } catch (error) {
-    console.error(error)
+    console.error("Error fetching posts:", error)
+    return [] as TPost[]
   }
 }
 
@@ -24,13 +25,16 @@ export const getPostsByUsername = async (username: string) => {
     await connectToDatabase()
     const user = await User.findOne({ username })
 
+    if (!user) return [] as TPost[]
+
     const posts: TPost[] = await Post.find({ user })
       .populate("user")
       .sort({ createdAt: -1 })
 
     return posts as TPost[]
   } catch (error) {
-    console.error(error)
+    console.error("Error fetching posts by username:", error)
+    return [] as TPost[]
   }
 }
 
@@ -46,7 +50,8 @@ export const getPostById = async (postId: string) => {
 
     return post as TPost
   } catch (error) {
-    console.error(error)
+    console.error("Error fetching post by ID:", error)
+    return null
   }
 }
 
@@ -60,7 +65,8 @@ export const getLikedPosts = async (profileUser: TUser) => {
 
     return likedPosts as TPost[]
   } catch (error) {
-    console.error(error)
+    console.error("Error fetching liked posts:", error)
+    return [] as TPost[]
   }
 }
 
@@ -76,7 +82,8 @@ export const getBookmarkedPosts = async (profileUser: TUser) => {
 
     return bookmarkedPosts as TPost[]
   } catch (error) {
-    console.error(error)
+    console.error("Error fetching bookmarked posts:", error)
+    return [] as TPost[]
   }
 }
 

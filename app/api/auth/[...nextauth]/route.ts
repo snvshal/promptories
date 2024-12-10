@@ -38,34 +38,34 @@ const handler = NextAuth({
       if (user) {
         const dbUser = await User.findOne({ email: user.email })
         if (dbUser) {
-          token.id = dbUser._id.toString()
-          token.username = dbUser.username
-          token.name = dbUser.name
-          token.image = dbUser.avatar
-          token.bio = dbUser.bio
-          token.social_links = dbUser.social_links
-          token.followers = st(dbUser.followers)
-          token.following = st(dbUser.following)
+          token.id = dbUser._id.toString() || ""
+          token.username = dbUser.username || ""
+          token.name = dbUser.name || ""
+          token.image = dbUser.avatar || ""
+          token.bio = dbUser.bio || ""
+          token.social_links = dbUser.social_links || {}
+          token.followers = st(dbUser.followers || [])
+          token.following = st(dbUser.following || [])
         }
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string
-        session.user.username = token.username as string
-        session.user.name = token.name as string
-        session.user.image = token.image as string
-        session.user.bio = token.bio as string | undefined
-        session.user.social_links = token.social_links as
-          | {
-              twitter?: string
-              github?: string
-            }
-          | undefined
-        session.user.followers = token.followers as string[]
-        session.user.following = token.following as string[]
+        session.user.id = (token.id as string) || ""
+        session.user.username = (token.username as string) || ""
+        session.user.name = (token.name as string) || ""
+        session.user.image = (token.image as string) || ""
+        session.user.bio = (token.bio as string) || ""
+        session.user.social_links =
+          (token.social_links as {
+            twitter?: string
+            github?: string
+          }) || {}
+        session.user.followers = (token.followers as string[]) || []
+        session.user.following = (token.following as string[]) || []
       }
+
       return session
     },
   },

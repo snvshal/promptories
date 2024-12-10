@@ -1,20 +1,34 @@
-import NextAuth from "next-auth";
+import NextAuth from "next-auth"
 
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string;
-      username: string;
-      name: string;
-      email: string;
-      bio?: string;
-      image?: string;
+      id: string
+      username: string
+      name: string
+      email: string
+      bio?: string
+      image?: string
       social_links?: {
-        twitter?: string;
-        github?: string;
-      };
-      followers: string[];
-      following: string[];
-    };
+        twitter?: string
+        github?: string
+      }
+      followers: string[]
+      following: string[]
+    }
+  }
+
+  declare interface JWT {
+    id?: string
+    username?: string
+    name?: string
+    bio?: string
+    image?: string
+    social_links?: {
+      twitter?: string
+      github?: string
+    }
+    followers?: string[]
+    following?: string[]
   }
 }
