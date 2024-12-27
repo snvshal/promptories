@@ -10,7 +10,6 @@ import { Sidebar } from "@/components/sidebar"
 import { currentUser } from "@/utils/get-user"
 import { TUser } from "@/types/schema.type"
 import { ps } from "@/utils/ps"
-import { CookiesProvider } from "next-client-cookies/server"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -93,16 +92,15 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthSessionProvider session={session as Session}>
-          <CookiesProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Sidebar user={ps(user as TUser)}>{children}</Sidebar>
-            </ThemeProvider>
-          </CookiesProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Sidebar user={ps(user as TUser)}>{children}</Sidebar>
+          </ThemeProvider>
+
           <Toaster />
         </AuthSessionProvider>
       </body>

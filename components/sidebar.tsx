@@ -31,7 +31,7 @@ import { getNotificationCount } from "@/actions/notificationActions"
 import { AvatarComponent } from "./post/content"
 import { TUser } from "@/types/schema.type"
 import { getTrendingTags } from "@/actions/getTrendingTags"
-import { useCookies } from "next-client-cookies"
+import Cookies from "js-cookie"
 
 export type SidebarProps = {
   user: TUser
@@ -80,30 +80,28 @@ export function Sidebar({ user, children }: SidebarProps) {
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
-      <div className="flex-end lg:w-[calc(22%)] xl:w-[calc(28%)] 2xl:w-[calc(35%)]">
-        <aside className="z-50 border-t bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
-          <nav className="relative h-full">
-            <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
-              <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
-                <NavLinks notificationCount={notificationCount} />
-              </div>
-              <UserProfileLink user={user} />
-            </div>
-            <div className="max-sm:h-[var(--navbar-height)]"></div>
-            <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
+      <aside className="z-50 border-t border-border bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
+        <nav className="relative h-full">
+          <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
+            <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
               <NavLinks notificationCount={notificationCount} />
-              <UserProfileLink user={user} />
             </div>
-          </nav>
-        </aside>
-      </div>
+            <UserProfileLink user={user} />
+          </div>
+          <div className="max-sm:h-[var(--navbar-height)]"></div>
+          <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
+            <NavLinks notificationCount={notificationCount} />
+            <UserProfileLink user={user} />
+          </div>
+        </nav>
+      </aside>
 
       <aside
         id="scrollable-element"
-        className="flex-start flex-1 overflow-y-auto max-sm:pb-[var(--navbar-height)]"
+        className="flex-1 overflow-y-auto max-sm:pb-[var(--navbar-height)]"
       >
         <div className="flex">
-          <div className="w-full border-r md:w-[32rem]">{children}</div>
+          <div className="w-full flex-1 border-r md:w-2/3">{children}</div>
           <SidePanel />
         </div>
       </aside>
@@ -218,12 +216,8 @@ export function UserProfileLink({ user }: { user: TUser }) {
 }
 
 export function SidePanel() {
-  const cookies = useCookies()
   const [inputValue, setInputValue] = useState("")
   const [promptoryType, setPromptoryType] = useState("every")
-  const [feedType, setFeedType] = useState(
-    cookies.get("feed_type") || "for-you",
-  )
   const [trendingTags, setTrendingTags] = useState<
     { tag: string; count: number }[]
   >([])
@@ -244,12 +238,6 @@ export function SidePanel() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     router.push(`/search?q=${inputValue}`)
-  }
-
-  const handleFeedTypeChange = (newValue: string) => {
-    setFeedType(newValue)
-    cookies.set("feed_type", newValue)
-    router.refresh()
   }
 
   return (
@@ -285,15 +273,7 @@ export function SidePanel() {
                 </ScrollArea>
               </SelectContent>
             </Select>
-            <Select value={feedType} onValueChange={handleFeedTypeChange}>
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Feed Types" />
-              </SelectTrigger>
-              <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
-                <SelectItem value="for-you">For You</SelectItem>
-                <SelectItem value="following">Following</SelectItem>
-              </SelectContent>
-            </Select>
+            <FeedTypeComponent />
           </div>
         )}
         {pathname === "/home" && (
@@ -324,5 +304,30 @@ export function SidePanel() {
         )}
       </div>
     </aside>
+  )
+}
+
+export function FeedTypeComponent() {
+  const ft = Cookies.get("feed_type")
+  const [feedType, setFeedType] = useState(ft ?? "for_you")
+
+  const router = useRouter()
+
+  const handleFeedTypeChange = (newValue: string) => {
+    setFeedType(newValue)
+    Cookies.set("feed_type", newValue, { expires: 28 })
+    router.refresh()
+  }
+
+  return (
+    <Select value={feedType} onValueChange={handleFeedTypeChange}>
+      <SelectTrigger className="rounded-lg">
+        <SelectValue placeholder="Feed Types" />
+      </SelectTrigger>
+      <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
+        <SelectItem value="for_you">For You</SelectItem>
+        <SelectItem value="following">Following</SelectItem>
+      </SelectContent>
+    </Select>
   )
 }
