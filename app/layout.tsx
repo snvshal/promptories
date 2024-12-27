@@ -100,6 +100,7 @@ export default async function RootLayout({
           >
             <Sidebar user={ps(user as TUser)}>{children}</Sidebar>
           </ThemeProvider>
+
           <Toaster />
         </AuthSessionProvider>
       </body>

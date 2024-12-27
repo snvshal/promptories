@@ -93,7 +93,7 @@ export async function validateAIChatFormData(data: AIChatFormValue) {
   }
 }
 
-export const isValidURL = (url: string) => {
+export const isValidURL = async (url: string) => {
   try {
     new URL(url)
     return true
