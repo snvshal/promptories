@@ -20,6 +20,7 @@ import { promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
 import { Input } from "./ui/input"
+import { Button } from "./ui/button"
 import {
   Select,
   SelectContent,
@@ -307,27 +308,47 @@ export function SidePanel() {
   )
 }
 
-export function FeedTypeComponent() {
-  const ft = Cookies.get("feed_type")
-  const [feedType, setFeedType] = useState(ft ?? "for_you")
-
+export function FeedTypeComponent({
+  trigger,
+}: {
+  trigger?: "button" | "select"
+}) {
+  const [feedType, setFeedType] = useState<string>("for_you")
   const router = useRouter()
 
-  const handleFeedTypeChange = (newValue: string) => {
-    setFeedType(newValue)
-    Cookies.set("feed_type", newValue, { expires: 28 })
+  useEffect(() => {
+    const ft = Cookies.get("feed_type")
+    setFeedType(ft ?? "for_you")
+  }, [])
+
+  useEffect(() => {
+    Cookies.set("feed_type", feedType, { expires: 28 })
     router.refresh()
-  }
+  }, [feedType])
 
   return (
-    <Select value={feedType} onValueChange={handleFeedTypeChange}>
-      <SelectTrigger className="rounded-lg">
-        <SelectValue placeholder="Feed Types" />
-      </SelectTrigger>
-      <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
-        <SelectItem value="for_you">For You</SelectItem>
-        <SelectItem value="following">Following</SelectItem>
-      </SelectContent>
-    </Select>
+    <>
+      {trigger === "button" ? (
+        <Button
+          variant="ghost"
+          className="lg:hidden"
+          onClick={() =>
+            setFeedType(feedType === "for_you" ? "following" : "for_you")
+          }
+        >
+          {feedType === "for_you" ? "For You" : "Following"}
+        </Button>
+      ) : (
+        <Select value={feedType} onValueChange={setFeedType}>
+          <SelectTrigger className="rounded-lg">
+            <SelectValue placeholder="Feed Types" />
+          </SelectTrigger>
+          <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
+            <SelectItem value="for_you">For You</SelectItem>
+            <SelectItem value="following">Following</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+    </>
   )
 }

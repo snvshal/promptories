@@ -7,36 +7,19 @@ import { TPost } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { PostType } from "./post/content"
 import { ArrowBack } from "./ui/svg-icons"
-import Cookies from "js-cookie"
+import { FeedTypeComponent } from "./sidebar"
 
 export function HomePageComponent({ posts }: { posts: TPost[] }) {
-  const ft = Cookies.get("feed_type")
-  const [feedType, setFeedType] = useState(ft ?? "for_you")
-
-  const router = useRouter()
-
-  const handleFeedTypeChange = () => {
-    const newFeedType = feedType === "for_you" ? "following" : "for_you"
-    setFeedType(newFeedType)
-    Cookies.set("feed_type", newFeedType, { expires: 28 })
-    router.refresh()
-  }
   return (
     <div className="w-full">
       <DynamicHeader>
-        <div className="mx-auto flex max-w-7xl items-center justify-between p-4 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center">
             <h1 className="mr-8 text-2xl font-bold text-blue-600">
               Promptories
             </h1>
           </div>
-          <Button
-            variant="ghost"
-            className="lg:hidden"
-            onClick={handleFeedTypeChange}
-          >
-            {feedType === "for_you" ? "For You" : "Following"}
-          </Button>
+          <FeedTypeComponent trigger="button" />
         </div>
       </DynamicHeader>
       <main className="main-content">
