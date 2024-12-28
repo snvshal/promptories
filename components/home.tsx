@@ -13,8 +13,8 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
   return (
     <div className="w-full">
       <DynamicHeader>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-          <div className="flex items-center">
+        <div className="mx-auto flex h-16 items-center justify-between px-4 py-3">
+          <div className="flex flex-1 items-center">
             <h1 className="mr-8 text-2xl font-bold text-blue-600">
               Promptories
             </h1>
