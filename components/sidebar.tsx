@@ -20,6 +20,7 @@ import { promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
 import { Input } from "./ui/input"
+import { Button } from "./ui/button"
 import {
   Select,
   SelectContent,
@@ -80,31 +81,30 @@ export function Sidebar({ user, children }: SidebarProps) {
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
-      <aside className="z-50 border-t border-border bg-background sm:h-screen sm:w-16 sm:border-r md:w-60">
-        <nav className="relative h-full">
-          <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
-            <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
-              <NavLinks notificationCount={notificationCount} />
-            </div>
-            <UserProfileLink user={user} />
-          </div>
-          <div className="max-sm:h-[var(--navbar-height)]"></div>
-          <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
-            <NavLinks notificationCount={notificationCount} />
-            <UserProfileLink user={user} />
-          </div>
-        </nav>
-      </aside>
-
-      <aside
+      <div className="max-sm:h-[var(--navbar-height)]"></div>
+      <div
         id="scrollable-element"
-        className="flex-1 overflow-y-auto max-sm:pb-[var(--navbar-height)]"
+        className="flex flex-1 justify-center overflow-y-auto"
       >
-        <div className="flex">
-          <div className="w-full flex-1 border-r md:w-2/3">{children}</div>
+        <aside className="sticky top-0 z-50 h-screen border-r">
+          <nav className="relative bg-background sm:h-screen sm:w-16 md:w-60">
+            <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
+              <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
+                <NavLinks notificationCount={notificationCount} />
+              </div>
+              <UserProfileLink user={user} />
+            </div>
+            <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
+              <NavLinks notificationCount={notificationCount} />
+              <UserProfileLink user={user} />
+            </div>
+          </nav>
+        </aside>
+        <div className="max-w-xl flex-1">{children}</div>
+        <section className="sticky top-0 h-screen border-l">
           <SidePanel />
-        </div>
-      </aside>
+        </section>
+      </div>
     </div>
   )
 }
@@ -241,93 +241,111 @@ export function SidePanel() {
   }
 
   return (
-    <aside className="w-[18rem] max-lg:hidden">
-      <div className="sticky top-0 h-screen w-full overflow-hidden px-4 pt-4">
-        {pathname.startsWith("/search") || (
-          <div className="flex-center mt-2">
-            <form onSubmit={onSubmit} className="w-full">
-              <Input
-                name="search"
-                placeholder="Search"
-                value={inputValue}
-                className="w-full rounded-lg"
-                onChange={(e) => setInputValue(e.target.value)}
-              />
-            </form>
-          </div>
-        )}
-        {pathname === "/home" && (
-          <div className="my-2 flex w-full flex-col gap-2">
-            <Select value={promptoryType} onValueChange={setPromptoryType}>
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Promptory Types" />
-              </SelectTrigger>
-              <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
-                <ScrollArea className="h-48 rounded-lg">
-                  <SelectItem value="every">Every</SelectItem>
-                  {promptory_types.map((type, index) => (
-                    <SelectItem key={index} value={type}>
-                      <span className="capitalize">{type}</span>
-                    </SelectItem>
-                  ))}
-                </ScrollArea>
-              </SelectContent>
-            </Select>
-            <FeedTypeComponent />
-          </div>
-        )}
-        {pathname === "/home" && (
-          <div className="flex-center flex-col">
-            <ScrollArea className="h-[17rem] w-full rounded-lg border shadow">
-              <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
-                <TrendingUp />
-                <span>Trending</span>
-              </h2>
-              {trendingTags.map((tag, index) => (
-                <Link
-                  key={index}
-                  href={`/search?q=${tag.tag}&category=tags`}
-                  className="flex-between w-full gap-2 px-4 py-1 hover:bg-accent hover:text-accent-foreground"
-                >
-                  <span className="flex-start gap-2">
-                    <span className="font-mono text-xl">#</span>
-                    <span>{tag.tag}</span>
-                  </span>
+    <div className="w-[18rem] overflow-hidden px-4 pt-4 max-lg:hidden">
+      {pathname.startsWith("/search") || (
+        <div className="flex-center mt-2">
+          <form onSubmit={onSubmit} className="w-full">
+            <Input
+              name="search"
+              placeholder="Search"
+              value={inputValue}
+              className="w-full rounded-lg"
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+          </form>
+        </div>
+      )}
+      {pathname === "/home" && (
+        <div className="my-2 flex w-full flex-col gap-2">
+          <Select value={promptoryType} onValueChange={setPromptoryType}>
+            <SelectTrigger className="rounded-lg">
+              <SelectValue placeholder="Promptory Types" />
+            </SelectTrigger>
+            <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
+              <ScrollArea className="h-48 rounded-lg">
+                <SelectItem value="every">Every</SelectItem>
+                {promptory_types.map((type, index) => (
+                  <SelectItem key={index} value={type}>
+                    <span className="capitalize">{type}</span>
+                  </SelectItem>
+                ))}
+              </ScrollArea>
+            </SelectContent>
+          </Select>
+          <FeedTypeComponent />
+        </div>
+      )}
+      {pathname === "/home" && (
+        <div className="flex-center flex-col">
+          <ScrollArea className="h-[17rem] w-full rounded-lg border shadow">
+            <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
+              <TrendingUp />
+              <span>Trending</span>
+            </h2>
+            {trendingTags.map((tag, index) => (
+              <Link
+                key={index}
+                href={`/search?q=${tag.tag}&category=tags`}
+                className="flex-between w-full gap-2 px-4 py-1 hover:bg-accent hover:text-accent-foreground"
+              >
+                <span className="flex-start gap-2">
+                  <span className="font-mono text-xl">#</span>
+                  <span>{tag.tag}</span>
+                </span>
 
-                  <span className="text-sm text-muted-foreground">
-                    {tag.count}
-                  </span>
-                </Link>
-              ))}
-            </ScrollArea>
-          </div>
-        )}
-      </div>
-    </aside>
+                <span className="text-sm text-muted-foreground">
+                  {tag.count}
+                </span>
+              </Link>
+            ))}
+          </ScrollArea>
+        </div>
+      )}
+    </div>
   )
 }
 
-export function FeedTypeComponent() {
-  const ft = Cookies.get("feed_type")
-  const [feedType, setFeedType] = useState(ft ?? "for_you")
-
+export function FeedTypeComponent({
+  trigger,
+}: {
+  trigger?: "button" | "select"
+}) {
+  const [feedType, setFeedType] = useState<string>("for_you")
   const router = useRouter()
 
-  const handleFeedTypeChange = (newValue: string) => {
-    setFeedType(newValue)
-    Cookies.set("feed_type", newValue, { expires: 28 })
+  useEffect(() => {
+    const ft = Cookies.get("feed_type")
+    setFeedType(ft ?? "for_you")
+  }, [])
+
+  useEffect(() => {
+    Cookies.set("feed_type", feedType, { expires: 28 })
     router.refresh()
-  }
+  }, [feedType, router])
 
   return (
-    <Select value={feedType} onValueChange={handleFeedTypeChange}>
-      <SelectTrigger className="rounded-lg">
-        <SelectValue placeholder="Feed Types" />
-      </SelectTrigger>
-      <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
-        <SelectItem value="for_you">For You</SelectItem>
-        <SelectItem value="following">Following</SelectItem>
-      </SelectContent>
-    </Select>
+    <>
+      {trigger === "button" ? (
+        <Button
+          variant="ghost"
+          className="lg:hidden"
+          onClick={() =>
+            setFeedType(feedType === "for_you" ? "following" : "for_you")
+          }
+        >
+          {feedType === "for_you" ? "For You" : "Following"}
+        </Button>
+      ) : (
+        <Select value={feedType} onValueChange={setFeedType}>
+          <SelectTrigger className="rounded-lg">
+            <SelectValue placeholder="Feed Types" />
+          </SelectTrigger>
+          <SelectContent className="rounded-lg shadow-2xl shadow-slate-900">
+            <SelectItem value="for_you">For You</SelectItem>
+            <SelectItem value="following">Following</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+    </>
   )
 }
