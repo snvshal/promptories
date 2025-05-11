@@ -13,7 +13,6 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, usePathname, useRouter } from "next/navigation"
-import { cl } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
 import { defaultValues, postMedia, promptory_types } from "@/lib/constants"
@@ -38,12 +37,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
 import PostForm from "./form"
 import { SetAction } from "@/types/generics.type"
 
