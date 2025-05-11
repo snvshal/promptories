@@ -16,7 +16,7 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { cl } from "@/utils/ps"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
-import { promptory_types } from "@/lib/constants"
+import { defaultValues, postMedia, promptory_types } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
 import { Input } from "./ui/input"
@@ -33,6 +33,19 @@ import { AvatarComponent } from "./post/content"
 import { TUser } from "@/types/schema.type"
 import { getTrendingTags } from "@/actions/getTrendingTags"
 import Cookies from "js-cookie"
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import PostForm from "./form"
+import { SetAction } from "@/types/generics.type"
 
 export type SidebarProps = {
   user: TUser
@@ -184,24 +197,28 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
 
 export function UserProfileLink({ user }: { user: TUser }) {
   const params = useParams()
-  const router = useRouter()
 
+  const [open, setOpen] = useState(false)
+
+  const isProfileRoute =
+    Object.keys(params).length === 1 && params.username === user?.username
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
-      <Link
+      <ComposePostButton open={open} setOpen={setOpen} />
+
+      {/* <Link
         href={"/compose/promptory"}
         className="flex-center w-full self-center rounded-full bg-foreground p-2 text-background max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
         aria-label="Compose Promptory"
       >
         <Feather className="size-5 text-base md:hidden" />
         <span className="text-lg font-medium max-md:hidden">Post</span>
-      </Link>
+      </Link> */}
 
-      <div
-        onClick={() => router.push(cl(user?.username))}
-        className={`${params.username === user?.username ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
+      <Link
+        href={`/${user?.username}`}
+        className={`${isProfileRoute ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
         aria-label="Profile"
-        role="button"
       >
         <AvatarComponent user={user} classname="max-sm:size-8" />
         <span className="flex flex-col items-start max-md:hidden">
@@ -210,8 +227,41 @@ export function UserProfileLink({ user }: { user: TUser }) {
             &#64;{user?.username}
           </span>
         </span>
-      </div>
+      </Link>
     </div>
+  )
+}
+
+export function ComposePostButton({
+  open,
+  setOpen,
+}: {
+  open: boolean
+  setOpen: SetAction<boolean>
+}) {
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          className="flex-center w-full self-center rounded-full bg-foreground p-2 text-background max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
+          aria-label="Compose Promptory"
+        >
+          <Feather className="size-5 text-base md:hidden" />
+          <span className="text-lg font-medium max-md:hidden">Post</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-full overflow-y-auto sm:max-h-[calc(100dvh-4rem)]">
+        <DialogHeader>
+          <DialogTitle></DialogTitle>
+          <DialogDescription></DialogDescription>
+        </DialogHeader>
+        <PostForm
+          defaultFormValues={defaultValues}
+          operationType="POST"
+          media={postMedia}
+        />
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -14,25 +14,34 @@ export async function savePostForm(data: FormValues) {
     const user = await currentUser()
     if (!user) throw new Error("User not found.")
 
-    const post = await Post.create({
+    const postData = {
       user: user,
-      caption: data.caption,
-      model_url: data.model_url,
-      chat_link: data.chat_link,
-      prompt: { text: data.prompt, media: data.prompt_media },
-      response: { text: data.response, media: data.response_media },
+      caption: data.caption || "",
+      model_url: data.model_url || "",
+      chat_link: data.chat_link || "",
+      prompt: {
+        text: data.prompt,
+        media: data.prompt_media || null,
+      },
+      response: {
+        text: data.response || "",
+        media: data.response_media || null,
+      },
       promptory_type: data.promptory_type,
-      tags: parseTags(data.tags as string),
-    })
+      tags: parseTags(data.tags || ""),
+    }
 
-    user?.posts.push(post)
-    await user?.save()
+    const post = await Post.create(postData)
+    if (!post) throw new Error("Failed to create post")
+
+    user.posts.push(post._id)
+    await user.save()
 
     revalidatePath("/home")
-
     return ps(post)
   } catch (error) {
     console.error("Error saving post:", error)
+    throw error
   }
 }
 

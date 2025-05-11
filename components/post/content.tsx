@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User } from "lucide-react"
+import { SquareParkingIcon, User } from "lucide-react"
 import Link from "next/link"
 import { NavigateBackHeader } from "../home"
 import { TimeAgo } from "../time-ago"
@@ -17,6 +17,16 @@ import { cl, getSortedReplies, postPathname, pu } from "@/utils/ps"
 import clsx from "clsx"
 import { SetAction } from "@/types/generics.type"
 import { ProfileHoverCard } from "../profile/user"
+import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const sortedReplies = getSortedReplies(post.replies)
@@ -110,13 +120,19 @@ export function PostContentType({
   content: string
 }) {
   if (type === "post") {
-    return <p className="whitespace-pre-wrap">{content}</p>
+    return (
+      <div className="prose prose-sm dark:prose-invert max-w-none">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      </div>
+    )
   } else {
     return (
       <>
-        <p className="whitespace-pre-wrap">
-          {content.split(" ").slice(0, 40).join(" ")}
-        </p>
+        <div className="prose prose-sm dark:prose-invert max-w-none">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {content.split(" ").slice(0, 40).join(" ")}
+          </ReactMarkdown>
+        </div>
         {content.split(" ").length > 40 && (
           <span className="text-blue-500 hover:underline">Show more</span>
         )}
@@ -145,6 +161,42 @@ export function PostHeader({ type, post }: PostContentProps) {
             </p>
           )}
         </div>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="releative mr-8 h-8 w-8 rounded-full"
+            >
+              <SquareParkingIcon className="h-4 w-4" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Prompt</SheetTitle>
+            </SheetHeader>
+            <div className="mt-4">
+              {post.prompt.media?.url ? (
+                <Link
+                  href={postPathname(post, "prompt", "media")}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <PostMedia
+                    mediaType={post.prompt.media?.type}
+                    mediaUrl={post.prompt.media?.url}
+                    caption={post.caption}
+                    prType="prompt"
+                  />
+                </Link>
+              ) : (
+                <PostContentType
+                  type={type}
+                  content={post.prompt.text as string}
+                />
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
         <PostOptions post={post} type={type} />
       </div>
     </CardHeader>
@@ -217,28 +269,9 @@ export function PostContent({ type, post }: PostContentProps) {
         <PostContentType type={type} content={post.caption} />
       </div>
       <div
-        className={`relative flex flex-col gap-4 overflow-hidden rounded-lg bg-primary-foreground p-4`}
+        className={`relative flex flex-col gap-4 overflow-hidden rounded-lg bg-primary-foreground p-2`}
       >
         <div>
-          <h2 className="font-bold">Prompt:</h2>
-          {post.prompt.media?.url ? (
-            <Link
-              href={postPathname(post, "prompt", "media")}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <PostMedia
-                mediaType={post.prompt.media?.type}
-                mediaUrl={post.prompt.media?.url}
-                caption={post.caption}
-                prType="prompt"
-              />
-            </Link>
-          ) : (
-            <PostContentType type={type} content={post.prompt.text as string} />
-          )}
-        </div>
-        <div>
-          <h2 className="font-bold">Response:</h2>
           {post.response.media?.url ? (
             <Link
               href={postPathname(post, "prompt", "media")}
@@ -284,7 +317,7 @@ export function PostMedia({
             height={500}
             quality={75}
             priority={true}
-            className="mt-1.5 w-full rounded-lg"
+            className="w-full rounded-lg"
             alt="promptory image"
             aria-describedby="image-description"
           />
@@ -297,7 +330,7 @@ export function PostMedia({
           <video
             src={mediaUrl}
             controls={true}
-            className="mt-1.5 w-full rounded-lg"
+            className="w-full rounded-lg"
             aria-describedby="video-description"
             aria-label={`${prType} ${mediaType}`}
           >
