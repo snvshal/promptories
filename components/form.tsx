@@ -17,7 +17,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { promptory_types } from "@/lib/constants"
 import { savePostForm, updatePostForm } from "@/actions/postFormActions"
-import { NavigateBackHeader } from "./home"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
 import { postPathname } from "@/utils/ps"
@@ -29,6 +28,8 @@ import { Separator } from "@/components/ui/separator"
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { Info } from "lucide-react"
 import { ToolTipComponent } from "./ui/tooltip"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 export const ACCEPTED_IMAGE_TYPES = [
@@ -46,10 +47,10 @@ const mediaSchema = z.object({
 
 const formSchema = z
   .object({
-    caption: z.string().min(1, "Caption is required"),
-    model_url: z.string().url("Invalid model URL").min(10, "Model is required"),
+    caption: z.string().optional(),
+    model_url: z.string().url("Invalid model URL").optional().or(z.literal("")),
     chat_link: z.string().url("Invalid chat URL").optional().or(z.literal("")),
-    prompt: z.string().optional(),
+    prompt: z.string().min(1, "Prompt text is required"),
     prompt_media: mediaSchema.optional(),
     response: z.string().optional(),
     response_media: mediaSchema.optional(),
@@ -58,19 +59,6 @@ const formSchema = z
     }),
     tags: z.string().optional(),
   })
-  .refine(
-    (data) => {
-      if (data.promptory_type.toLowerCase().startsWith("text")) {
-        return !!data.prompt
-      } else {
-        return !!data.prompt_media
-      }
-    },
-    {
-      message: "Prompt is required based on the selected promptory type",
-      path: ["prompt"],
-    },
-  )
   .refine(
     (data) => {
       if (data.promptory_type.toLowerCase().endsWith("text")) {
@@ -214,19 +202,22 @@ export default function PostForm({
       }
 
       if (operationType === "POST") {
-        const post: TPost = await savePostForm(formData)
+        const savedPost = await savePostForm(formData)
+        if (!savedPost) throw new Error("Failed to save post")
+
         router.back()
         toast({
           description: "Your post has been sent.",
           action: (
             <ToastAction
-              onClick={() => postRoute(post)}
+              onClick={() => postRoute(savedPost)}
               altText="View your created post"
             >
               View
             </ToastAction>
           ),
         })
+        reset()
       } else if (operationType === "PATCH" && post) {
         await updatePostForm(formData, post._id as string)
         router.back()
@@ -242,12 +233,12 @@ export default function PostForm({
           ),
         })
       }
-      reset()
     } catch (error) {
       console.error("Error submitting form:", error)
       toast({
         title: "Error",
-        description: "There was a problem sending your post.",
+        description:
+          error instanceof Error ? error.message : "Failed to save post",
         variant: "destructive",
       })
     } finally {
@@ -264,147 +255,163 @@ export default function PostForm({
 
   return (
     <div className="w-full">
-      <NavigateBackHeader
+      {/* <NavigateBackHeader
         page={operationType === "POST" ? "Create Promptory" : "Edit Promptory"}
-      />
+      /> */}
       <main className="main-content p-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex flex-col gap-6 md:flex-row">
-            <div className="flex-1 space-y-6">
+          <div className="flex-1 space-y-6">
+            <div>
+              <Label htmlFor="promptory_type">Promptory Type</Label>
+              <Controller
+                name="promptory_type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger id="promptory_type">
+                      <SelectValue placeholder="Select a promptory type" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-48">
+                      {promptory_types.map((type) => (
+                        <SelectItem
+                          key={type}
+                          value={type}
+                          className="capitalize"
+                        >
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.promptory_type && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.promptory_type.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="prompt">Prompt Text</Label>
+              <Controller
+                name="prompt"
+                control={control}
+                render={({ field }) => (
+                  <Textarea
+                    id="prompt"
+                    placeholder="Enter prompt text"
+                    value={field.value}
+                    onChange={(e) => {
+                      field.onChange(e)
+                      autoResize(e.target as HTMLTextAreaElement)
+                    }}
+                    onBlur={field.onBlur}
+                    ref={(element) => {
+                      field.ref(element)
+                      autoResize(element as HTMLTextAreaElement)
+                    }}
+                  />
+                )}
+              />
+              {errors.prompt && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.prompt.message}
+                </p>
+              )}
+            </div>
+
+            {!isPromptText && (
               <div>
-                <Label htmlFor="promptory_type">Promptory Type</Label>
-                <Controller
-                  name="promptory_type"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                <Label htmlFor="promptMedia">
+                  Prompt Media (
+                  {promptoryType?.toLowerCase().startsWith("image")
+                    ? "Image"
+                    : "Video"}
+                  )
+                </Label>
+                <CldUploadWidget
+                  uploadPreset={
+                    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+                  }
+                  options={{
+                    maxFiles: 1,
+                    resourceType: "auto",
+                    clientAllowedFormats: [
+                      ...ACCEPTED_IMAGE_TYPES,
+                      ...ACCEPTED_VIDEO_TYPES,
+                    ],
+                    maxFileSize: MAX_FILE_SIZE,
+                  }}
+                  onSuccess={(result) => handleUploadSuccess(result, "prompt")}
+                >
+                  {({ open }) => (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => open()}
+                      className="w-full"
                     >
-                      <SelectTrigger id="promptory_type">
-                        <SelectValue placeholder="Select a promptory type" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-48">
-                        {promptory_types.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      Upload Prompt Media
+                    </Button>
                   )}
-                />
-                {errors.promptory_type && (
+                </CldUploadWidget>
+                {promptMediaUrl && promptMediaType && (
+                  <div className="mt-4">
+                    <RenderPreview
+                      mediaUrl={promptMediaUrl}
+                      mediaType={promptMediaType}
+                    />
+                  </div>
+                )}
+                {!promptMediaUrl && errors.prompt && (
                   <p className="mt-1 text-sm text-red-500">
-                    {errors.promptory_type.message}
+                    {errors.prompt.message || "Prompt media is required"}
                   </p>
                 )}
               </div>
+            )}
 
-              {isPromptText ? (
+            {isResponseText && (
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="prompt">Prompt</Label>
-                  <Controller
-                    name="prompt"
-                    control={control}
-                    render={({ field }) => (
-                      <Textarea
-                        id="prompt"
-                        placeholder="Enter prompt"
-                        value={field.value}
-                        onChange={(e) => {
-                          field.onChange(e)
-                          autoResize(e.target as HTMLTextAreaElement)
-                        }}
-                        onBlur={field.onBlur}
-                        ref={(element) => {
-                          field.ref(element)
-                          autoResize(element as HTMLTextAreaElement)
-                        }}
-                      />
-                    )}
-                  />
-                  {errors.prompt && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.prompt.message}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <Label htmlFor="promptMedia">
-                    Prompt{" "}
-                    {promptoryType?.toLowerCase().startsWith("image")
-                      ? "Image"
-                      : promptoryType?.toLowerCase().startsWith("video")
-                        ? "Video"
-                        : "Audio as Video"}
-                  </Label>
-                  <CldUploadWidget
-                    uploadPreset={
-                      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-                    }
-                    options={{
-                      maxFiles: 1,
-                      resourceType: "auto",
-                      clientAllowedFormats: [
-                        ...ACCEPTED_IMAGE_TYPES,
-                        ...ACCEPTED_VIDEO_TYPES,
-                      ],
-                      maxFileSize: MAX_FILE_SIZE,
-                    }}
-                    onSuccess={(result) =>
-                      handleUploadSuccess(result, "prompt")
-                    }
-                  >
-                    {({ open }) => (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => open()}
-                        className="w-full"
-                      >
-                        Upload Prompt Media
-                      </Button>
-                    )}
-                  </CldUploadWidget>
-                  {promptMediaUrl && promptMediaType && (
-                    <div className="mt-4">
-                      <RenderPreview
-                        mediaUrl={promptMediaUrl}
-                        mediaType={promptMediaType}
-                      />
-                    </div>
-                  )}
-                  {!promptMediaUrl && errors.prompt && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.prompt.message || "Prompt media is required"}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {isResponseText ? (
-                <div>
-                  <Label htmlFor="response">Response</Label>
+                  <Label htmlFor="response">Response (Markdown)</Label>
                   <Controller
                     name="response"
                     control={control}
-                    render={({ field }) => (
-                      <Textarea
-                        id="response"
-                        placeholder="Enter response"
-                        value={field.value}
-                        onChange={(e) => {
-                          field.onChange(e)
-                          autoResize(e.target as HTMLTextAreaElement)
-                        }}
-                        onBlur={field.onBlur}
-                        ref={(element) => {
-                          field.ref(element)
-                          autoResize(element as HTMLTextAreaElement)
-                        }}
-                      />
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <div className="space-y-4">
+                        <Textarea
+                          id="response"
+                          placeholder="Enter response in Markdown"
+                          className="min-h-[200px] font-mono text-sm"
+                          value={value || ""}
+                          onChange={(e) => {
+                            onChange(e.target.value)
+                            autoResize(e.target as HTMLTextAreaElement)
+                          }}
+                          {...field}
+                        />
+                        <div className="rounded-lg border bg-card p-4">
+                          <div className="mb-2 flex items-center gap-2">
+                            <span className="text-sm font-medium text-muted-foreground">
+                              Preview
+                            </span>
+                            <Separator orientation="vertical" className="h-4" />
+                            <span className="text-xs text-muted-foreground">
+                              Markdown supported
+                            </span>
+                          </div>
+                          <div className="prose prose-sm max-w-none overflow-auto rounded-md dark:prose-invert prose-pre:bg-muted prose-pre:p-4">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {value || "_Start typing to see preview..._"}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
+                      </div>
                     )}
                   />
                   {errors.response && (
@@ -413,164 +420,162 @@ export default function PostForm({
                     </p>
                   )}
                 </div>
-              ) : (
-                <div>
-                  <Label htmlFor="responseMedia">
-                    Response{" "}
-                    {promptoryType?.toLowerCase().endsWith("image")
-                      ? "Image"
-                      : promptoryType?.toLowerCase().endsWith("video")
-                        ? "Video"
-                        : "Audio as Video"}
-                  </Label>
-                  <CldUploadWidget
-                    uploadPreset={
-                      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-                    }
-                    options={{
-                      maxFiles: 1,
-                      resourceType: "auto",
-                      clientAllowedFormats: [
-                        ...ACCEPTED_IMAGE_TYPES,
-                        ...ACCEPTED_VIDEO_TYPES,
-                      ],
-                      maxFileSize: MAX_FILE_SIZE,
-                    }}
-                    onSuccess={(result) =>
-                      handleUploadSuccess(result, "response")
-                    }
-                  >
-                    {({ open }) => (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => open()}
-                        className="w-full"
-                      >
-                        Upload Response Media
-                      </Button>
-                    )}
-                  </CldUploadWidget>
-                  {responseMediaUrl && responseMediaType && (
-                    <div className="mt-4">
-                      <RenderPreview
-                        mediaUrl={responseMediaUrl}
-                        mediaType={responseMediaType}
-                      />
-                    </div>
-                  )}
-                  {!responseMediaUrl && errors.response && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.response.message || "Response media is required"}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
-            <Separator orientation="vertical" className="h-auto" />
-
-            <div className="space-y-6 md:w-1/3">
+            {!isResponseText && (
               <div>
-                <Label htmlFor="caption">Caption</Label>
-                <Controller
-                  name="caption"
-                  control={control}
-                  render={({ field }) => (
-                    <Textarea
-                      id="caption"
-                      placeholder="Enter caption"
-                      value={field.value}
-                      onChange={(e) => {
-                        field.onChange(e)
-                        autoResize(e.target as HTMLTextAreaElement)
-                      }}
-                      onBlur={field.onBlur}
-                      ref={(element) => {
-                        field.ref(element)
-                        autoResize(element as HTMLTextAreaElement)
-                      }}
-                    />
+                <Label htmlFor="responseMedia">
+                  Response{" "}
+                  {promptoryType?.toLowerCase().endsWith("image")
+                    ? "Image"
+                    : promptoryType?.toLowerCase().endsWith("video")
+                      ? "Video"
+                      : "Audio as Video"}
+                </Label>
+                <CldUploadWidget
+                  uploadPreset={
+                    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+                  }
+                  options={{
+                    maxFiles: 1,
+                    resourceType: "auto",
+                    clientAllowedFormats: [
+                      ...ACCEPTED_IMAGE_TYPES,
+                      ...ACCEPTED_VIDEO_TYPES,
+                    ],
+                    maxFileSize: MAX_FILE_SIZE,
+                  }}
+                  onSuccess={(result) =>
+                    handleUploadSuccess(result, "response")
+                  }
+                >
+                  {({ open }) => (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => open()}
+                      className="w-full"
+                    >
+                      Upload Response Media
+                    </Button>
                   )}
-                />
-                {errors.caption && (
+                </CldUploadWidget>
+                {responseMediaUrl && responseMediaType && (
+                  <div className="mt-4">
+                    <RenderPreview
+                      mediaUrl={responseMediaUrl}
+                      mediaType={responseMediaType}
+                    />
+                  </div>
+                )}
+                {!responseMediaUrl && errors.response && (
                   <p className="mt-1 text-sm text-red-500">
-                    {errors.caption.message}
+                    {errors.response.message || "Response media is required"}
                   </p>
                 )}
               </div>
-
-              <div>
-                <LabelWithToolTip
-                  htmlFor="model_url"
-                  label="Platform"
-                  content="Enter full URL of the website where we can try it. (e.g.,
-                  https://example.com)"
-                />
-                <Controller
-                  name="model_url"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="model_url"
-                      placeholder="Enter model URL"
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.model_url && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.model_url.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <LabelWithToolTip
-                  htmlFor="chat_link"
-                  label="Chat"
-                  content="Enter public chat link of this promptory"
-                />
-                <Controller
-                  name="chat_link"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="chat_link"
-                      placeholder="Enter chat link"
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.chat_link && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.chat_link.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <LabelWithToolTip
-                  htmlFor="tags"
-                  label="Tags"
-                  content="Enter tags separated by space (e.g., tag1 tag2 tag3)"
-                />
-                <Controller
-                  name="tags"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="tags"
-                      placeholder="Enter tags (space-separated)"
-                      {...field}
-                    />
-                  )}
-                />
-              </div>
-            </div>
+            )}
           </div>
 
-          <Separator orientation="horizontal" />
+          <Separator orientation="vertical" className="h-auto" />
+
+          <div>
+            <Label htmlFor="caption">Caption (Optional)</Label>
+            <Controller
+              name="caption"
+              control={control}
+              render={({ field }) => (
+                <Textarea
+                  id="caption"
+                  placeholder="Enter caption (optional)"
+                  value={field.value}
+                  onChange={(e) => {
+                    field.onChange(e)
+                    autoResize(e.target as HTMLTextAreaElement)
+                  }}
+                  onBlur={field.onBlur}
+                  ref={(element) => {
+                    field.ref(element)
+                    autoResize(element as HTMLTextAreaElement)
+                  }}
+                />
+              )}
+            />
+            {/* {errors.caption && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.caption.message}
+              </p>
+            )} */}
+          </div>
+
+          <div>
+            <LabelWithToolTip
+              htmlFor="model_url"
+              label="Platform (Optional)"
+              content="Enter full URL of the website where we can try it. (e.g.,
+                  https://example.com)"
+            />
+            <Controller
+              name="model_url"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="model_url"
+                  placeholder="Enter model URL"
+                  {...field}
+                />
+              )}
+            />
+            {/* {errors.model_url && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.model_url.message}
+              </p>
+            )} */}
+          </div>
+
+          <div>
+            <LabelWithToolTip
+              htmlFor="chat_link"
+              label="Chat Link (Optional)"
+              content="Enter public chat link of this promptory"
+            />
+            <Controller
+              name="chat_link"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="chat_link"
+                  placeholder="Enter chat link"
+                  {...field}
+                />
+              )}
+            />
+            {/* {errors.chat_link && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.chat_link.message}
+              </p>
+            )} */}
+          </div>
+
+          <div>
+            <LabelWithToolTip
+              htmlFor="tags"
+              label="Tags (Optional)"
+              content="Enter tags separated by space (e.g., tag1 tag2 tag3)"
+            />
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="tags"
+                  placeholder="Enter tags (space-separated)"
+                  {...field}
+                />
+              )}
+            />
+          </div>
 
           <div className="flex w-full gap-2">
             <Button type="submit" disabled={isSubmitting}>
@@ -582,13 +587,13 @@ export default function PostForm({
                   ? "Updating..."
                   : "Update"}
             </Button>
-            <Button
+            {/* <Button
               variant="secondary"
               type="button"
               onClick={() => router.back()}
             >
               Cancel
-            </Button>
+            </Button> */}
           </div>
         </form>
       </main>

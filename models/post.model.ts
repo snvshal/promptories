@@ -21,12 +21,10 @@ const PostSchema = new Schema<TPost>(
     },
     caption: {
       type: String,
-      required: true,
       trim: true,
     },
     model_url: {
       type: String,
-      required: true,
       trim: true,
     },
     chat_link: {
