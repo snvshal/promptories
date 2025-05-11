@@ -12,12 +12,7 @@ import {
   Bot,
 } from "lucide-react"
 import Link from "next/link"
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
 import { defaultValues, postMedia, promptory_types } from "@/lib/constants"
