@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Feather } from "lucide-react"
 import { TPost } from "@/types/schema.type"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { PostType } from "./post/content"
 import { ArrowBack } from "./ui/svg-icons"
 import { FeedTypeComponent } from "./sidebar"
+import Link from "next/link"
 
 export function HomePageComponent({ posts }: { posts: TPost[] }) {
   return (
@@ -111,16 +112,17 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
 }
 
 export function ComposePromptoryButton() {
-  const router = useRouter()
+  const pathname = usePathname()
   return (
-    <Button
-      size="icon"
-      name="Compose Promptory"
-      onClick={() => router.push("/compose/promptory")}
-      className="compose-button"
-      aria-label="Compose Promptory"
-    >
-      <Feather size={24} />
-    </Button>
+    <Link href={`${pathname}?compose=true`}>
+      <Button
+        size="icon"
+        name="Compose Promptory"
+        className="compose-button"
+        aria-label="Compose Promptory"
+      >
+        <Feather size={24} />
+      </Button>
+    </Link>
   )
 }

@@ -69,6 +69,26 @@
   }
 }
 
+@layer base {
+  .prose {
+    @apply text-foreground;
+  }
+  .prose pre {
+    @apply bg-muted text-muted-foreground;
+  }
+  .prose code {
+    @apply font-mono text-sm;
+  }
+  .prose pre code {
+    @apply text-sm leading-normal;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .prose :not(pre) > code {
+    @apply rounded bg-muted text-foreground;
+  }
+}
+
 html {
   @apply overflow-hidden;
 }
