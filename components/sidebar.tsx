@@ -12,7 +12,7 @@ import {
   Bot,
 } from "lucide-react"
 import Link from "next/link"
-import { useParams, usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
 import { defaultValues, postMedia, promptory_types } from "@/lib/constants"
@@ -193,12 +193,10 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
 }
 
 export function UserProfileLink({ user }: { user: TUser }) {
-  const params = useParams()
-
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  const isProfileRoute =
-    Object.keys(params).length === 1 && params.username === user?.username
+  const isProfileRoute = pathname === `/${user?.username}`
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
       <ComposePostButton open={open} setOpen={setOpen} />
@@ -236,8 +234,28 @@ export function ComposePostButton({
   open: boolean
   setOpen: SetAction<boolean>
 }) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  if (searchParams.get("compose") === "true") {
+    setOpen(true)
+  } else {
+    setOpen(false)
+  }
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        if (open) {
+          setOpen(false)
+          router.push(pathname)
+        } else {
+          setOpen(true)
+          router.push(`${pathname}?compose=true`)
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           className="flex-center w-full self-center rounded-full bg-foreground p-2 text-background max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
@@ -256,6 +274,7 @@ export function ComposePostButton({
           defaultFormValues={defaultValues}
           operationType="POST"
           media={postMedia}
+          setOpen={setOpen}
         />
       </DialogContent>
     </Dialog>

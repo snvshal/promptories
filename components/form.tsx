@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { promptory_types } from "@/lib/constants"
 import { savePostForm, updatePostForm } from "@/actions/postFormActions"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
 import { postPathname } from "@/utils/ps"
 import { PostFormProps } from "@/types/props.type"
@@ -82,6 +82,7 @@ export default function PostForm({
   operationType,
   post,
   media,
+  setOpen,
 }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(
@@ -186,6 +187,9 @@ export default function PostForm({
     [setValue],
   )
 
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true)
     try {
@@ -205,7 +209,13 @@ export default function PostForm({
         const savedPost = await savePostForm(formData)
         if (!savedPost) throw new Error("Failed to save post")
 
-        router.back()
+        if (searchParams.get("compose") === "true") {
+          setOpen?.(false)
+          router.push(pathname)
+        } else {
+          router.back()
+        }
+
         toast({
           description: "Your post has been sent.",
           action: (

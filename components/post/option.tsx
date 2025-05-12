@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Trash,
@@ -51,33 +51,102 @@ export function PostOptions({ post, type }: PostContentProps) {
   const router = useRouter()
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const isLoading = isDeleting || isPending
 
   const handleDeletePostClick = async () => {
     try {
       setIsDeleting(true)
-      const data_key = post._id?.toString() as string
-      const element = document.querySelector(`[data-key="${data_key}"]`)
+      const postId = post._id?.toString()
 
-      if (element) {
-        await handleDeletePost(post._id as string)
-        type === "post" && router.back()
-        element.remove()
-      }
+      if (!postId) throw new Error("Invalid post ID")
 
-      toast({
-        description: "Your post has been deleted.",
+      startTransition(async () => {
+        // First delete from database
+        await handleDeletePost(postId)
+
+        // Handle DOM update and navigation
+        if (type === "post") {
+          router.back()
+        } else {
+          const postElement = document.querySelector(
+            `[data-key="${postId}"].mid-width-card-content`,
+          )
+
+          if (postElement instanceof HTMLElement) {
+            // Set initial styles for smooth animation
+            postElement.style.cssText = `
+              transition: 
+                opacity 0.4s ease-out,
+                transform 0.4s ease-out,
+                height 0.4s ease-out 0.2s,
+                margin 0.4s ease-out 0.2s,
+                padding 0.4s ease-out 0.2s;
+              transform-origin: top;
+              overflow: hidden;
+            `
+
+            // Start the animation sequence
+            requestAnimationFrame(() => {
+              postElement.style.opacity = "0"
+              postElement.style.transform = "translateY(-8px) scale(0.98)"
+
+              // Add event listener for the first phase completion
+              postElement.addEventListener(
+                "transitionend",
+                (e) => {
+                  // Only proceed if opacity transition ended
+                  if (e.propertyName === "opacity") {
+                    const height = postElement.offsetHeight
+                    postElement.style.height = `${height}px`
+
+                    // Force browser reflow
+                    postElement.offsetHeight
+
+                    // Collapse the element
+                    requestAnimationFrame(() => {
+                      postElement.style.height = "0"
+                      postElement.style.margin = "0"
+                      postElement.style.padding = "0"
+
+                      // Remove element after all transitions complete
+                      postElement.addEventListener(
+                        "transitionend",
+                        (e) => {
+                          if (e.propertyName === "height") {
+                            postElement.remove()
+                          }
+                        },
+                        { once: true },
+                      )
+                    })
+                  }
+                },
+                { once: true },
+              )
+            })
+          }
+
+          toast({
+            description: "Post deleted successfully",
+            variant: "default",
+          })
+        }
       })
     } catch (error) {
       toast({
         title: "Error",
-        description: "There was a problem deleting your post.",
+        description:
+          error instanceof Error ? error.message : "Failed to delete post",
         variant: "destructive",
       })
     } finally {
       setIsDeleting(false)
       setIsAlertOpen(false)
       setIsSheetOpen(false)
+      setIsMenuOpen(false)
     }
   }
 
@@ -91,12 +160,17 @@ export function PostOptions({ post, type }: PostContentProps) {
           <span>&#64;{pu(post).username}</span>
         </Button>
       </Link>
-      <Link href={post.model_url} target="_blank" prefetch={false}>
-        <Button variant="ghost" className="w-full justify-start max-sm:text-lg">
-          <SquareArrowOutUpRight className="mr-2 size-5 sm:size-4" />
-          <span>Test it</span>
-        </Button>
-      </Link>
+      {post.model_url && (
+        <Link href={post.model_url} target="_blank" prefetch={false}>
+          <Button
+            variant="ghost"
+            className="w-full justify-start max-sm:text-lg"
+          >
+            <SquareArrowOutUpRight className="mr-2 size-5 sm:size-4" />
+            <span>Test it</span>
+          </Button>
+        </Link>
+      )}
       {post.chat_link && (
         <Link href={post.chat_link} target="_blank" prefetch={false}>
           <Button
@@ -146,10 +220,17 @@ export function PostOptions({ post, type }: PostContentProps) {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeletePostClick}
-                disabled={isDeleting}
-                className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
+                disabled={isLoading}
+                className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 disabled:opacity-50"
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    <span>Deleting...</span>
+                  </div>
+                ) : (
+                  "Delete"
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -182,7 +263,7 @@ export function PostOptions({ post, type }: PostContentProps) {
       </Sheet>
 
       {/* Desktop View */}
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             size="icon"

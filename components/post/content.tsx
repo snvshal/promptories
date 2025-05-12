@@ -121,14 +121,14 @@ export function PostContentType({
 }) {
   if (type === "post") {
     return (
-      <div className="prose prose-sm dark:prose-invert max-w-none">
+      <div className="prose prose-sm max-w-none dark:prose-invert">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </div>
     )
   } else {
     return (
       <>
-        <div className="prose prose-sm dark:prose-invert max-w-none">
+        <div className="prose prose-sm max-w-none dark:prose-invert">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {content.split(" ").slice(0, 40).join(" ")}
           </ReactMarkdown>

@@ -71,7 +71,7 @@ export async function handleDeletePost(postId: string) {
 
     await Post.findByIdAndDelete(post._id)
 
-    revalidatePath("/home")
+    // revalidatePath("/home")
   } catch (error) {
     console.error("Error deleting post:", error)
   }
