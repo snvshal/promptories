@@ -247,17 +247,12 @@ export function ComposePostButton({
     <Dialog
       open={open}
       onOpenChange={() => {
-        if (open) {
-          setOpen(false)
-          router.push(pathname)
-        } else {
-          setOpen(true)
-          router.push(`${pathname}?compose=true`)
-        }
+        if (open) router.push(pathname)
       }}
     >
       <DialogTrigger asChild>
         <Button
+          onClick={() => router.push(`${pathname}?compose=true`)}
           className="flex-center w-full self-center rounded-full bg-foreground p-2 text-background max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
           aria-label="Compose Promptory"
         >
@@ -265,7 +260,7 @@ export function ComposePostButton({
           <span className="text-lg font-medium max-md:hidden">Post</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-full overflow-y-auto sm:max-h-[calc(100dvh-4rem)]">
+      <DialogContent className="max-h-full overflow-y-auto max-sm:p-0 sm:max-h-[calc(100dvh-4rem)]">
         <DialogHeader>
           <DialogTitle></DialogTitle>
           <DialogDescription></DialogDescription>
@@ -393,7 +388,7 @@ export function FeedTypeComponent({
     <>
       {trigger === "button" ? (
         <Button
-          variant="ghost"
+          variant="outline"
           className="lg:hidden"
           onClick={() =>
             setFeedType(feedType === "for_you" ? "following" : "for_you")
