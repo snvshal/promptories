@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Feather } from "lucide-react"
 import { TPost } from "@/types/schema.type"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { PostType } from "./post/content"
 import { ArrowBack } from "./ui/svg-icons"
 import { FeedTypeComponent } from "./sidebar"
@@ -112,9 +112,8 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
 }
 
 export function ComposePromptoryButton() {
-  const pathname = usePathname()
   return (
-    <Link href={`${pathname}?compose=true`}>
+    <Link href={"/compose/promptory"}>
       <Button
         size="icon"
         name="Compose Promptory"
