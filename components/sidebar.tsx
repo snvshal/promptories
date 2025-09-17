@@ -10,6 +10,7 @@ import {
   TrendingUp,
   LucideProps,
   Bot,
+  User,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -28,7 +29,6 @@ import {
   SelectValue,
 } from "./ui/select"
 import { getNotificationCount } from "@/actions/notificationActions"
-import { AvatarComponent } from "./post/content"
 import { TUser } from "@/types/schema.type"
 import { getTrendingTags } from "@/actions/getTrendingTags"
 import Cookies from "js-cookie"
@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dialog"
 import PostForm from "./form"
 import { SetAction } from "@/types/generics.type"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
 export type SidebarProps = {
   user: TUser
@@ -87,17 +88,17 @@ export function Sidebar({ user, children }: SidebarProps) {
     pathname.endsWith("/media") ||
     pathname === "/"
 
-  if (noSidebar) return <div className="h-screen overflow-auto">{children}</div>
+  if (noSidebar) return <div className="h-dvh overflow-auto">{children}</div>
 
   return (
-    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
+    <div className="flex h-dvh overflow-hidden max-sm:flex-col-reverse">
       <div className="max-sm:h-[var(--navbar-height)]"></div>
       <div
         id="scrollable-element"
         className="flex flex-1 justify-center overflow-y-scroll"
       >
-        <aside className="sticky top-0 z-50 h-screen border-r">
-          <nav className="relative bg-background sm:h-screen sm:w-16 md:w-60">
+        <aside className="sticky top-0 z-50 h-dvh border-r">
+          <nav className="relative bg-background sm:h-dvh sm:w-16 md:w-60">
             <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
               <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
                 <NavLinks notificationCount={notificationCount} />
@@ -111,7 +112,7 @@ export function Sidebar({ user, children }: SidebarProps) {
           </nav>
         </aside>
         <div className="max-w-xl flex-1">{children}</div>
-        <section className="sticky top-0 h-screen border-l">
+        <section className="sticky top-0 h-dvh border-l">
           <SidePanel />
         </section>
       </div>
@@ -215,7 +216,13 @@ export function UserProfileLink({ user }: { user: TUser }) {
         className={`${isProfileRoute ? "bg-accent" : "bg-background"} size-10 gap-2 rounded-full p-1 hover:bg-accent sm:size-12 md:flex md:h-14 md:w-full md:items-center md:justify-start md:p-2`}
         aria-label="Profile"
       >
-        <AvatarComponent user={user} classname="max-sm:size-8" />
+        <Avatar className="max-sm:size-8">
+          <AvatarImage src={user.avatar} alt={user.name} />
+          <AvatarFallback>
+            <User className="size-5 text-muted-foreground" />
+          </AvatarFallback>
+        </Avatar>
+        {/* <AvatarComponent user={user} classname="max-sm:size-8" /> */}
         <span className="flex flex-col items-start max-md:hidden">
           <span className="font-semibold">{user?.name}</span>
           <span className="leading-4 text-muted-foreground">

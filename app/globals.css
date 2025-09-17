@@ -132,3 +132,14 @@ html {
 .nav-button {
   @apply h-10 w-10 gap-4 rounded-lg py-2 sm:px-2 md:flex md:w-full md:items-center md:justify-start md:px-3;
 }
+
+/* nprogress custom styling */
+#nprogress .bar {
+  background: #3b82f6; /* Tailwind blue-500 */
+  height: 3px;
+}
+#nprogress .peg {
+  box-shadow:
+    0 0 10px #3b82f6,
+    0 0 5px #3b82f6;
+}
