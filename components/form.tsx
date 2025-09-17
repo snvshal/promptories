@@ -272,9 +272,9 @@ export default function PostForm({
 
   return (
     <div className="w-full">
-      <NavigateBackHeader
+      {/* <NavigateBackHeader
         page={operationType === "POST" ? "Create Promptory" : "Edit Promptory"}
-      />
+      /> */}
       <main className="main-content p-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex-1 space-y-6">

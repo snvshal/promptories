@@ -114,7 +114,7 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
 export function ComposePromptoryButton() {
   const pathname = usePathname()
   return (
-    <Link href={`${pathname}?compose=true`}>
+    <Link href={"/compose/promptory"}>
       <Button
         size="icon"
         name="Compose Promptory"

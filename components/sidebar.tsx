@@ -87,12 +87,7 @@ export function Sidebar({ user, children }: SidebarProps) {
     pathname.endsWith("/media") ||
     pathname === "/"
 
-  if (noSidebar)
-    return (
-      <div className="h-[calc(100dvh-var(--navbar-height))] overflow-auto">
-        {children}
-      </div>
-    )
+  if (noSidebar) return <div className="h-screen overflow-auto">{children}</div>
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
