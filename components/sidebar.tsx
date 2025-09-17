@@ -87,17 +87,17 @@ export function Sidebar({ user, children }: SidebarProps) {
     pathname.endsWith("/media") ||
     pathname === "/"
 
-  if (noSidebar) return <div className="h-screen overflow-auto">{children}</div>
+  if (noSidebar) return <div className="h-dvh overflow-auto">{children}</div>
 
   return (
-    <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
+    <div className="flex h-dvh overflow-hidden max-sm:flex-col-reverse">
       <div className="max-sm:h-[var(--navbar-height)]"></div>
       <div
         id="scrollable-element"
         className="flex flex-1 justify-center overflow-y-scroll"
       >
-        <aside className="sticky top-0 z-50 h-screen border-r">
-          <nav className="relative bg-background sm:h-screen sm:w-16 md:w-60">
+        <aside className="sticky top-0 z-50 h-dvh border-r">
+          <nav className="relative bg-background sm:h-dvh sm:w-16 md:w-60">
             <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
               <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
                 <NavLinks notificationCount={notificationCount} />
@@ -111,7 +111,7 @@ export function Sidebar({ user, children }: SidebarProps) {
           </nav>
         </aside>
         <div className="max-w-xl flex-1">{children}</div>
-        <section className="sticky top-0 h-screen border-l">
+        <section className="sticky top-0 h-dvh border-l">
           <SidePanel />
         </section>
       </div>
