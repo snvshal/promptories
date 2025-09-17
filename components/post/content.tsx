@@ -156,10 +156,12 @@ export function PostHeader({ type, post }: PostContentProps) {
           )}
           <PostAuthorName type={type} post={post} />
           {type === "posts" && (
-            <p className="text-muted-foreground">
+            <span className="text-muted-foreground">
               <span className="px-1">&#183;</span>
-              <TimeAgo timestamp={post.createdAt as Date} />
-            </p>
+              <span className="text-sm">
+                <TimeAgo timestamp={post.createdAt as Date} />
+              </span>
+            </span>
           )}
         </div>
         <Sheet>

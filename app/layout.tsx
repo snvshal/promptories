@@ -10,6 +10,7 @@ import { Sidebar } from "@/components/sidebar"
 import { currentUser } from "@/utils/get-user"
 import { TUser } from "@/types/schema.type"
 import { ps } from "@/utils/ps"
+import ProgressBar from "@/components/progress-bar"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -91,6 +92,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ProgressBar />
         <AuthSessionProvider session={session as Session}>
           <ThemeProvider
             attribute="class"
