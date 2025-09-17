@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { SquareParkingIcon, User } from "lucide-react"
+import { Copy, Check, SquareParkingIcon, User } from "lucide-react"
 import Link from "next/link"
 import { NavigateBackHeader } from "../home"
 import { TimeAgo } from "../time-ago"
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sheet"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { ToolTipComponent } from "../ui/tooltip"
 
 export default function SinglePostPage({ post }: { post: TPost }) {
   const sortedReplies = getSortedReplies(post.replies)
@@ -162,21 +163,29 @@ export function PostHeader({ type, post }: PostContentProps) {
           )}
         </div>
         <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="releative mr-8 h-8 w-8 rounded-full"
-            >
-              <SquareParkingIcon className="h-4 w-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
+          <ToolTipComponent content="Prompt">
+            <SheetTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="releative mr-8 h-8 w-8 rounded-full"
+              >
+                <SquareParkingIcon className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </ToolTipComponent>
+          <SheetContent className="overflow-y-auto max-sm:w-full">
+            <SheetHeader className="flex-row items-center justify-between space-y-0 pr-2">
               <SheetTitle>Prompt</SheetTitle>
+              <CopyButton text={post.prompt.text as string} />
             </SheetHeader>
-            <div className="mt-4">
-              {post.prompt.media?.url ? (
+            <div className="mt-2">
+              <div className="prose prose-sm mb-2 max-w-none dark:prose-invert">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {post.prompt.text as string}
+                </ReactMarkdown>
+              </div>
+              {post.prompt.media?.url && (
                 <Link
                   href={postPathname(post, "prompt", "media")}
                   onClick={(e) => e.stopPropagation()}
@@ -188,11 +197,6 @@ export function PostHeader({ type, post }: PostContentProps) {
                     prType="prompt"
                   />
                 </Link>
-              ) : (
-                <PostContentType
-                  type={type}
-                  content={post.prompt.text as string}
-                />
               )}
             </div>
           </SheetContent>
@@ -268,30 +272,27 @@ export function PostContent({ type, post }: PostContentProps) {
       <div className="relative mb-2 overflow-hidden">
         <PostContentType type={type} content={post.caption} />
       </div>
-      <div
+      {/* <div
         className={`relative flex flex-col gap-4 overflow-hidden rounded-lg bg-primary-foreground p-2`}
-      >
-        <div>
-          {post.response.media?.url ? (
-            <Link
-              href={postPathname(post, "prompt", "media")}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <PostMedia
-                mediaType={post.response.media?.type}
-                mediaUrl={post.response.media?.url}
-                caption={post.caption}
-                prType="response"
-              />
-            </Link>
-          ) : (
-            <PostContentType
-              type={type}
-              content={post.response.text as string}
+      > */}
+      <div>
+        {post.response.media?.url ? (
+          <Link
+            href={postPathname(post, "prompt", "media")}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <PostMedia
+              mediaType={post.response.media?.type}
+              mediaUrl={post.response.media?.url}
+              caption={post.caption}
+              prType="response"
             />
-          )}
-        </div>
+          </Link>
+        ) : (
+          <PostContentType type={type} content={post.response.text as string} />
+        )}
       </div>
+      {/* </div> */}
     </CardContent>
   )
 }
@@ -342,5 +343,27 @@ export function PostMedia({
         </>
       )}
     </div>
+  )
+}
+
+export function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch (err) {
+      console.error("Copy failed:", err)
+    }
+  }
+
+  return (
+    <ToolTipComponent content={copied ? "Copied!" : "Copy"}>
+      <Button size="icon" variant="ghost" onClick={handleCopy}>
+        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      </Button>
+    </ToolTipComponent>
   )
 }

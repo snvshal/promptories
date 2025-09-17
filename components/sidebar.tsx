@@ -87,14 +87,19 @@ export function Sidebar({ user, children }: SidebarProps) {
     pathname.endsWith("/media") ||
     pathname === "/"
 
-  if (noSidebar) return <div className="h-screen overflow-auto">{children}</div>
+  if (noSidebar)
+    return (
+      <div className="h-[calc(100dvh-var(--navbar-height))] overflow-auto">
+        {children}
+      </div>
+    )
 
   return (
     <div className="flex h-screen overflow-hidden max-sm:flex-col-reverse">
       <div className="max-sm:h-[var(--navbar-height)]"></div>
       <div
         id="scrollable-element"
-        className="flex flex-1 justify-center overflow-y-auto"
+        className="flex flex-1 justify-center overflow-y-scroll"
       >
         <aside className="sticky top-0 z-50 h-screen border-r">
           <nav className="relative bg-background sm:h-screen sm:w-16 md:w-60">
@@ -194,21 +199,21 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
 
 export function UserProfileLink({ user }: { user: TUser }) {
   const pathname = usePathname()
-  const [open, setOpen] = useState(false)
+  // const [open, setOpen] = useState(false)
 
   const isProfileRoute = pathname === `/${user?.username}`
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
-      <ComposePostButton open={open} setOpen={setOpen} />
+      {/* <ComposePostButton open={open} setOpen={setOpen} /> */}
 
-      {/* <Link
+      <Link
         href={"/compose/promptory"}
         className="flex-center w-full self-center rounded-full bg-foreground p-2 text-background max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
         aria-label="Compose Promptory"
       >
         <Feather className="size-5 text-base md:hidden" />
         <span className="text-lg font-medium max-md:hidden">Post</span>
-      </Link> */}
+      </Link>
 
       <Link
         href={`/${user?.username}`}

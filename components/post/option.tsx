@@ -44,6 +44,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { ToolTipComponent } from "../ui/tooltip"
 
 export function PostOptions({ post, type }: PostContentProps) {
   const { data: session } = useSession()
@@ -264,16 +265,18 @@ export function PostOptions({ post, type }: PostContentProps) {
 
       {/* Desktop View */}
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size="icon"
-            variant="ghost"
-            className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full max-sm:hidden`}
-          >
-            <Ellipsis className="h-4 w-4 text-muted-foreground" />
-            <span className="sr-only">Post options</span>
-          </Button>
-        </DropdownMenuTrigger>
+        <ToolTipComponent content="More">
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full max-sm:hidden`}
+            >
+              <Ellipsis className="h-4 w-4 text-muted-foreground" />
+              <span className="sr-only">Post options</span>
+            </Button>
+          </DropdownMenuTrigger>
+        </ToolTipComponent>
         <DropdownMenuContent className="absolute -left-36 -top-8 w-40 shadow-2xl shadow-slate-900">
           <DropdownMenuLabel>Post Options</DropdownMenuLabel>
           <DropdownMenuSeparator className="h-[.1mm]" />
