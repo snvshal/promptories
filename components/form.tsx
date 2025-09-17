@@ -30,6 +30,13 @@ import { Info } from "lucide-react"
 import { ToolTipComponent } from "./ui/tooltip"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { NavigateBackHeader } from "./home"
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 export const ACCEPTED_IMAGE_TYPES = [
@@ -265,9 +272,9 @@ export default function PostForm({
 
   return (
     <div className="w-full">
-      {/* <NavigateBackHeader
+      <NavigateBackHeader
         page={operationType === "POST" ? "Create Promptory" : "Edit Promptory"}
-      /> */}
+      />
       <main className="main-content p-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex-1 space-y-6">
@@ -281,10 +288,13 @@ export default function PostForm({
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger id="promptory_type">
+                    <SelectTrigger
+                      id="promptory_type"
+                      className="capitalize text-muted-foreground"
+                    >
                       <SelectValue placeholder="Select a promptory type" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-48">
+                    <SelectContent className="max-h-60">
                       {promptory_types.map((type) => (
                         <SelectItem
                           key={type}
@@ -397,7 +407,7 @@ export default function PostForm({
                         <Textarea
                           id="response"
                           placeholder="Enter response in Markdown"
-                          className="min-h-[200px] font-mono text-sm"
+                          className="min-h-[200px] text-sm"
                           value={value || ""}
                           onChange={(e) => {
                             onChange(e.target.value)
@@ -490,102 +500,110 @@ export default function PostForm({
 
           <Separator orientation="vertical" className="h-auto" />
 
-          <div>
-            <Label htmlFor="caption">Caption (Optional)</Label>
-            <Controller
-              name="caption"
-              control={control}
-              render={({ field }) => (
-                <Textarea
-                  id="caption"
-                  placeholder="Enter caption (optional)"
-                  value={field.value}
-                  onChange={(e) => {
-                    field.onChange(e)
-                    autoResize(e.target as HTMLTextAreaElement)
-                  }}
-                  onBlur={field.onBlur}
-                  ref={(element) => {
-                    field.ref(element)
-                    autoResize(element as HTMLTextAreaElement)
-                  }}
-                />
-              )}
-            />
-            {/* {errors.caption && (
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                Additional Information (Optional)
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4">
+                <div>
+                  <Label htmlFor="caption">Caption</Label>
+                  <Controller
+                    name="caption"
+                    control={control}
+                    render={({ field }) => (
+                      <Textarea
+                        id="caption"
+                        placeholder="Enter caption"
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          autoResize(e.target as HTMLTextAreaElement)
+                        }}
+                        onBlur={field.onBlur}
+                        ref={(element) => {
+                          field.ref(element)
+                          autoResize(element as HTMLTextAreaElement)
+                        }}
+                      />
+                    )}
+                  />
+                  {/* {errors.caption && (
               <p className="mt-1 text-sm text-red-500">
                 {errors.caption.message}
               </p>
             )} */}
-          </div>
+                </div>
 
-          <div>
-            <LabelWithToolTip
-              htmlFor="model_url"
-              label="Platform (Optional)"
-              content="Enter full URL of the website where we can try it. (e.g.,
-                  https://example.com)"
-            />
-            <Controller
-              name="model_url"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  id="model_url"
-                  placeholder="Enter model URL"
-                  {...field}
-                />
-              )}
-            />
-            {/* {errors.model_url && (
+                <div>
+                  <LabelWithToolTip
+                    htmlFor="model_url"
+                    label="Platform"
+                    content="Enter the full URL of the website where you did this."
+                  />
+                  <Controller
+                    name="model_url"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id="model_url"
+                        placeholder="Enter the full URL of the website"
+                        {...field}
+                      />
+                    )}
+                  />
+                  {/* {errors.model_url && (
               <p className="mt-1 text-sm text-red-500">
                 {errors.model_url.message}
               </p>
             )} */}
-          </div>
+                </div>
 
-          <div>
-            <LabelWithToolTip
-              htmlFor="chat_link"
-              label="Chat Link (Optional)"
-              content="Enter public chat link of this promptory"
-            />
-            <Controller
-              name="chat_link"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  id="chat_link"
-                  placeholder="Enter chat link"
-                  {...field}
-                />
-              )}
-            />
-            {/* {errors.chat_link && (
+                <div>
+                  <LabelWithToolTip
+                    htmlFor="chat_link"
+                    label="Public Chat Link"
+                    content="Enter public chat link of this promptory"
+                  />
+                  <Controller
+                    name="chat_link"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id="chat_link"
+                        placeholder="Enter public chat link"
+                        {...field}
+                      />
+                    )}
+                  />
+                  {/* {errors.chat_link && (
               <p className="mt-1 text-sm text-red-500">
                 {errors.chat_link.message}
               </p>
             )} */}
-          </div>
+                </div>
 
-          <div>
-            <LabelWithToolTip
-              htmlFor="tags"
-              label="Tags (Optional)"
-              content="Enter tags separated by space (e.g., tag1 tag2 tag3)"
-            />
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  id="tags"
-                  placeholder="Enter tags (space-separated)"
-                  {...field}
-                />
-              )}
-            />
-          </div>
+                <div>
+                  <LabelWithToolTip
+                    htmlFor="tags"
+                    label="Tags"
+                    content="Enter tags separated by space (e.g., tag1 tag2 tag3)"
+                  />
+                  <Controller
+                    name="tags"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id="tags"
+                        placeholder="Enter tags (space-separated)"
+                        {...field}
+                      />
+                    )}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           <div className="flex w-full gap-2">
             <Button type="submit" disabled={isSubmitting}>
@@ -653,10 +671,7 @@ export function LabelWithToolTip({
   return (
     <Label htmlFor={htmlFor} className="mb-1 flex items-end">
       <span>{label}</span>
-      <ToolTipComponent
-        content={content}
-        className="border bg-background text-foreground"
-      >
+      <ToolTipComponent content={content}>
         <Info className="ml-2 size-3 text-muted-foreground" />
       </ToolTipComponent>
     </Label>
