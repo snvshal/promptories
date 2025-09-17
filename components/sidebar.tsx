@@ -29,7 +29,6 @@ import {
   SelectValue,
 } from "./ui/select"
 import { getNotificationCount } from "@/actions/notificationActions"
-import { AvatarComponent } from "./post/content"
 import { TUser } from "@/types/schema.type"
 import { getTrendingTags } from "@/actions/getTrendingTags"
 import Cookies from "js-cookie"
