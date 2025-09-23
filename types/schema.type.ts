@@ -21,16 +21,17 @@ export type TUser = Document & {
   username: string
   name: string
   email: string
-  password: string
+  password?: string
   bio?: string
   avatar?: string
-  social_links?: {
-    twitter?: string
-    github?: string
-  }
-  posts: Types.ObjectId[] | TPost[]
-  followers: Types.ObjectId[]
-  following: Types.ObjectId[]
+  external_link?: string
+  posts: (Types.ObjectId | TPost)[]
+  likes: (Types.ObjectId | TPost)[]
+  saved: (Types.ObjectId | TPost)[]
+  blocked: (Types.ObjectId | TUser)[]
+  muted: (Types.ObjectId | TUser)[]
+  followers: (Types.ObjectId | TUser)[]
+  following: (Types.ObjectId | TUser)[]
 }
 
 export type PRContent = {
@@ -65,12 +66,7 @@ export type SessionUser = {
   email: string
   bio?: string
   image?: string
-  social_links?: {
-    twitter?: string
-    github?: string
-  }
-  followers: string[]
-  following: string[]
+  external_link?: string
 }
 
 export type TNotification = Document & {

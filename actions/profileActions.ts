@@ -70,14 +70,10 @@ export async function updateUserData(
     const user = await currentUser()
     if (!user) return { success: false, message: "User not found." }
 
-    const { name, github, twitter, avatar, bio } = updatedData
+    const { name, external_link, avatar, bio } = updatedData
 
     if (user.name !== name) user.name = name
-    if (user.social_links) {
-      if (user.social_links.github !== github) user.social_links.github = github
-      if (user.social_links.twitter !== twitter)
-        user.social_links.twitter = twitter
-    }
+    if (user.external_link !== external_link) user.external_link = external_link
     if (user.avatar !== avatar) user.avatar = avatar as string
     if (user.bio !== bio) user.bio = bio
 

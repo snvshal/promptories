@@ -9,8 +9,19 @@ import { PostType } from "./post/content"
 import { ArrowBack } from "./ui/svg-icons"
 import { FeedTypeComponent } from "./sidebar"
 import Link from "next/link"
+import { usePosts } from "@/hooks/use-posts"
 
-export function HomePageComponent({ posts }: { posts: TPost[] }) {
+export function HomePageComponent() {
+  const { posts } = usePosts()
+
+  const [feedPosts, setFeedPosts] = useState(posts.forYou)
+
+  useEffect(() => {
+    setFeedPosts(
+      posts.feedType === "following" ? posts.following : posts.forYou,
+    )
+  }, [posts])
+
   return (
     <div className="w-full">
       <DynamicHeader>
@@ -24,7 +35,7 @@ export function HomePageComponent({ posts }: { posts: TPost[] }) {
         </div>
       </DynamicHeader>
       <main className="main-content">
-        <PostsComponent posts={posts} />
+        <PostsComponent posts={feedPosts} />
       </main>
       <ComposePromptoryButton />
     </div>

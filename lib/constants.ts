@@ -1,4 +1,5 @@
 import { FormValues } from "@/components/form"
+import { Tab } from "@/components/profile/user"
 import { PostFormMedia } from "@/types/props.type"
 
 export const promptory_types = [
@@ -130,3 +131,5 @@ export const reservedUsernames = [
   "username",
   "name",
 ]
+
+export const tabs = ["posts", "likes", "saved"] as const as Tab[]

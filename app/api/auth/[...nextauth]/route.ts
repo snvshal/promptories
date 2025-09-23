@@ -2,7 +2,6 @@ import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { User } from "@/models/user.model"
 import { connectToDatabase } from "@/utils/db"
-import { st } from "@/utils/ps"
 
 const handler = NextAuth({
   providers: [
@@ -44,8 +43,6 @@ const handler = NextAuth({
           token.image = dbUser.avatar || ""
           token.bio = dbUser.bio || ""
           token.social_links = dbUser.social_links || {}
-          token.followers = st(dbUser.followers || [])
-          token.following = st(dbUser.following || [])
         }
       }
       return token
@@ -57,13 +54,7 @@ const handler = NextAuth({
         session.user.name = (token.name as string) || ""
         session.user.image = (token.image as string) || ""
         session.user.bio = (token.bio as string) || ""
-        session.user.social_links =
-          (token.social_links as {
-            twitter?: string
-            github?: string
-          }) || {}
-        session.user.followers = (token.followers as string[]) || []
-        session.user.following = (token.following as string[]) || []
+        session.user.external_link = (token.external_link as string) || ""
       }
 
       return session

@@ -35,26 +35,7 @@ import { TUser } from "@/types/schema.type"
 const profileSchema = z.object({
   name: z.string().min(2).max(50),
   bio: z.string().max(160).optional(),
-  twitter: z
-    .string()
-    .url("Invalid URL")
-    .max(40)
-    .regex(
-      /^https:\/\/(www\.)?(twitter\.com|x\.com)\/[a-zA-Z0-9_]+$/,
-      "Invalid Twitter/X URL",
-    )
-    .optional()
-    .or(z.literal("")),
-  github: z
-    .string()
-    .url("Invalid URL")
-    .max(40)
-    .regex(
-      /^https:\/\/(www\.)?github\.com\/[a-zA-Z0-9_-]+$/,
-      "Invalid GitHub URL",
-    )
-    .optional()
-    .or(z.literal("")),
+  external_link: z.string().optional(),
 })
 
 export type ProfileFormValues = z.infer<typeof profileSchema>
@@ -63,7 +44,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
   const { data: session, update } = useSession()
 
   const [loading, setLoading] = useState(false)
-  const [avatar, setAvatar] = useState<string | null>(user?.avatar as string)
+  const [avatar, setAvatar] = useState<string | null>(user?.avatar ?? null)
 
   const handleUpload = (result: CloudinaryUploadWidgetResults) => {
     const info = result?.info as {
@@ -80,8 +61,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
     defaultValues: {
       name: user?.name as string,
       bio: user?.bio as string,
-      twitter: user?.social_links?.twitter as string,
-      github: user?.social_links?.github as string,
+      external_link: user?.external_link as string,
     },
   })
 
@@ -101,10 +81,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
             name: data.name,
             bio: data.bio,
             image: avatar,
-            social_links: {
-              twitter: data.twitter,
-              github: data.github,
-            },
+            external_link: data.external_link,
           },
         })
 
@@ -170,6 +147,7 @@ export default function ProfileSettings({ user }: { user: TUser }) {
                   type="button"
                   variant="destructive"
                   onClick={() => setAvatar("")}
+                  disabled={!avatar}
                 >
                   Remove
                 </Button>
@@ -203,37 +181,19 @@ export default function ProfileSettings({ user }: { user: TUser }) {
             />
             <FormField
               control={form.control}
-              name="twitter"
+              name="external_link"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Twitter</FormLabel>
+                  <FormLabel>Link</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Enter your twitter account link"
-                      {...field}
-                    />
+                    <Input placeholder="Enter an link" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="github"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Github</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your Github account link"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={loading}>
+
+            <Button type="submit" disabled={loading || !form.formState.isDirty}>
               {loading ? "Saving..." : "Save Profile"}
             </Button>
           </form>

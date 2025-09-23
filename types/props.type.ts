@@ -4,7 +4,7 @@ import { PRMedia, TPost } from "./schema.type"
 export type PostFormProps = OperationType & {
   defaultFormValues: FormValues
   media: PostFormMedia
-  setOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  // setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export type PostFormMedia = { prompt: PRMedia; response: PRMedia }

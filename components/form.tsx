@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { promptory_types } from "@/lib/constants"
 import { savePostForm, updatePostForm } from "@/actions/postFormActions"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
 import { postPathname } from "@/utils/ps"
 import { PostFormProps } from "@/types/props.type"
@@ -37,6 +37,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { NavigateBackHeader } from "./home"
+import { usePosts } from "@/hooks/use-posts"
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 export const ACCEPTED_IMAGE_TYPES = [
@@ -89,8 +90,9 @@ export default function PostForm({
   operationType,
   post,
   media,
-  setOpen,
 }: PostFormProps) {
+  const { setPosts } = usePosts()
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [promptMediaUrl, setPromptMediaUrl] = useState<string | null>(
     media?.prompt.url as string,
@@ -108,7 +110,7 @@ export default function PostForm({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     watch,
     setValue,
@@ -194,8 +196,8 @@ export default function PostForm({
     [setValue],
   )
 
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  // const pathname = usePathname()
+  // const searchParams = useSearchParams()
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true)
@@ -213,42 +215,79 @@ export default function PostForm({
       }
 
       if (operationType === "POST") {
-        const savedPost = await savePostForm(formData)
-        if (!savedPost) throw new Error("Failed to save post")
+        const { success, post } = await savePostForm(formData)
+        if (success && post) {
+          setPosts((posts) => ({
+            ...posts,
+            following: [post, ...posts.following],
+            forYou: [post, ...posts.forYou],
+          }))
 
-        if (searchParams.get("compose") === "true") {
-          setOpen?.(false)
-          router.push(pathname)
-        } else {
           router.back()
+
+          toast({
+            description: "Your post has been sent.",
+            action: (
+              <ToastAction
+                onClick={() => postRoute(post)}
+                altText="View your created post"
+              >
+                View
+              </ToastAction>
+            ),
+          })
+        } else {
+          toast({
+            title: "Error",
+            variant: "destructive",
+            description: "Failed to save the post. Try again later.",
+          })
         }
 
-        toast({
-          description: "Your post has been sent.",
-          action: (
-            <ToastAction
-              onClick={() => postRoute(savedPost)}
-              altText="View your created post"
-            >
-              View
-            </ToastAction>
-          ),
-        })
+        // if (searchParams.get("compose") === "true") {
+        //   setOpen?.(false)
+        //   router.push(pathname)
+        // } else {
+        //   router.back()
+        // }
+
         reset()
       } else if (operationType === "PATCH" && post) {
-        await updatePostForm(formData, post._id as string)
-        router.back()
-        toast({
-          description: "Your post has been updated.",
-          action: (
-            <ToastAction
-              onClick={() => postRoute(post)}
-              altText="View your updated post"
-            >
-              View
-            </ToastAction>
-          ),
-        })
+        const { success, updatedPost } = await updatePostForm(
+          formData,
+          post._id as string,
+        )
+
+        console.log(success, updatedPost)
+        if (success && updatedPost) {
+          setPosts((prev) => ({
+            ...prev,
+            following: prev.following.map((p) =>
+              p._id === post._id ? post : p,
+            ),
+            forYou: prev.forYou.map((p) => (p._id === post._id ? post : p)),
+          }))
+
+          router.back()
+
+          toast({
+            description: "Your post has been updated.",
+            action: (
+              <ToastAction
+                onClick={() => postRoute(post)}
+                altText="View your updated post"
+              >
+                View
+              </ToastAction>
+            ),
+          })
+        } else {
+          toast({
+            title: "Error",
+            variant: "destructive",
+            description: "Failed to update the post. Try again later.",
+          })
+        }
       }
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -373,7 +412,7 @@ export default function PostForm({
                       type="button"
                       variant="outline"
                       onClick={() => open()}
-                      className="w-full"
+                      className="w-full text-muted-foreground"
                     >
                       Upload Prompt Media
                     </Button>
@@ -475,7 +514,7 @@ export default function PostForm({
                       type="button"
                       variant="outline"
                       onClick={() => open()}
-                      className="w-full"
+                      className="w-full text-muted-foreground"
                     >
                       Upload Response Media
                     </Button>
@@ -506,7 +545,7 @@ export default function PostForm({
                 Additional Information (Optional)
               </AccordionTrigger>
               <AccordionContent className="space-y-4">
-                <div>
+                {/* <div>
                   <Label htmlFor="caption">Caption</Label>
                   <Controller
                     name="caption"
@@ -528,12 +567,7 @@ export default function PostForm({
                       />
                     )}
                   />
-                  {/* {errors.caption && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.caption.message}
-              </p>
-            )} */}
-                </div>
+                </div> */}
 
                 <div>
                   <LabelWithToolTip
@@ -552,11 +586,6 @@ export default function PostForm({
                       />
                     )}
                   />
-                  {/* {errors.model_url && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.model_url.message}
-              </p>
-            )} */}
                 </div>
 
                 <div>
@@ -576,11 +605,6 @@ export default function PostForm({
                       />
                     )}
                   />
-                  {/* {errors.chat_link && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.chat_link.message}
-              </p>
-            )} */}
                 </div>
 
                 <div>
@@ -606,7 +630,7 @@ export default function PostForm({
           </Accordion>
 
           <div className="flex w-full gap-2">
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !isDirty}>
               {operationType === "POST"
                 ? isSubmitting
                   ? "Submitting..."
