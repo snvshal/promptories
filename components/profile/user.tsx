@@ -4,16 +4,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PostsComponent } from "../home"
+import { DynamicHeader, PostsComponent } from "../home"
 import { TPost, TUser } from "@/types/schema.type"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { User } from "lucide-react"
+import { Link2Icon, User } from "lucide-react"
 import { NavigateBackHeader } from "../home"
 import { addFollower } from "@/actions/addFollower"
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
-import { cl, st } from "@/utils/ps"
-import { GitHubLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons"
+import { cl } from "@/utils/ps"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
 import {
@@ -22,58 +21,59 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { AvatarComponent } from "../post/content"
+import { ArrowBack } from "../ui/svg-icons"
+import { useUser } from "@/hooks/use-user"
+import { Types } from "mongoose"
+import { tabs } from "@/lib/constants"
 
 export type Tab = "posts" | "likes" | "saved"
 
 export default function UserProfileComponent({
   profileUser,
-  posts,
-  likedPosts,
-  bookmarkedPosts,
 }: {
   profileUser: TUser
-  posts: TPost[]
-  likedPosts: TPost[]
-  bookmarkedPosts: TPost[]
 }) {
   const router = useRouter()
   const { data: session } = useSession()
 
-  const isAdmin = profileUser.email === session?.user?.email
+  const isAdmin = profileUser?.email === session?.user?.email
 
   const searchParams = useSearchParams()
   const query = searchParams.get("tab")
 
-  const initialTab: Tab =
-    isAdmin || query === "posts"
-      ? "posts"
-      : query === "likes" || query === "saved"
-        ? query
-        : "posts"
+  const initialTab: Tab = isAdmin
+    ? tabs.includes(query as Tab)
+      ? (query as Tab)
+      : "posts"
+    : "posts"
 
   const [tab, setTab] = useState<Tab>(initialTab)
 
-  useEffect(() => {
-    if (query === "posts" || query === "likes" || query === "saved") {
-      setTab(query as Tab)
-    } else {
-      setTab("posts")
-    }
-  }, [query])
-
-  const toggleTab = (tab: string) => {
-    setTab(tab as Tab)
-    router.push(`?tab=${tab}`)
+  const toggleTab = (stdTab: string) => {
+    setTab(stdTab as Tab)
+    router.push(`?tab=${stdTab}`, { scroll: false })
   }
   return (
     <div className="w-full">
-      <NavigateBackHeader page={profileUser.name} />
+      {/* <NavigateBackHeader page={profileUser.name} /> */}
+      <DynamicHeader>
+        <div className="flex-between w-full px-4 py-2">
+          <div className="flex max-w-4xl items-center justify-start">
+            <button onClick={() => router.back()} className="flex-start mr-6">
+              <ArrowBack />
+            </button>
+            <div className="block">
+              <h1 className="text-xl font-bold">{profileUser?.name}</h1>
+              <p className="text-xs text-muted-foreground">
+                {profileUser?.posts.length} promptories
+              </p>
+            </div>
+          </div>
+        </div>
+      </DynamicHeader>
 
       <main className="main-content">
-        <ProfileUserContent
-          profileUser={profileUser}
-          postCount={posts.length}
-        />
+        <ProfileUserContent profileUser={profileUser as TUser} />
 
         <Tabs defaultValue={tab} onValueChange={toggleTab} className="w-full">
           <TabsList
@@ -95,15 +95,15 @@ export default function UserProfileComponent({
           </TabsList>
 
           <TabsContent value="posts" className="m-0">
-            <PostsComponent posts={posts} />
+            <PostsComponent posts={profileUser?.posts as TPost[]} />
           </TabsContent>
           {isAdmin && (
             <>
               <TabsContent value="likes" className="m-0">
-                <PostsComponent posts={likedPosts} />
+                <PostsComponent posts={profileUser?.likes as TPost[]} />
               </TabsContent>
               <TabsContent value="saved" className="m-0">
-                <PostsComponent posts={bookmarkedPosts} />
+                <PostsComponent posts={profileUser?.saved as TPost[]} />
               </TabsContent>
             </>
           )}
@@ -136,14 +136,10 @@ export function TabsTriggerButton({
   )
 }
 
-export function ProfileUserContent({
-  profileUser,
-  postCount,
-}: {
-  profileUser: TUser
-  postCount: number
-}) {
-  const [followers, setFollowers] = useState(profileUser?.followers.length)
+export function ProfileUserContent({ profileUser }: { profileUser: TUser }) {
+  const [followersCount, setFollowersCount] = useState(
+    profileUser.followers.length ?? 0,
+  )
 
   return (
     <Card className="mb-0 w-full rounded-none border-0 shadow-none">
@@ -151,7 +147,7 @@ export function ProfileUserContent({
         <div className="flex w-full justify-end space-x-4">
           <ProfileOptionButton
             profileUser={profileUser}
-            setFollowers={setFollowers}
+            setFollowersCount={setFollowersCount}
           />
         </div>
         <div className="sm:flex-start flex max-sm:flex-col">
@@ -168,38 +164,24 @@ export function ProfileUserContent({
             </p>
             <p className="mt-2">{profileUser?.bio}</p>
             <div className="mt-4 flex items-center space-x-4">
-              {profileUser.social_links?.github && (
+              {profileUser.external_link && (
                 <Link
                   target="_blank"
                   prefetch={false}
-                  href={profileUser.social_links?.github as string}
+                  href={profileUser.external_link as string}
                   className="text-muted-foreground hover:text-primary"
                 >
-                  <GitHubLogoIcon className="h-5 w-5" />
-                </Link>
-              )}
-              {profileUser.social_links?.twitter && (
-                <Link
-                  target="_blank"
-                  prefetch={false}
-                  href={profileUser.social_links?.twitter as string}
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  <TwitterLogoIcon className="h-5 w-5" />
+                  <Link2Icon className="h-5 w-5" />
                 </Link>
               )}
             </div>
             <div className="mt-4 flex gap-4">
               <div className="flex gap-1">
-                <p className="font-semibold">{postCount}</p>
-                <p className="text-muted-foreground">Posts</p>
-              </div>
-              <div className="flex gap-1">
                 <p className="font-semibold">{profileUser?.following.length}</p>
                 <p className="text-muted-foreground">Following</p>
               </div>
               <div className="flex gap-1">
-                <p className="font-semibold">{followers}</p>
+                <p className="font-semibold">{followersCount}</p>
                 <p className="text-muted-foreground">Followers</p>
               </div>
             </div>
@@ -247,69 +229,79 @@ export function UserNotFound() {
 
 export function ProfileOptionButton({
   profileUser,
-  setFollowers,
+  setFollowersCount,
 }: {
   profileUser: TUser
-  setFollowers: SetAction<number>
+  setFollowersCount: SetAction<number>
 }) {
   const { data: session } = useSession()
   const user = session?.user
-  const router = useRouter()
 
   const isAdmin = profileUser.email === user?.email
 
   if (isAdmin) {
     return (
-      <Button
-        variant="outline"
-        onClick={() => router.push("/settings/profile")}
-      >
-        Edit Profile
-      </Button>
+      <Link href="/settings/profile">
+        <Button variant="outline">Edit Profile</Button>
+      </Link>
     )
   } else {
     return (
-      <FollowButton profileUser={profileUser} setFollowers={setFollowers} />
+      <FollowButton
+        profileUser={profileUser}
+        setFollowersCount={setFollowersCount}
+      />
     )
   }
 }
 
 export function FollowButton({
   profileUser,
-  setFollowers,
+  setFollowersCount,
 }: {
   profileUser: TUser
-  setFollowers: SetAction<number>
+  setFollowersCount?: SetAction<number>
 }) {
-  const { data: session, update } = useSession()
-  const user = session?.user
-
+  const { user, setUser } = useUser()
   const [hover, setHover] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const isAdmin = profileUser.email === user?.email
-  const [follow, setFollow] = useState<"Follow" | "Following">(() =>
-    st(profileUser.followers).includes(user?.id as string)
+  const [follow, setFollow] = useState<"Follow" | "Following">("Follow")
+
+  useEffect(() => {
+    const isFollowing = user?.following.includes(
+      (profileUser._id as Types.ObjectId).toString(),
+    )
       ? "Following"
-      : "Follow",
-  )
+      : "Follow"
+    setFollow(isFollowing)
+  }, [profileUser.followers, user?.following, user?.id, profileUser._id])
 
   const handleAddFollower = async () => {
     try {
       setLoading(true)
-      const { newFollowing, newFollowersCount, updatedState } =
-        await addFollower(profileUser._id as string)
+      const { success, status } = await addFollower(profileUser._id as string)
+      if (success && status) {
+        setFollow(status)
+        setUser((prev) =>
+          prev
+            ? {
+                ...prev,
+                following:
+                  status === "Following"
+                    ? [...prev.following, profileUser._id?.toString() as string]
+                    : prev.following.filter(
+                        (id) => id !== profileUser._id?.toString(),
+                      ),
+              }
+            : prev,
+        )
+      }
 
-      setFollow(updatedState)
-      setFollowers(newFollowersCount)
-
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          following: newFollowing,
-        },
-      })
+      setFollowersCount?.((prev: number) =>
+        Math.abs(status === "Following" ? prev + 1 : prev - 1),
+      )
     } catch (error) {
       console.error("Error updating follower state:", error)
     } finally {
@@ -329,8 +321,24 @@ export function FollowButton({
       onMouseLeave={() => setHover(false)}
       disabled={loading}
     >
-      {hover && follow === "Following" ? "Unfollow" : follow}
+      {loading ? (
+        <LoadingDots />
+      ) : hover && follow === "Following" ? (
+        "Unfollow"
+      ) : (
+        follow
+      )}
     </Button>
+  )
+}
+
+const LoadingDots = () => {
+  return (
+    <div className="flex space-x-1">
+      <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0.1s]"></div>
+      <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0.2s]"></div>
+      <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0.3s]"></div>
+    </div>
   )
 }
 
@@ -341,8 +349,9 @@ export function ProfileHoverCard({
   profileUser: TUser
   children: React.ReactNode
 }) {
-  const [followers, setFollowers] = useState(profileUser.followers.length)
-
+  const [followersCount, setFollowersCount] = useState(
+    profileUser.followers.length,
+  )
   return (
     <HoverCard>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
@@ -352,7 +361,7 @@ export function ProfileHoverCard({
             <AvatarComponent user={profileUser} classname="size-16" />
             <FollowButton
               profileUser={profileUser}
-              setFollowers={setFollowers}
+              setFollowersCount={setFollowersCount}
             />
           </div>
 
@@ -376,7 +385,7 @@ export function ProfileHoverCard({
               <span className="text-muted-foreground">Following</span>
             </div>
             <div className="flex gap-1">
-              <span className="font-semibold">{followers}</span>
+              <span className="font-semibold">{followersCount}</span>
               <span className="text-muted-foreground">Followers</span>
             </div>
           </div>

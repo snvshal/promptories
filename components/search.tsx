@@ -193,7 +193,9 @@ function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
 }
 
 function UserProfileCard({ profileUser }: { profileUser: TUser }) {
-  const [followers, setFollowers] = useState(profileUser.followers.length)
+  const [followersCount, setFollowersCount] = useState<number>(
+    profileUser.followers.length,
+  )
 
   return (
     <Card className="mid-width-card-content shadow-none">
@@ -213,7 +215,7 @@ function UserProfileCard({ profileUser }: { profileUser: TUser }) {
           <p className="mt-1 text-sm">{profileUser.bio}</p>
           <div className="mt-2 flex space-x-4">
             <p className="text-sm">
-              {followers}{" "}
+              {followersCount}{" "}
               <span className="text-muted-foreground">Followers</span>
             </p>
             <p className="text-sm">
@@ -222,7 +224,10 @@ function UserProfileCard({ profileUser }: { profileUser: TUser }) {
             </p>
           </div>
         </Link>
-        <FollowButton profileUser={profileUser} setFollowers={setFollowers} />
+        <FollowButton
+          profileUser={profileUser}
+          setFollowersCount={setFollowersCount}
+        />
       </CardContent>
     </Card>
   )

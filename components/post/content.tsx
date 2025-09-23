@@ -16,7 +16,7 @@ import { PostReplies } from "./reply"
 import { cl, getSortedReplies, postPathname, pu } from "@/utils/ps"
 import clsx from "clsx"
 import { SetAction } from "@/types/generics.type"
-import { ProfileHoverCard } from "../profile/user"
+// import { ProfileHoverCard } from "../profile/user"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -120,7 +120,9 @@ export function PostContentType({
   type: "post" | "posts"
   content: string
 }) {
-  if (type === "post") {
+  const [showMore, setShowMore] = useState(false)
+
+  if (type === "post" || showMore) {
     return (
       <div className="prose prose-sm max-w-none dark:prose-invert">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
@@ -131,11 +133,20 @@ export function PostContentType({
       <>
         <div className="prose prose-sm max-w-none dark:prose-invert">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {content.split(" ").slice(0, 40).join(" ")}
+            {content.split(" ").slice(0, 50).join(" ")}
           </ReactMarkdown>
         </div>
-        {content.split(" ").length > 40 && (
-          <span className="text-blue-500 hover:underline">Show more</span>
+        {content.split(" ").length > 50 && (
+          <Button
+            variant="link"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowMore(true)
+            }}
+            className="text-blue-500 hover:underline"
+          >
+            Show more
+          </Button>
         )}
       </>
     )
@@ -158,7 +169,7 @@ export function PostHeader({ type, post }: PostContentProps) {
           {type === "posts" && (
             <span className="text-muted-foreground">
               <span className="px-1">&#183;</span>
-              <span className="text-sm">
+              <span className="max-sm:text-sm">
                 <TimeAgo timestamp={post.createdAt as Date} />
               </span>
             </span>
@@ -218,34 +229,34 @@ export function PostAuthorName({
 }) {
   if (type === "post") {
     return (
-      <ProfileHoverCard profileUser={pu(post)}>
-        <Link
-          href={cl(pu(post).username)}
-          className="flex cursor-pointer flex-col gap-0"
-        >
-          <p className="font-semibold hover:underline">{pu(post).name}</p>
-          <p className="leading-4 text-muted-foreground">
-            &#64;{pu(post).username}
-          </p>
-        </Link>
-      </ProfileHoverCard>
+      // <ProfileHoverCard profileUser={pu(post)}>
+      <Link
+        href={cl(pu(post).username)}
+        className="flex cursor-pointer flex-col gap-0"
+      >
+        <p className="font-semibold hover:underline">{pu(post).name}</p>
+        <p className="leading-4 text-muted-foreground">
+          &#64;{pu(post).username}
+        </p>
+      </Link>
+      // </ProfileHoverCard>
     )
   } else {
     return (
-      <ProfileHoverCard profileUser={pu(post)}>
-        <Link
-          href={cl(pu(post).username)}
-          className="flex cursor-pointer items-center justify-start gap-1"
-        >
-          <p className="font-semibold hover:underline max-sm:hidden">
-            {pu(post).name}
-          </p>
-          <p className="max-sm:font-semibold sm:text-muted-foreground">
-            <span className="max-sm:hidden">&#64;</span>
-            {pu(post).username}
-          </p>
-        </Link>
-      </ProfileHoverCard>
+      // <ProfileHoverCard profileUser={pu(post)}>
+      <Link
+        href={cl(pu(post).username)}
+        className="flex cursor-pointer items-center justify-start gap-1"
+      >
+        <p className="font-semibold hover:underline max-sm:hidden">
+          {pu(post).name}
+        </p>
+        <p className="max-sm:font-semibold sm:text-muted-foreground">
+          <span className="max-sm:hidden">&#64;</span>
+          {pu(post).username}
+        </p>
+      </Link>
+      // </ProfileHoverCard>
     )
   }
 }

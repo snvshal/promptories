@@ -9,12 +9,7 @@ declare module "next-auth" {
       email: string
       bio?: string
       image?: string
-      social_links?: {
-        twitter?: string
-        github?: string
-      }
-      followers: string[]
-      following: string[]
+      external_link?: string
     }
   }
 
@@ -24,11 +19,6 @@ declare module "next-auth" {
     name?: string
     bio?: string
     image?: string
-    social_links?: {
-      twitter?: string
-      github?: string
-    }
-    followers?: string[]
-    following?: string[]
+    external_link?: string
   }
 }

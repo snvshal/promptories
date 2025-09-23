@@ -193,7 +193,9 @@ export function PostRepliesContent({
                 </Link>
                 <p className="text-muted-foreground">
                   <span className="px-1">&#183;</span>
-                  <TimeAgo timestamp={reply.timestamp} />
+                  <span className="max-sm:text-sm">
+                    <TimeAgo timestamp={reply.timestamp} />
+                  </span>
                 </p>
               </div>
               <PostReplyOptions

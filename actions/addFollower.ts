@@ -3,11 +3,16 @@
 import { User } from "@/models/user.model"
 import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
-import { ps, st } from "@/utils/ps"
 import { Types } from "mongoose"
 import { followNotification } from "./notificationActions"
+import { TUser } from "@/types/schema.type"
+import { ps } from "@/utils/ps"
 
-export async function addFollower(userId: string) {
+export async function addFollower(userId: string): Promise<{
+  success: boolean
+  status?: "Follow" | "Following"
+  updatedFollowers?: Types.ObjectId[]
+}> {
   try {
     await connectToDatabase()
 
@@ -16,43 +21,52 @@ export async function addFollower(userId: string) {
     const user = await currentUser()
     if (!user) throw new Error("Current user not found.")
 
-    const profileUser = await User.findById(userId)
+    const profileUser: TUser | null = await User.findById(userId)
     if (!profileUser) throw new Error("Profile user not found.")
 
-    const isFollowing = profileUser.followers.includes(user._id)
+    const isFollowing = profileUser.followers.includes(
+      user._id as Types.ObjectId,
+    )
 
     if (!isFollowing) {
       // Add follower
-      profileUser.followers.push(user._id)
-      user.following.push(profileUser._id)
+      profileUser.followers.push(user._id as Types.ObjectId)
+      user.following.push(profileUser._id as Types.ObjectId)
 
       // Follow notification
       await followNotification(profileUser)
     } else {
       // Remove follower
-      profileUser.followers = profileUser.followers.filter(
-        (followerId: Types.ObjectId) =>
-          !followerId.equals(user._id as Types.ObjectId),
-      )
-      user.following = user.following.filter(
-        (followingId) => !followingId.equals(profileUser._id),
-      )
+      profileUser.followers = profileUser.followers.filter((follower) => {
+        if (follower instanceof Types.ObjectId) {
+          return !follower.equals(user._id as Types.ObjectId)
+        }
+        // If follower is a user object, compare its _id
+        return !(follower._id as Types.ObjectId).equals(
+          user._id as Types.ObjectId,
+        )
+      })
+      user.following = user.following.filter((following) => {
+        if (following instanceof Types.ObjectId) {
+          return !following.equals(profileUser._id as Types.ObjectId)
+        }
+        // If following is a user object, compare its _id
+        return !(following._id as Types.ObjectId).equals(
+          profileUser._id as Types.ObjectId,
+        )
+      })
     }
 
     await profileUser.save()
     await user.save()
 
     return ps({
-      updatedState: isFollowing ? "Follow" : "Following",
-      newFollowing: st(user.following),
-      newFollowersCount: profileUser.followers.length,
-    }) as {
-      updatedState: "Follow" | "Following"
-      newFollowing: string[]
-      newFollowersCount: number
-    }
+      success: true,
+      status: isFollowing ? "Follow" : "Following",
+      updatedFollowers: profileUser.followers as Types.ObjectId[],
+    })
   } catch (error) {
     console.error("Error adding follower:", error)
-    throw new Error("Failed to update follower.")
+    return { success: false }
   }
 }

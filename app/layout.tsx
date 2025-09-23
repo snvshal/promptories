@@ -7,10 +7,12 @@ import { Session } from "next-auth"
 import { getServerSession } from "next-auth"
 import { Toaster } from "@/components/ui/toaster"
 import { Sidebar } from "@/components/sidebar"
-import { currentUser } from "@/utils/get-user"
-import { TUser } from "@/types/schema.type"
+import { getContextUser } from "@/utils/get-user"
 import { ps } from "@/utils/ps"
 import ProgressBar from "@/components/progress-bar"
+import { fetchFeedPosts } from "@/actions/getFeedPosts"
+import { PostsProvider } from "@/hooks/use-posts"
+import { UserProvider } from "@/hooks/use-user"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -85,7 +87,9 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const session: Session | null = await getServerSession()
-  const user = await currentUser()
+
+  const contextUser = await getContextUser()
+  const posts = await fetchFeedPosts()
 
   return (
     <html lang="en">
@@ -100,7 +104,11 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Sidebar user={ps(user as TUser)}>{children}</Sidebar>
+            <UserProvider initialUser={JSON.parse(JSON.stringify(contextUser))}>
+              <PostsProvider initialPosts={ps(posts)}>
+                <Sidebar>{children}</Sidebar>
+              </PostsProvider>
+            </UserProvider>
           </ThemeProvider>
 
           <Toaster />

@@ -29,7 +29,6 @@ import {
   SelectValue,
 } from "./ui/select"
 import { getNotificationCount } from "@/actions/notificationActions"
-import { TUser } from "@/types/schema.type"
 import { getTrendingTags } from "@/actions/getTrendingTags"
 import Cookies from "js-cookie"
 
@@ -44,13 +43,10 @@ import {
 import PostForm from "./form"
 import { SetAction } from "@/types/generics.type"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { useUser } from "@/hooks/use-user"
+import { usePosts } from "@/hooks/use-posts"
 
-export type SidebarProps = {
-  user: TUser
-  children: React.ReactNode
-}
-
-export function Sidebar({ user, children }: SidebarProps) {
+export function Sidebar({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const pathname = usePathname()
 
@@ -103,11 +99,11 @@ export function Sidebar({ user, children }: SidebarProps) {
               <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
                 <NavLinks notificationCount={notificationCount} />
               </div>
-              <UserProfileLink user={user} />
+              <UserProfileLink />
             </div>
             <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
               <NavLinks notificationCount={notificationCount} />
-              <UserProfileLink user={user} />
+              <UserProfileLink />
             </div>
           </nav>
         </aside>
@@ -167,7 +163,7 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
           href={item.url}
           className={`nav-button flex-center hover:bg-accent ${pathname.startsWith(item.url) ? "bg-accent" : "bg-background"}`}
           aria-label={item.name}
-          prefetch={false}
+          prefetch={true}
         >
           {item.url === "/notifications" ? (
             <span className="relative">
@@ -193,7 +189,9 @@ export function NavLinks({ notificationCount }: { notificationCount: number }) {
   )
 }
 
-export function UserProfileLink({ user }: { user: TUser }) {
+export function UserProfileLink() {
+  const { user } = useUser()
+
   const pathname = usePathname()
   // const [open, setOpen] = useState(false)
 
@@ -217,7 +215,7 @@ export function UserProfileLink({ user }: { user: TUser }) {
         aria-label="Profile"
       >
         <Avatar className="max-sm:size-8">
-          <AvatarImage src={user.avatar} alt={user.name} />
+          <AvatarImage src={user?.avatar} alt={user?.name} />
           <AvatarFallback>
             <User className="size-5 text-muted-foreground" />
           </AvatarFallback>
@@ -276,7 +274,6 @@ export function ComposePostButton({
           defaultFormValues={defaultValues}
           operationType="POST"
           media={postMedia}
-          setOpen={setOpen}
         />
       </DialogContent>
     </Dialog>
@@ -301,7 +298,7 @@ export function SidePanel() {
     fetchTags()
   }, [])
 
-  if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return null
+  // if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return null
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -310,7 +307,7 @@ export function SidePanel() {
 
   return (
     <div className="w-[18rem] overflow-hidden px-4 pt-4 max-lg:hidden">
-      {pathname.startsWith("/search") || (
+      {pathname === "/home" && (
         <div className="flex-center mt-2">
           <form onSubmit={onSubmit} className="w-full">
             <Input
@@ -378,18 +375,22 @@ export function FeedTypeComponent({
 }: {
   trigger?: "button" | "select"
 }) {
+  const { setPosts } = usePosts()
+
   const [feedType, setFeedType] = useState<string>("for_you")
-  const router = useRouter()
 
   useEffect(() => {
-    const ft = Cookies.get("feed_type")
+    const ft = Cookies.get("feed_type") as "for_you" | "following"
     setFeedType(ft ?? "for_you")
   }, [])
 
   useEffect(() => {
     Cookies.set("feed_type", feedType, { expires: 28 })
-    router.refresh()
-  }, [feedType, router])
+    setPosts((prev) => ({
+      ...prev,
+      feedType: feedType as "for_you" | "following",
+    }))
+  }, [feedType, setPosts])
 
   return (
     <>

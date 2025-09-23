@@ -13,7 +13,6 @@ import {
 import { TPost, TReplies } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { handlePostShare, ib, il, objId, st } from "@/utils/ps"
-import { useSession } from "next-auth/react"
 import { SetAction } from "@/types/generics.type"
 import { ScrollArea } from "../ui/scroll-area"
 import {
@@ -25,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { PostReplyDialog } from "./reply"
+import { useUser } from "@/hooks/use-user"
 
 export function PostFooter({
   post,
@@ -113,8 +113,10 @@ export function PostTagsDialog({
 }
 
 export function LikeButton({ post }: { post: TPost }) {
-  const { data: session } = useSession()
-  const user = session?.user
+  // const { data: session } = useSession()
+  // const user = session?.user
+
+  const { user } = useUser()
 
   const initialLikes = post.likes.length
 
@@ -157,8 +159,10 @@ export function LikeButton({ post }: { post: TPost }) {
 }
 
 export function BookmarkButton({ post }: { post: TPost }) {
-  const { data: session } = useSession()
-  const user = session?.user
+  // const { data: session } = useSession()
+  // const user = session?.user
+
+  const { user } = useUser()
 
   const initialBookmarks = post.bookmarks.length
   const hasBookmarkedInitial = post.bookmarks.includes(objId(user?.id))
@@ -202,8 +206,10 @@ export function BookmarkButton({ post }: { post: TPost }) {
 }
 
 export function PostViews({ post }: { post: TPost }) {
-  const { data: session } = useSession()
-  const user = session?.user
+  // const { data: session } = useSession()
+  // const user = session?.user
+
+  const { user } = useUser()
 
   const postRef = useRef<HTMLButtonElement>(null)
 
