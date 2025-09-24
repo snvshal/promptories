@@ -47,3 +47,12 @@ export const getSortedReplies = (replies: TReplies[]) =>
   replies.sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   )
+
+export const isValidUrl = (url: string): boolean => {
+  try {
+    new URL(url)
+    return true
+  } catch {
+    return false
+  }
+}

@@ -15,7 +15,7 @@ export async function addReplyToPost(postId: string, replyText: string) {
 
     if (!Types.ObjectId.isValid(postId)) throw new Error("Invalid post ID!")
 
-    if (!replyText) throw new Error("Reply is required!")
+    if (!replyText.trim()) throw new Error("Reply is required!")
 
     const user = await currentUser()
 

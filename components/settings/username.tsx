@@ -25,8 +25,8 @@ import {
 import { toast } from "@/hooks/use-toast"
 import { isUsernameUnique, updateUsername } from "@/actions/profileActions"
 import { useSession } from "next-auth/react"
-import { TUser } from "@/types/schema.type"
 import { useState } from "react"
+import { ContextUser, useUser } from "@/hooks/use-user"
 
 const usernameSchema = z.object({
   username: z
@@ -46,9 +46,9 @@ const usernameSchema = z.object({
 
 export type UsernameFormValues = z.infer<typeof usernameSchema>
 
-export default function UsernameSettings({ user }: { user: TUser }) {
+export default function UsernameSettings() {
+  const { user, setUser } = useUser()
   const { data: session, update } = useSession()
-
   const [loading, setLoading] = useState(false)
 
   const usernameForm = useForm<UsernameFormValues>({
@@ -63,6 +63,7 @@ export default function UsernameSettings({ user }: { user: TUser }) {
       setLoading(true)
       const { success } = await updateUsername(data.username)
       if (success) {
+        setUser((prev) => ({ ...prev, username: data.username }) as ContextUser)
         await update({
           ...session,
           user: {

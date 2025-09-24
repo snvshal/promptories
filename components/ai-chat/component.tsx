@@ -79,7 +79,7 @@ export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
             href={cl(user.username)}
             className="text-sm font-medium hover:underline"
           >
-            {user?.name}
+            {user.name}
           </Link>
         </div>
         <DropdownMenu>

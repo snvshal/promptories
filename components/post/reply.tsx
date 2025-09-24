@@ -32,8 +32,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Textarea } from "../ui/textarea"
-import { PostFooterIconButton } from "./footer"
+import { PostIconButton } from "./footer"
 import { AvatarComponent } from "./content"
+import { useUser } from "@/hooks/use-user"
 
 export function PostReplies({
   post,
@@ -49,16 +50,16 @@ export function PostReplies({
   const [sendingReply, setSendingReply] = useState(false)
 
   const handleReplySubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    setSendingReply(true)
-
-    if (!replyText) {
-      setEmptyReplyError("Reply is required!")
-      return
-    }
-
     try {
+      e.preventDefault()
+
+      setSendingReply(true)
+
+      if (!replyText.trim()) {
+        setEmptyReplyError("Reply is required!")
+        return
+      }
+
       const updatedReplies = await addReplyToPost(post._id as string, replyText)
       setPostReplies(updatedReplies)
       setReplyText("")
@@ -94,9 +95,13 @@ export function PostReplies({
                 setEmptyReplyError("")
                 setSendingReply(false)
               }}
-              className="flex-1"
+              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <Button type="submit" disabled={sendingReply}>
+            <Button
+              size="icon"
+              type="submit"
+              disabled={sendingReply || !replyText.trim()}
+            >
               <Send className="h-4 w-4" />
               <span className="sr-only">Send reply</span>
             </Button>
@@ -125,8 +130,7 @@ export function PostRepliesContent({
   replies: TReplies[]
   setPostReplies: SetAction<TReplies[]>
 }) {
-  const { data: session } = useSession()
-  const user = session?.user
+  const { user } = useUser()
 
   const [hasLiked, setHasLiked] = useState<Record<string, boolean>>({})
 
@@ -210,11 +214,8 @@ export function PostRepliesContent({
                 {reply.content}
               </p>
               <div className="flex-start flex-col">
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <PostIconButton
                   onClick={() => handleLikeReplyClick(reply._id as string)}
-                  className="hover:bg-background"
                 >
                   <Heart
                     style={{
@@ -223,9 +224,9 @@ export function PostRepliesContent({
                     fill={il(hasLiked[reply._id?.toString() as string])}
                     className="size-4 text-muted-foreground"
                   />
-                </Button>
-                <p className="text-sm text-muted-foreground">
-                  {reply.likes.length ? reply.likes.length : null}
+                </PostIconButton>
+                <p className="text-xs text-muted-foreground">
+                  {reply.likes.length || null}
                 </p>
               </div>
             </div>
@@ -270,8 +271,12 @@ export function PostReplyOptions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size={"icon"} variant={"ghost"} className="rounded-full">
-          <Ellipsis className="h-4 w-4 text-muted-foreground" />
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8 rounded-full text-muted-foreground"
+        >
+          <Ellipsis className="h-4 w-4" />
           <span className="sr-only">Post reply options</span>
         </Button>
       </DropdownMenuTrigger>
@@ -315,7 +320,7 @@ export function PostReplyDialog({
 
     setSendingReply(true)
 
-    if (!replyContent) {
+    if (!replyContent.trim()) {
       setEmptyReplyError("Reply is required!")
       return
     }
@@ -354,14 +359,16 @@ export function PostReplyDialog({
   return (
     <Dialog open={dialogState} onOpenChange={onDialogChange}>
       <DialogTrigger asChild>
-        {children ? (
-          children
-        ) : (
-          <PostFooterIconButton>
-            <MessageCircle className="mr-2 size-4" />
-            {repliesCount ? repliesCount : null}
-            <span className="sr-only">Reply Post</span>
-          </PostFooterIconButton>
+        {children || (
+          <div className="flex items-center justify-start">
+            <PostIconButton>
+              <MessageCircle className="size-4" />
+              <span className="sr-only">Reply Post</span>
+            </PostIconButton>
+            <span className="text-xs text-muted-foreground">
+              {repliesCount || null}
+            </span>
+          </div>
         )}
       </DialogTrigger>
       <DialogContent className="max-sm:top-56 sm:max-w-[425px]">
@@ -393,7 +400,7 @@ export function PostReplyDialog({
           <Button
             className="w-full"
             aria-label="Submit Reply"
-            disabled={sendingReply}
+            disabled={sendingReply || !replyContent.trim()}
           >
             <Send className="mr-2 size-4" />
             Submit Reply

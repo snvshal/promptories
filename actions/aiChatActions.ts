@@ -5,6 +5,7 @@ import { AIChat } from "@/models/ai-chat.model"
 import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
 import { AIChatFormValue } from "@/components/ai-chat/create"
+import { isValidUrl } from "@/utils/ps"
 
 export async function saveAIChat(data: AIChatFormValue) {
   try {
@@ -69,7 +70,7 @@ export async function validateAIChatFormData(data: AIChatFormValue) {
       !chat_link ||
       chat_link.length < 4 ||
       chat_link.length > 200 ||
-      !isValidURL(chat_link)
+      !isValidUrl(chat_link)
     ) {
       throw new Error(
         "Chat link must be a valid URL between 4 and 200 characters.",
@@ -90,14 +91,5 @@ export async function validateAIChatFormData(data: AIChatFormValue) {
   } catch (error) {
     console.error(error)
     return { status: false, FormValues: null }
-  }
-}
-
-export const isValidURL = async (url: string) => {
-  try {
-    new URL(url)
-    return true
-  } catch {
-    return false
   }
 }

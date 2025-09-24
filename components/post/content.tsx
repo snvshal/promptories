@@ -3,7 +3,13 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Copy, Check, SquareParkingIcon, User } from "lucide-react"
+import {
+  Copy,
+  Check,
+  SquareParkingIcon,
+  User,
+  MessageCircle,
+} from "lucide-react"
 import Link from "next/link"
 import { NavigateBackHeader } from "../home"
 import { TimeAgo } from "../time-ago"
@@ -12,7 +18,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { PostFooter } from "./footer"
 import { PostOptions } from "./option"
-import { PostReplies } from "./reply"
+import { PostReplies, PostReplyDialog } from "./reply"
 import { cl, getSortedReplies, postPathname, pu } from "@/utils/ps"
 import clsx from "clsx"
 import { SetAction } from "@/types/generics.type"
@@ -44,6 +50,16 @@ export default function SinglePostPage({ post }: { post: TPost }) {
           setPostReplies={setPostReplies}
         />
       </main>
+      <PostReplyDialog post={post} setPostReplies={setPostReplies}>
+        <Button
+          size="icon"
+          name="Reply Promptory"
+          className="compose-button hover:bg-blue-600"
+          aria-label="Reply Promptory"
+        >
+          <MessageCircle className="h-6 w-6 text-white" />
+        </Button>
+      </PostReplyDialog>
     </div>
   )
 }
@@ -159,7 +175,7 @@ export function PostHeader({ type, post }: PostContentProps) {
   return (
     <CardHeader onClick={(e) => e.stopPropagation()} className="p-0">
       <div className={`${type === "post" && "mb-4"} flex-between relative`}>
-        <div className="flex-start">
+        <div className="flex-start flex-1">
           {type === "post" && (
             <div className="mr-2">
               <AvatarComponent user={pu(post)} />
@@ -175,48 +191,52 @@ export function PostHeader({ type, post }: PostContentProps) {
             </span>
           )}
         </div>
-        <Sheet>
-          <ToolTipComponent content="Prompt">
-            <SheetTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="releative mr-8 h-8 w-8 rounded-full"
-              >
-                <SquareParkingIcon className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-          </ToolTipComponent>
-          <SheetContent className="overflow-y-auto max-sm:w-full">
-            <SheetHeader className="flex-row items-center justify-between space-y-0 pr-2">
-              <SheetTitle>Prompt</SheetTitle>
-              <CopyButton text={post.prompt.text as string} />
-            </SheetHeader>
-            <div className="mt-2">
-              <div className="prose prose-sm mb-2 max-w-none dark:prose-invert">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {post.prompt.text as string}
-                </ReactMarkdown>
-              </div>
-              {post.prompt.media?.url && (
-                <Link
-                  href={postPathname(post, "prompt", "media")}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <PostMedia
-                    mediaType={post.prompt.media?.type}
-                    mediaUrl={post.prompt.media?.url}
-                    caption={post.caption}
-                    prType="prompt"
-                  />
-                </Link>
-              )}
-            </div>
-          </SheetContent>
-        </Sheet>
-        <PostOptions post={post} type={type} />
+        <div className="absolute -right-2 -top-1 flex gap-2 self-start">
+          <PostPromptSheet post={post} />
+          <PostOptions post={post} type={type} />
+        </div>
       </div>
     </CardHeader>
+  )
+}
+
+export function PostPromptSheet({ post }: { post: TPost }) {
+  return (
+    <Sheet>
+      <ToolTipComponent content="Prompt">
+        <SheetTrigger asChild>
+          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
+            <SquareParkingIcon className="h-4 w-4" />
+          </Button>
+        </SheetTrigger>
+      </ToolTipComponent>
+      <SheetContent className="overflow-y-auto max-sm:w-full">
+        <SheetHeader className="flex-row items-center justify-between space-y-0 pr-2">
+          <SheetTitle>Prompt</SheetTitle>
+          <CopyButton text={post.prompt.text as string} />
+        </SheetHeader>
+        <div className="mt-2">
+          <div className="prose prose-sm mb-2 max-w-none dark:prose-invert">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {post.prompt.text as string}
+            </ReactMarkdown>
+          </div>
+          {post.prompt.media?.url && (
+            <Link
+              href={postPathname(post, "prompt", "media")}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PostMedia
+                mediaType={post.prompt.media?.type}
+                mediaUrl={post.prompt.media?.url}
+                caption={post.caption}
+                prType="prompt"
+              />
+            </Link>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -281,8 +301,8 @@ export function PostTime({ createdAt }: { createdAt: Date }) {
 
 export function PostContent({ type, post }: PostContentProps) {
   return (
-    <CardContent className={`border-0 p-0`}>
-      <div className="relative mb-2 overflow-hidden">
+    <CardContent className="border-0 p-0">
+      <div className="relative overflow-hidden">
         <PostContentType type={type} content={post.caption} />
       </div>
       {/* <div
@@ -291,7 +311,7 @@ export function PostContent({ type, post }: PostContentProps) {
       <div>
         {post.response.media?.url ? (
           <Link
-            href={postPathname(post, "prompt", "media")}
+            href={postPathname(post, "response", "media")}
             onClick={(e) => e.stopPropagation()}
           >
             <PostMedia

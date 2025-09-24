@@ -284,7 +284,7 @@ function SearchFilterDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="caption">Caption</SelectItem>
+                {/* <SelectItem value="caption">Caption</SelectItem> */}
                 <SelectItem value="prompt">Prompt</SelectItem>
                 <SelectItem value="response">Response</SelectItem>
                 <SelectItem value="tags">Tags</SelectItem>

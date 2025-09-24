@@ -154,9 +154,12 @@ export function PostOptions({ post, type }: PostContentProps) {
   const authorized = pu(post).email === user?.email
 
   const PostOptionItems = () => (
-    <div className="flex flex-col max-sm:gap-2">
+    <div className="flex flex-col">
       <Link href={cl(pu(post).username)} prefetch={false} className="sm:hidden">
-        <Button variant="ghost" className="w-full justify-start max-sm:text-lg">
+        <Button
+          variant="ghost"
+          className="w-full justify-start max-sm:h-12 max-sm:text-lg"
+        >
           <User className="mr-2 size-5 sm:size-4" />
           <span>&#64;{pu(post).username}</span>
         </Button>
@@ -165,7 +168,7 @@ export function PostOptions({ post, type }: PostContentProps) {
         <Link href={post.model_url} target="_blank" prefetch={false}>
           <Button
             variant="ghost"
-            className="w-full justify-start max-sm:text-lg"
+            className="w-full justify-start max-sm:h-12 max-sm:text-lg"
           >
             <SquareArrowOutUpRight className="mr-2 size-5 sm:size-4" />
             <span>Test it</span>
@@ -176,7 +179,7 @@ export function PostOptions({ post, type }: PostContentProps) {
         <Link href={post.chat_link} target="_blank" prefetch={false}>
           <Button
             variant="ghost"
-            className="w-full justify-start max-sm:text-lg"
+            className="w-full justify-start max-sm:h-12 max-sm:text-lg"
           >
             <MessageSquareShare className="mr-2 size-5 sm:size-4" />
             <span>View chat</span>
@@ -187,7 +190,7 @@ export function PostOptions({ post, type }: PostContentProps) {
         <Link href={postPathname(post, "edit")} prefetch={false}>
           <Button
             variant="ghost"
-            className="w-full justify-start max-sm:text-lg"
+            className="w-full justify-start max-sm:h-12 max-sm:text-lg"
           >
             <Edit className="mr-2 size-5 sm:size-4" />
             <span>Edit</span>
@@ -199,7 +202,7 @@ export function PostOptions({ post, type }: PostContentProps) {
           <AlertDialogTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full justify-start text-red-500 hover:text-red-500 max-sm:text-lg"
+              className="w-full justify-start text-red-500 hover:text-red-500 max-sm:h-12 max-sm:text-lg"
               onClick={(event) => {
                 event.preventDefault()
                 setIsAlertOpen(true)
@@ -248,9 +251,9 @@ export function PostOptions({ post, type }: PostContentProps) {
           <Button
             size="icon"
             variant="ghost"
-            className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full sm:hidden`}
+            className="size-8 rounded-full text-muted-foreground sm:hidden"
           >
-            <Ellipsis className="h-4 w-4 text-muted-foreground" />
+            <Ellipsis className="h-4 w-4" />
             <span className="sr-only">Post options</span>
           </Button>
         </SheetTrigger>
@@ -270,9 +273,9 @@ export function PostOptions({ post, type }: PostContentProps) {
             <Button
               size="icon"
               variant="ghost"
-              className={`${type === "post" && "self-start"} absolute -right-2 size-8 rounded-full max-sm:hidden`}
+              className="size-8 rounded-full text-muted-foreground max-sm:hidden"
             >
-              <Ellipsis className="h-4 w-4 text-muted-foreground" />
+              <Ellipsis className="h-4 w-4" />
               <span className="sr-only">Post options</span>
             </Button>
           </DropdownMenuTrigger>

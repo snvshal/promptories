@@ -30,19 +30,53 @@ import { useSession } from "next-auth/react"
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { ACCEPTED_IMAGE_TYPES } from "../form"
 import { AvatarComponent } from "../post/content"
-import { TUser } from "@/types/schema.type"
+import { ContextUser, useUser } from "@/hooks/use-user"
 
-const profileSchema = z.object({
+export const normalizeUrl = (url: string): string => {
+  if (!/^https?:\/\//i.test(url)) {
+    url = "https://" + url
+  }
+  return url
+}
+
+export const isValidDomainOrUrl = (input: string): boolean => {
+  try {
+    const url = new URL(normalizeUrl(input))
+
+    // Only allow http/https
+    if (!["http:", "https:"].includes(url.protocol)) return false
+
+    // Must have a valid hostname (e.g., ai.com)
+    if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(url.hostname)) return false
+
+    return true
+  } catch {
+    return false
+  }
+}
+
+export const profileSchema = z.object({
   name: z.string().min(2).max(50),
   bio: z.string().max(160).optional(),
-  external_link: z.string().optional(),
+  external_link: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true
+        return isValidDomainOrUrl(val)
+      },
+      { message: "Invalid URL format" },
+    )
+    .transform((val) => (val ? normalizeUrl(val) : val)),
 })
 
 export type ProfileFormValues = z.infer<typeof profileSchema>
 
-export default function ProfileSettings({ user }: { user: TUser }) {
+export default function ProfileSettings() {
+  const { user, setUser } = useUser()
   const { data: session, update } = useSession()
-
   const [loading, setLoading] = useState(false)
   const [avatar, setAvatar] = useState<string | null>(user?.avatar ?? null)
 
@@ -74,6 +108,8 @@ export default function ProfileSettings({ user }: { user: TUser }) {
       const { success } = await updateUserData(dataWithAvatar)
 
       if (success) {
+        setUser((prev) => ({ ...prev, ...dataWithAvatar }) as ContextUser)
+
         await update({
           ...session,
           user: {

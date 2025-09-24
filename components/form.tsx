@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/accordion"
 import { NavigateBackHeader } from "./home"
 import { usePosts } from "@/hooks/use-posts"
+import { isValidDomainOrUrl, normalizeUrl } from "./settings/profile"
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 export const ACCEPTED_IMAGE_TYPES = [
@@ -56,7 +57,18 @@ const mediaSchema = z.object({
 const formSchema = z
   .object({
     caption: z.string().optional(),
-    model_url: z.string().url("Invalid model URL").optional().or(z.literal("")),
+    model_url: z
+      .string()
+      .trim()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val) return true
+          return isValidDomainOrUrl(val)
+        },
+        { message: "Invalid URL format" },
+      )
+      .transform((val) => (val ? normalizeUrl(val) : val)),
     chat_link: z.string().url("Invalid chat URL").optional().or(z.literal("")),
     prompt: z.string().min(1, "Prompt text is required"),
     prompt_media: mediaSchema.optional(),
@@ -258,7 +270,7 @@ export default function PostForm({
           post._id as string,
         )
 
-        console.log(success, updatedPost)
+        // console.log(success, updatedPost)
         if (success && updatedPost) {
           setPosts((prev) => ({
             ...prev,
@@ -586,6 +598,11 @@ export default function PostForm({
                       />
                     )}
                   />
+                  {errors.model_url && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.model_url.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -605,6 +622,11 @@ export default function PostForm({
                       />
                     )}
                   />
+                  {errors.chat_link && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.chat_link.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -624,6 +646,11 @@ export default function PostForm({
                       />
                     )}
                   />
+                  {errors.tags && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.tags.message}
+                    </p>
+                  )}
                 </div>
               </AccordionContent>
             </AccordionItem>

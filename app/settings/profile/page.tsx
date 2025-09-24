@@ -1,8 +1,5 @@
-import ProfileSettings from "@/components/settings/profile"
-import { TUser } from "@/types/schema.type"
-import { currentUser } from "@/utils/get-user"
-import { ps } from "@/utils/ps"
 import { Metadata } from "next"
+import ProfileSettings from "@/components/settings/profile"
 
 export const metadata: Metadata = {
   title: "Edit Profile",
@@ -24,6 +21,5 @@ export const metadata: Metadata = {
 }
 
 export default async function ProfileSettingsPage() {
-  const user = await currentUser()
-  return <ProfileSettings user={ps(user as TUser)} />
+  return <ProfileSettings />
 }
