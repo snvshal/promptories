@@ -128,10 +128,10 @@ export function ComposePromptoryButton() {
       <Button
         size="icon"
         name="Compose Promptory"
-        className="compose-button"
+        className="compose-button hover:bg-blue-600"
         aria-label="Compose Promptory"
       >
-        <Feather size={24} />
+        <Feather className="h-6 w-6 text-white" />
       </Button>
     </Link>
   )

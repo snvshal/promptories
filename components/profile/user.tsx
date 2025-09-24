@@ -151,7 +151,7 @@ export function ProfileUserContent({ profileUser }: { profileUser: TUser }) {
           />
         </div>
         <div className="sm:flex-start flex max-sm:flex-col">
-          <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 md:mr-4 md:size-40">
+          <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 sm:size-40 md:mr-4">
             <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
             <AvatarFallback>
               <User className="size-16 text-muted-foreground md:size-20" />
@@ -163,15 +163,20 @@ export function ProfileUserContent({ profileUser }: { profileUser: TUser }) {
               &#64;{profileUser?.username}
             </p>
             <p className="mt-2">{profileUser?.bio}</p>
-            <div className="mt-4 flex items-center space-x-4">
+            <div className="mt-4">
               {profileUser.external_link && (
                 <Link
                   target="_blank"
                   prefetch={false}
                   href={profileUser.external_link as string}
-                  className="text-muted-foreground hover:text-primary"
+                  className="flex items-center gap-2"
                 >
-                  <Link2Icon className="h-5 w-5" />
+                  <Link2Icon className="h-5 w-5 -rotate-45 text-muted-foreground" />
+                  <span className="text-blue-500 hover:underline">
+                    {profileUser.external_link
+                      ?.replace(/^https?:\/\//, "")
+                      .replace(/^www\./, "")}
+                  </span>
                 </Link>
               )}
             </div>

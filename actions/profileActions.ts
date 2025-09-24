@@ -6,7 +6,7 @@ import { ProfileFormValues } from "@/components/settings/profile"
 import { reservedUsernames } from "@/lib/constants"
 import { currentUser } from "@/utils/get-user"
 import { revalidatePath } from "next/cache"
-import { cl } from "@/utils/ps"
+import { cl, isValidUrl } from "@/utils/ps"
 import { Post } from "@/models/post.model"
 import { AIChat } from "@/models/ai-chat.model"
 import { Notification } from "@/models/notification.model"
@@ -73,7 +73,12 @@ export async function updateUserData(
     const { name, external_link, avatar, bio } = updatedData
 
     if (user.name !== name) user.name = name
-    if (user.external_link !== external_link) user.external_link = external_link
+    if (
+      user.external_link !== external_link &&
+      isValidUrl(external_link as string)
+    ) {
+      user.external_link = external_link
+    }
     if (user.avatar !== avatar) user.avatar = avatar as string
     if (user.bio !== bio) user.bio = bio
 
@@ -117,10 +122,10 @@ export async function updateUsername(
 
 export async function deleteAccount() {
   try {
+    await connectToDatabase()
+
     const user = await currentUser()
     if (!user) throw new Error("User not authenticated.")
-
-    await connectToDatabase()
 
     const deletedUser = await User.findByIdAndDelete(user._id)
     if (!deletedUser) throw new Error("User not found.")
@@ -141,18 +146,20 @@ export async function deleteAccount() {
 
     // Remove user from likes, bookmarks, and views in the respective posts
     await Post.updateMany(
-      { _id: { $in: likedPosts } },
-      { $pull: { likes: deletedUser._id } },
-    )
-
-    await Post.updateMany(
-      { _id: { $in: bookmarkedPosts } },
-      { $pull: { bookmarks: deletedUser._id } },
-    )
-
-    await Post.updateMany(
-      { _id: { $in: viewedPosts } },
-      { $pull: { views: deletedUser._id } },
+      {
+        $or: [
+          { _id: { $in: likedPosts } },
+          { _id: { $in: bookmarkedPosts } },
+          { _id: { $in: viewedPosts } },
+        ],
+      },
+      {
+        $pull: {
+          likes: deletedUser._id,
+          bookmarks: deletedUser._id,
+          views: deletedUser._id,
+        },
+      },
     )
 
     // Remove likes from replies where the user interacted
@@ -169,14 +176,43 @@ export async function deleteAccount() {
       $or: [{ user: deletedUser._id }, { actor: deletedUser._id }],
     })
 
+    // After deleting user's posts
+    const deletedUserPosts = deletedUser.posts || []
+
+    // Remove deleted user's posts from likes and saved of other users
+    await User.updateMany(
+      {
+        $or: [
+          { likes: { $in: deletedUserPosts } },
+          { saved: { $in: deletedUserPosts } },
+        ],
+      },
+      {
+        $pull: {
+          likes: { $in: deletedUserPosts },
+          saved: { $in: deletedUserPosts },
+        },
+      },
+    )
+
     // Remove the user from the followers/following arrays of others
     await User.updateMany(
-      { followers: deletedUser._id },
-      { $pull: { followers: deletedUser._id } },
-    )
-    await User.updateMany(
-      { following: deletedUser._id },
-      { $pull: { following: deletedUser._id } },
+      {
+        $or: [
+          { followers: deletedUser._id },
+          { following: deletedUser._id },
+          { blocked: deletedUser._id },
+          { muted: deletedUser._id },
+        ],
+      },
+      {
+        $pull: {
+          followers: deletedUser._id,
+          following: deletedUser._id,
+          blocked: deletedUser._id,
+          muted: deletedUser._id,
+        },
+      },
     )
 
     revalidatePath("/")

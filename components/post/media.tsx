@@ -23,7 +23,7 @@ export function PromptoryMedia({
 }) {
   const router = useRouter()
   return (
-    <div className="flex h-screen w-full flex-col">
+    <div className="flex h-dvh w-full flex-col">
       <header className="flex-between z-20 border-b bg-background px-4 py-2">
         <div className="flex-start gap-2">
           <AvatarComponent user={pu(post)} />
@@ -45,19 +45,20 @@ export function PromptoryMedia({
           <X size={20} />
         </Button>
       </header>
-      <div className="flex-center h-[calc(100vh-4rem)]">
+      <div className="flex-center h-[calc(100dvh-4rem)]">
         {mediaType === "image" ? (
           <>
             <Image
               role="img"
               src={mediaUrl}
-              width={800}
+              width={1200}
               height={600}
               priority={true}
-              className="h-auto max-h-80 w-auto"
+              className="max-h-[80vh] max-w-full object-contain"
               alt={`This is a ${prompt_response} ${mediaType} created by @${pu(post).username}`}
               aria-describedby="image-description"
             />
+
             <span id="image-description" className="sr-only">
               {post.caption}
             </span>
@@ -66,13 +67,14 @@ export function PromptoryMedia({
           <>
             <video
               src={mediaUrl}
-              className="h-auto max-h-80 w-auto"
+              className="max-h-[80vh] max-w-full object-contain"
               controls
               aria-describedby="video-description"
               aria-label={`${prompt_response} ${mediaType}`}
             >
               Your browser does not support the video tag.
             </video>
+
             <span id="video-description" className="sr-only">
               {post.caption}
             </span>

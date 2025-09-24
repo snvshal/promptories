@@ -36,22 +36,24 @@ export function PostFooter({
   const [open, setOpen] = useState(false)
 
   return (
-    <CardFooter onClick={(e) => e.stopPropagation()} className="p-0 pt-3">
+    <CardFooter onClick={(e) => e.stopPropagation()} className="h-8 p-0 pt-3">
       <div className="grid w-4/5 grid-cols-4">
         <PostReplyDialog post={post} setPostReplies={setPostReplies} />
         <LikeButton post={post} />
         <BookmarkButton post={post} />
         <PostViews post={post} />
       </div>
-      <div className="flex-end flex-1 gap-4">
-        {post.tags.length > 0 && (
-          <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
-        )}
+      <div className="flex-end relative flex-1">
+        <div className="absolute -right-2 flex gap-2">
+          {post.tags.length > 0 && (
+            <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
+          )}
 
-        <PostFooterIconButton onClick={async () => await handlePostShare(post)}>
-          <Share2 className="size-4" />
-          <span className="sr-only">Share Post</span>
-        </PostFooterIconButton>
+          <PostIconButton onClick={async () => await handlePostShare(post)}>
+            <Share2 className="size-4" />
+            <span className="sr-only">Share Post</span>
+          </PostIconButton>
+        </div>
       </div>
     </CardFooter>
   )
@@ -75,10 +77,10 @@ export function PostTagsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <PostFooterIconButton>
+        <PostIconButton>
           <Tag className="size-4" />
           <span className="sr-only">View Tags</span>
-        </PostFooterIconButton>
+        </PostIconButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -134,7 +136,7 @@ export function LikeButton({ post }: { post: TPost }) {
     try {
       // Optimistically update state
       setHasLiked(!hasLiked)
-      setLikes(hasLiked ? Math.max(likes - 1, 0) : likes + 1)
+      setLikes(hasLiked ? Math.abs(likes - 1) : likes + 1)
 
       // Server action to handle like/unlike
       await handleLikePost(post._id as string)
@@ -144,17 +146,20 @@ export function LikeButton({ post }: { post: TPost }) {
   }
 
   return (
-    <form onSubmit={handleLikeClick}>
-      <PostFooterIconButton>
-        <Heart
-          style={{ color: il(hasLiked) }}
-          fill={il(hasLiked)}
-          className="mr-2 size-4"
-        />
-        {likes ? likes : null}
-        <span className="sr-only">Like Post</span>
-      </PostFooterIconButton>
-    </form>
+    <div className="flex items-center justify-start">
+      <form onSubmit={handleLikeClick}>
+        <PostIconButton>
+          <Heart
+            style={{ color: il(hasLiked) }}
+            fill={il(hasLiked)}
+            className="size-4"
+          />
+
+          <span className="sr-only">Like Post</span>
+        </PostIconButton>
+      </form>
+      <span className="text-xs text-muted-foreground">{likes || null}</span>
+    </div>
   )
 }
 
@@ -181,7 +186,7 @@ export function BookmarkButton({ post }: { post: TPost }) {
     try {
       // Optimistically update state
       setHasBookmarked(!hasBookmarked)
-      setBookmarks(hasBookmarked ? Math.max(bookmarks - 1, 0) : bookmarks + 1)
+      setBookmarks(hasBookmarked ? Math.abs(bookmarks - 1) : bookmarks + 1)
 
       // Server action to handle bookmark/unbookmark
       await handleBookmarkPost(post._id as string)
@@ -191,17 +196,19 @@ export function BookmarkButton({ post }: { post: TPost }) {
   }
 
   return (
-    <form onSubmit={handleBookmarkClick}>
-      <PostFooterIconButton>
-        <Bookmark
-          style={{ color: ib(hasBookmarked) }}
-          fill={ib(hasBookmarked)}
-          className="mr-2 size-4"
-        />
-        {bookmarks ? bookmarks : null}
-        <span className="sr-only">Bookmark Post</span>
-      </PostFooterIconButton>
-    </form>
+    <div className="flex items-center justify-start">
+      <form onSubmit={handleBookmarkClick}>
+        <PostIconButton>
+          <Bookmark
+            style={{ color: ib(hasBookmarked) }}
+            fill={ib(hasBookmarked)}
+            className="size-4"
+          />
+          <span className="sr-only">Bookmark Post</span>
+        </PostIconButton>
+      </form>
+      <span className="text-xs text-muted-foreground">{bookmarks || null}</span>
+    </div>
   )
 }
 
@@ -244,15 +251,19 @@ export function PostViews({ post }: { post: TPost }) {
     }
   }, [post._id, post.views, user?.id])
   return (
-    <PostFooterIconButton ref={postRef}>
-      <ChartNoAxesColumn className="mr-2 size-4" />
-      {post.views.length < 1 ? "" : post.views.length}
-      <span className="sr-only">Post Views</span>
-    </PostFooterIconButton>
+    <div className="flex items-center justify-start">
+      <PostIconButton ref={postRef}>
+        <ChartNoAxesColumn className="size-4" />
+        <span className="sr-only">Post Views</span>
+      </PostIconButton>
+      <span className="text-xs text-muted-foreground">
+        {post.views.length || null}
+      </span>
+    </div>
   )
 }
 
-export const PostFooterIconButton = React.forwardRef<
+export const PostIconButton = React.forwardRef<
   HTMLButtonElement,
   {
     children: React.ReactNode
@@ -263,13 +274,13 @@ export const PostFooterIconButton = React.forwardRef<
     <Button
       ref={ref}
       variant="ghost"
-      size="sm"
+      size="icon"
       onClick={onClick}
-      className="flex-start p-0 text-muted-foreground hover:bg-background"
+      className="h-8 w-8 rounded-full p-1 text-muted-foreground"
     >
       {children}
     </Button>
   )
 })
 
-PostFooterIconButton.displayName = "PostFooterIconButton"
+PostIconButton.displayName = "PostIconButton"
