@@ -25,7 +25,6 @@ import {
 import { toast } from "@/hooks/use-toast"
 import { isUsernameUnique, updateUsername } from "@/actions/profileActions"
 import { useSession } from "next-auth/react"
-import { TUser } from "@/types/schema.type"
 import { useState } from "react"
 import { ContextUser, useUser } from "@/hooks/use-user"
 

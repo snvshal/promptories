@@ -30,7 +30,6 @@ import { useSession } from "next-auth/react"
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { ACCEPTED_IMAGE_TYPES } from "../form"
 import { AvatarComponent } from "../post/content"
-import { TUser } from "@/types/schema.type"
 import { ContextUser, useUser } from "@/hooks/use-user"
 
 export const normalizeUrl = (url: string): string => {
