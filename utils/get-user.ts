@@ -56,14 +56,17 @@ export const getUserByUsername = async (
       {
         path: "posts",
         populate: { path: "user" },
+        options: { sort: { createdAt: -1 } },
       },
       {
         path: "likes",
         populate: { path: "user" },
+        options: { sort: { createdAt: -1 } },
       },
       {
         path: "saved",
         populate: { path: "user" },
+        options: { sort: { createdAt: -1 } },
       },
     ])
     // .populate("blocked")
