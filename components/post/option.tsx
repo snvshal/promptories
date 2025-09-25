@@ -45,6 +45,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { ToolTipComponent } from "../ui/tooltip"
+import { PostIconButton } from "./footer"
 
 export function PostOptions({ post, type }: PostContentProps) {
   const { data: session } = useSession()
@@ -248,14 +249,10 @@ export function PostOptions({ post, type }: PostContentProps) {
       {/* Mobile View */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetTrigger asChild>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="size-8 rounded-full text-muted-foreground sm:hidden"
-          >
+          <PostIconButton className="sm:hidden">
             <Ellipsis className="h-4 w-4" />
             <span className="sr-only">Post options</span>
-          </Button>
+          </PostIconButton>
         </SheetTrigger>
         <SheetContent side="bottom" className="rounded-t-3xl sm:hidden">
           <SheetHeader>
@@ -270,14 +267,10 @@ export function PostOptions({ post, type }: PostContentProps) {
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <ToolTipComponent content="More">
           <DropdownMenuTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="size-8 rounded-full text-muted-foreground max-sm:hidden"
-            >
+            <PostIconButton className="max-sm:hidden">
               <Ellipsis className="h-4 w-4" />
               <span className="sr-only">Post options</span>
-            </Button>
+            </PostIconButton>
           </DropdownMenuTrigger>
         </ToolTipComponent>
         <DropdownMenuContent className="absolute -left-36 -top-8 w-40 shadow-2xl shadow-slate-900">

@@ -95,7 +95,7 @@ export function PostReplies({
                 setEmptyReplyError("")
                 setSendingReply(false)
               }}
-              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <Button
               size="icon"
@@ -216,13 +216,14 @@ export function PostRepliesContent({
               <div className="flex-start flex-col">
                 <PostIconButton
                   onClick={() => handleLikeReplyClick(reply._id as string)}
+                  className="hover:bg-red-500/10 hover:text-red-500"
                 >
                   <Heart
                     style={{
                       color: il(hasLiked[reply._id?.toString() as string]),
                     }}
                     fill={il(hasLiked[reply._id?.toString() as string])}
-                    className="size-4 text-muted-foreground"
+                    className="size-4"
                   />
                 </PostIconButton>
                 <p className="text-xs text-muted-foreground">
@@ -271,14 +272,10 @@ export function PostReplyOptions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8 rounded-full text-muted-foreground"
-        >
+        <PostIconButton>
           <Ellipsis className="h-4 w-4" />
           <span className="sr-only">Post reply options</span>
-        </Button>
+        </PostIconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32">
         {authorized ? (

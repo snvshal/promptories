@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog"
 import { PostReplyDialog } from "./reply"
 import { useUser } from "@/hooks/use-user"
+import { cn } from "@/lib/utils"
 
 export function PostFooter({
   post,
@@ -40,11 +41,11 @@ export function PostFooter({
       <div className="grid w-4/5 grid-cols-4">
         <PostReplyDialog post={post} setPostReplies={setPostReplies} />
         <LikeButton post={post} />
-        <BookmarkButton post={post} />
         <PostViews post={post} />
+        <BookmarkButton post={post} />
       </div>
       <div className="flex-end relative flex-1">
-        <div className="absolute -right-2 flex gap-2">
+        <div className="absolute -right-2 flex">
           {post.tags.length > 0 && (
             <PostTagsDialog tags={post.tags} open={open} setOpen={setOpen} />
           )}
@@ -99,7 +100,7 @@ export function PostTagsDialog({
                   onClick={() => handleTagClick(tag)}
                   role="button"
                 >
-                  #{tag}
+                  {tag}
                 </Badge>
               ))}
             </div>
@@ -148,7 +149,7 @@ export function LikeButton({ post }: { post: TPost }) {
   return (
     <div className="flex items-center justify-start">
       <form onSubmit={handleLikeClick}>
-        <PostIconButton>
+        <PostIconButton className="hover:bg-red-500/10 hover:text-red-500">
           <Heart
             style={{ color: il(hasLiked) }}
             fill={il(hasLiked)}
@@ -265,18 +266,18 @@ export function PostViews({ post }: { post: TPost }) {
 
 export const PostIconButton = React.forwardRef<
   HTMLButtonElement,
-  {
-    children: React.ReactNode
-    onClick?: () => void
-  }
->(({ children, onClick }, ref) => {
+  React.ComponentPropsWithoutRef<"button">
+>(({ children, className, ...props }, ref) => {
   return (
     <Button
       ref={ref}
       variant="ghost"
       size="icon"
-      onClick={onClick}
-      className="h-8 w-8 rounded-full p-1 text-muted-foreground"
+      className={cn(
+        "h-8 w-8 rounded-full p-1 text-muted-foreground hover:bg-blue-500/10 hover:text-blue-500",
+        className,
+      )}
+      {...props}
     >
       {children}
     </Button>

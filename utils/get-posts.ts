@@ -5,20 +5,20 @@ import { User } from "@/models/user.model"
 import { FormValues } from "@/components/form"
 import { PostFormMedia } from "@/types/props.type"
 
-export const getPosts = async () => {
-  try {
-    await connectToDatabase()
+// export const getPosts = async () => {
+//   try {
+//     await connectToDatabase()
 
-    const posts: TPost[] = await Post.find({})
-      .populate("user")
-      .sort({ createdAt: -1 })
+//     const posts: TPost[] = await Post.find({})
+//       .populate("user")
+//       .sort({ createdAt: -1 })
 
-    return posts as TPost[]
-  } catch (error) {
-    console.error("Error fetching posts:", error)
-    return [] as TPost[]
-  }
-}
+//     return posts as TPost[]
+//   } catch (error) {
+//     console.error("Error fetching posts:", error)
+//     return [] as TPost[]
+//   }
+// }
 
 export const getPostsByUsername = async (username: string) => {
   try {

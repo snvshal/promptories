@@ -1,21 +1,22 @@
-import mongoose from "mongoose"
+import mongoose, { Mongoose } from "mongoose"
 
 export type MongooseCache = {
-  conn: typeof mongoose | null
-  promise: Promise<typeof mongoose> | null
+  conn: Mongoose | null
+  promise: Promise<Mongoose> | null
 }
 
 declare global {
-  var mongoose: MongooseCache
+  // allow global `mongoose` cache in dev mode
+  // eslint-disable-next-line no-var
+  var mongoose: MongooseCache | undefined
 }
 
 const cached: MongooseCache = global.mongoose || { conn: null, promise: null }
 
 mongoose.set("strictQuery", false)
 
-export const connectToDatabase = async (): Promise<typeof mongoose> => {
+export const connectToDatabase = async (): Promise<Mongoose> => {
   const uri = process.env.MONGODB_URI
-
   if (!uri) {
     throw new Error(
       "Please define the MONGODB_URI environment variable inside .env.local",
@@ -25,15 +26,11 @@ export const connectToDatabase = async (): Promise<typeof mongoose> => {
   if (cached.conn) return cached.conn
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(uri).then(
-      (mongoose) => mongoose,
-      (err) => {
-        console.error("MongoDB connection error:", err)
-        throw err
-      },
-    )
+    cached.promise = mongoose.connect(uri, { bufferCommands: false })
   }
 
   cached.conn = await cached.promise
+  global.mongoose = cached
+
   return cached.conn
 }

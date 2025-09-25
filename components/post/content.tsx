@@ -16,7 +16,7 @@ import { TimeAgo } from "../time-ago"
 import { TPost, TReplies, TUser } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { PostFooter } from "./footer"
+import { PostFooter, PostIconButton } from "./footer"
 import { PostOptions } from "./option"
 import { PostReplies, PostReplyDialog } from "./reply"
 import { cl, getSortedReplies, postPathname, pu } from "@/utils/ps"
@@ -191,7 +191,7 @@ export function PostHeader({ type, post }: PostContentProps) {
             </span>
           )}
         </div>
-        <div className="absolute -right-2 -top-1 flex gap-2 self-start">
+        <div className="absolute -right-2 -top-1 flex">
           <PostPromptSheet post={post} />
           <PostOptions post={post} type={type} />
         </div>
@@ -205,9 +205,9 @@ export function PostPromptSheet({ post }: { post: TPost }) {
     <Sheet>
       <ToolTipComponent content="Prompt">
         <SheetTrigger asChild>
-          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
+          <PostIconButton>
             <SquareParkingIcon className="h-4 w-4" />
-          </Button>
+          </PostIconButton>
         </SheetTrigger>
       </ToolTipComponent>
       <SheetContent className="overflow-y-auto max-sm:w-full">
@@ -342,7 +342,7 @@ export function PostMedia({
   caption: string
 }) {
   return (
-    <div className="w-full">
+    <div className="mt-3 w-full">
       {mediaType === "image" ? (
         <>
           <Image
