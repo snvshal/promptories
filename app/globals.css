@@ -134,7 +134,7 @@ html {
 }
 
 .option-button {
-  @apply w-full justify-start gap-3 px-3 max-sm:h-12 max-sm:text-lg;
+  @apply w-full justify-start gap-3 px-3 max-sm:h-12 max-sm:rounded-none max-sm:px-6 max-sm:text-lg;
 }
 
 /* nprogress custom styling */

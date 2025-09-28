@@ -15,6 +15,7 @@ import { PostsProvider } from "@/hooks/use-posts"
 import { ContextUser, UserProvider } from "@/hooks/use-user"
 import { Suspense } from "react"
 import { FullPageLoadingIndicator } from "@/components/home"
+import FeedbackDialog from "@/components/feedback-dialog"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -116,6 +117,7 @@ export default async function RootLayout({
           </ThemeProvider>
 
           <Toaster />
+          {session?.user && <FeedbackDialog />}
         </AuthSessionProvider>
       </body>
     </html>

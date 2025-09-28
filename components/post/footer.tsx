@@ -134,12 +134,12 @@ export function LikeButton({ post }: { post: TPost }) {
 
   const handleLikeClick = async () => {
     try {
-      // Server action to handle like/unlike
-      const { success } = await handleLikePost(post._id as string)
-      if (!success) return
       // Optimistically update state
       setHasLiked((prev) => !prev)
       setLikes((prev) => (hasLiked ? Math.abs(prev - 1) : prev + 1))
+      // Server action to handle like/unlike
+      const { success } = await handleLikePost(post._id as string)
+      if (!success) return
     } catch (error) {
       console.error("Failed to save post like")
     }
@@ -180,13 +180,12 @@ export function BookmarkButton({ post }: { post: TPost }) {
 
   const handleBookmarkClick = async () => {
     try {
-      // Server action to handle bookmark/unbookmark
-      const { success } = await handleBookmarkPost(post._id as string)
-      if (!success) return
-
       // Optimistically update state
       setHasBookmarked((prev) => !prev)
       setBookmarks((prev) => (hasBookmarked ? Math.abs(prev - 1) : prev + 1))
+      // Server action to handle bookmark/unbookmark
+      const { success } = await handleBookmarkPost(post._id as string)
+      if (!success) return
     } catch (error) {
       console.error("Failed to save post bookmark")
     }

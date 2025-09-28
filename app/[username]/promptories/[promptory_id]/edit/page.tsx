@@ -5,7 +5,6 @@ import { getPostById, updatePostValues } from "@/utils/get-posts"
 import { currentUser } from "@/utils/get-user"
 import { ps } from "@/utils/ps"
 import { Metadata } from "next"
-import { notFound } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Edit Promptory",
@@ -21,14 +20,14 @@ export default async function UpdatePromptory({
   const user = await currentUser()
   const post = await getPostById(params.promptory_id)
 
-  if (user?._id?.toString() !== post?.user._id?.toString()) return notFound()
-
-  if (!post) {
+  if (user?._id?.toString() !== post?.user._id?.toString() || !post) {
     return (
       <main className="main-content">
         <NavigateBackHeader page="Edit Promptory" />
-        <div className="flex-center mt-40">
-          <p className="text-xl font-semibold">Promptory not found!</p>
+        <div className="flex-center mt-40 p-4">
+          <p className="text-xl font-semibold">
+            {!post ? "Promptory not found!" : "You are not authorized here!"}
+          </p>
         </div>
       </main>
     )

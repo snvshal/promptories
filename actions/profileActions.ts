@@ -12,8 +12,10 @@ import { AIChat } from "@/models/ai-chat.model"
 import { Notification } from "@/models/notification.model"
 
 export async function isUsernameUnique(
-  username: string,
+  utusername: string,
 ): Promise<{ status: boolean; message: string }> {
+  const username = utusername.trim()
+
   if (username.length < 3 || username.length > 12) {
     return {
       status: false,
@@ -84,10 +86,10 @@ export async function updateUserData(
       user.external_link !== external_link &&
       isValidUrl(external_link as string)
     ) {
-      user.external_link = external_link
+      user.external_link = external_link?.trim()
     }
-    if (user.avatar !== avatar) user.avatar = avatar as string
-    if (user.bio !== bio) user.bio = bio
+    if (user.avatar !== avatar) user.avatar = avatar?.trim() as string
+    if (user.bio !== bio) user.bio = bio?.trim()
 
     await user.save()
 
