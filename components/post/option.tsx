@@ -24,7 +24,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { handleDeletePost } from "@/actions/postActions"
@@ -107,24 +106,20 @@ export function PostOptions({ post, type }: PostContentProps) {
   const PostOptionItems = () => (
     <div className="flex flex-col">
       {type === "posts" && (
-        <DropdownMenuItem className="p-0">
-          <Link href={postPathname(post)} className="w-full">
-            <Button variant="ghost" className="option-button">
-              <FileTextIcon className="size-5 sm:size-4" />
-              <span>View Promptory</span>
-            </Button>
-          </Link>
-        </DropdownMenuItem>
+        <Link href={postPathname(post)} className="w-full">
+          <Button variant="ghost" className="option-button">
+            <FileTextIcon className="size-5 sm:size-4" />
+            <span>View Promptory</span>
+          </Button>
+        </Link>
       )}
       {authorized && (
-        <DropdownMenuItem className="p-0">
-          <Link href={postPathname(post, "edit")} className="w-full">
-            <Button variant="ghost" className="option-button">
-              <Edit className="size-5 sm:size-4" />
-              <span>Edit</span>
-            </Button>
-          </Link>
-        </DropdownMenuItem>
+        <Link href={postPathname(post, "edit")} className="w-full">
+          <Button variant="ghost" className="option-button">
+            <Edit className="size-5 sm:size-4" />
+            <span>Edit</span>
+          </Button>
+        </Link>
       )}
       {post.model_url && (
         <AlertDialogComponent
@@ -176,13 +171,32 @@ export function PostOptions({ post, type }: PostContentProps) {
       )}
       {!authorized && (
         <>
-          <UserOptions userId={postUserId} username={pu(post).username} />
-          <DropdownMenuItem className="p-0">
-            <Button variant="ghost" className="option-button">
-              <FlagIcon className="size-5 sm:size-4" />
-              <span>Report post</span>
-            </Button>
-          </DropdownMenuItem>
+          <div className="max-sm:hidden">
+            <UserOptions
+              userId={postUserId}
+              username={pu(post).username}
+              setIsMenuOpen={setIsMenuOpen}
+            />
+          </div>
+          <div className="sm:hidden">
+            <UserOptions
+              userId={postUserId}
+              username={pu(post).username}
+              setIsMenuOpen={setIsSheetOpen}
+            />
+          </div>
+
+          <Button
+            variant="ghost"
+            className="option-button"
+            onClick={() => {
+              setIsMenuOpen(false)
+              setIsSheetOpen(false)
+            }}
+          >
+            <FlagIcon className="size-5 sm:size-4" />
+            <span>Report post</span>
+          </Button>
         </>
       )}
       {authorized && (
@@ -231,7 +245,7 @@ export function PostOptions({ post, type }: PostContentProps) {
             <span className="sr-only">Post options</span>
           </PostIconButton>
         </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-3xl sm:hidden">
+        <SheetContent side="bottom" className="rounded-t-3xl px-0 sm:hidden">
           <SheetHeader>
             <SheetTitle className="mb-4 text-xl">Post Options</SheetTitle>
             <SheetDescription></SheetDescription>
@@ -295,9 +309,11 @@ export function AlertDialogComponent({
 export function UserOptions({
   userId,
   username,
+  setIsMenuOpen,
 }: {
   userId: string
   username: string
+  setIsMenuOpen: SetAction<boolean>
 }) {
   const { posts, removePost } = usePosts()
   const {
@@ -315,6 +331,8 @@ export function UserOptions({
   const handleAddFollower = async () => {
     const { success, status } = await setUserFollowing(userId)
     if (!success) return
+
+    setIsMenuOpen(false)
 
     toast({
       variant: "default",
@@ -336,6 +354,7 @@ export function UserOptions({
     if (!success) return
 
     removePostFromState(userId)
+    setIsMenuOpen(false)
 
     toast({
       variant: "default",
@@ -347,73 +366,69 @@ export function UserOptions({
     if (!success) return
 
     removePostFromState(userId)
+    setIsMenuOpen(false)
 
     toast({
       variant: "default",
       description: `You ${status} @${username}`,
     })
   }
+
   return (
     <>
       {!authorized && (
         <>
-          <DropdownMenuItem className="p-0">
-            <Button
-              variant="ghost"
-              onClick={handleAddFollower}
-              className="option-button"
-            >
-              {isUserFollowed(userId) ? (
-                <>
-                  <UserMinusIcon className="size-5 sm:size-4" />
-                  <span>Unfollow &#64;{username}</span>
-                </>
-              ) : (
-                <>
-                  <UserPlusIcon className="size-5 sm:size-4" />
-                  <span>Follow &#64;{username}</span>
-                </>
-              )}
-            </Button>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="p-0">
-            <Button
-              variant="ghost"
-              onClick={handleMuteClick}
-              className="option-button"
-            >
-              {isUserMuted(userId) ? (
-                <>
-                  <Volume2Icon className="size-5 sm:size-4" />
-                  <span>Unmute &#64;{username}</span>
-                </>
-              ) : (
-                <>
-                  <VolumeOffIcon className="size-5 sm:size-4" />
-                  <span>Mute &#64;{username}</span>
-                </>
-              )}
-            </Button>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="p-0">
-            <Button
-              variant="ghost"
-              onClick={handleBlockClick}
-              className="option-button"
-            >
-              {isUserBlocked(userId) ? (
-                <>
-                  <Circle className="size-5 sm:size-4" />
-                  <span>Unblock &#64;{username}</span>
-                </>
-              ) : (
-                <>
-                  <BanIcon className="size-5 sm:size-4" />
-                  <span>Block &#64;{username}</span>
-                </>
-              )}
-            </Button>
-          </DropdownMenuItem>
+          <Button
+            variant="ghost"
+            onClick={handleAddFollower}
+            className="option-button"
+          >
+            {isUserFollowed(userId) ? (
+              <>
+                <UserMinusIcon className="size-5 sm:size-4" />
+                <span>Unfollow &#64;{username}</span>
+              </>
+            ) : (
+              <>
+                <UserPlusIcon className="size-5 sm:size-4" />
+                <span>Follow &#64;{username}</span>
+              </>
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleMuteClick}
+            className="option-button"
+          >
+            {isUserMuted(userId) ? (
+              <>
+                <Volume2Icon className="size-5 sm:size-4" />
+                <span>Unmute &#64;{username}</span>
+              </>
+            ) : (
+              <>
+                <VolumeOffIcon className="size-5 sm:size-4" />
+                <span>Mute &#64;{username}</span>
+              </>
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleBlockClick}
+            className="option-button"
+          >
+            {isUserBlocked(userId) ? (
+              <>
+                <Circle className="size-5 sm:size-4" />
+                <span>Unblock &#64;{username}</span>
+              </>
+            ) : (
+              <>
+                <BanIcon className="size-5 sm:size-4" />
+                <span>Block &#64;{username}</span>
+              </>
+            )}
+          </Button>
         </>
       )}
     </>

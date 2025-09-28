@@ -61,8 +61,8 @@ export async function muteUser(targetUserId: string): Promise<{
       status = "Muted"
     }
 
-    revalidatePath("/")
-    revalidatePath(`/profile/${targetUserId}`)
+    // revalidatePath("/")
+    // revalidatePath(`/profile/${targetUserId}`)
 
     return {
       success: true,
@@ -145,8 +145,8 @@ export async function blockUser(targetUserId: string): Promise<{
       status = "Blocked"
     }
 
-    revalidatePath("/")
-    revalidatePath(`/profile/${targetUserId}`)
+    // revalidatePath("/")
+    // revalidatePath(`/profile/${targetUserId}`)
 
     return {
       success: true,

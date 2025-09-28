@@ -23,8 +23,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { AvatarComponent } from "../post/content"
 import { ArrowBack } from "../ui/svg-icons"
 import { useUser } from "@/hooks/use-user"
@@ -510,25 +517,65 @@ export function ProfileUserOptions({
   userId: string
   username: string
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+
   return (
-    <DropdownMenu>
-      <ToolTipComponent content="More">
-        <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="outline">
+    <>
+      {/* Mobile View */}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetTrigger asChild>
+          <Button size="icon" variant="outline" className="sm:hidden">
             <Ellipsis className="h-4 w-4" />
             <span className="sr-only">User options</span>
           </Button>
-        </DropdownMenuTrigger>
-      </ToolTipComponent>
-      <DropdownMenuContent className="shadow-2xl shadow-slate-900">
-        <UserOptions userId={userId} username={username} />
-        <DropdownMenuItem className="p-0">
+        </SheetTrigger>
+        <SheetContent side="bottom" className="rounded-t-3xl px-0 sm:hidden">
+          <SheetHeader>
+            <SheetTitle></SheetTitle>
+            <SheetDescription></SheetDescription>
+          </SheetHeader>
+          <UserOptions
+            userId={userId}
+            username={username}
+            setIsMenuOpen={setIsSheetOpen}
+          />
           <Button variant="ghost" className="option-button">
             <FlagIcon className="size-5 sm:size-4" />
             <span>Report @{username}</span>
           </Button>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop View */}
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <ToolTipComponent content="More">
+          <DropdownMenuTrigger asChild>
+            <Button size="icon" variant="outline" className="max-sm:hidden">
+              <Ellipsis className="h-4 w-4" />
+              <span className="sr-only">User options</span>
+            </Button>
+          </DropdownMenuTrigger>
+        </ToolTipComponent>
+        <DropdownMenuContent className="max-w-64 shadow-2xl shadow-slate-900 max-sm:hidden">
+          <UserOptions
+            userId={userId}
+            username={username}
+            setIsMenuOpen={setIsMenuOpen}
+          />
+          <Button
+            variant="ghost"
+            className="option-button"
+            onClick={() => {
+              setIsMenuOpen(false)
+              setIsSheetOpen(false)
+            }}
+          >
+            <FlagIcon className="size-5 sm:size-4" />
+            <span>Report @{username}</span>
+          </Button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   )
 }

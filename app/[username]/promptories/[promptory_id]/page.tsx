@@ -33,7 +33,7 @@ export default async function PromptoriesPage({
     return (
       <main className="main-content">
         <NavigateBackHeader page="Promptory" />
-        <div className="flex-center mt-40">
+        <div className="flex-center mt-40 p-4">
           <p className="text-xl font-semibold">Promptory not found!</p>
         </div>
       </main>
