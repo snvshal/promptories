@@ -11,13 +11,6 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { updateUserData } from "@/actions/profileActions"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
   Form,
   FormControl,
   FormField,
@@ -31,6 +24,7 @@ import { CldUploadWidget, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { ACCEPTED_IMAGE_TYPES } from "../form"
 import { AvatarComponent } from "../post/content"
 import { ContextUser, useUser } from "@/hooks/use-user"
+import { SettingsContentCard } from "./settings-list"
 
 export const normalizeUrl = (url: string): string => {
   if (!/^https?:\/\//i.test(url)) {
@@ -56,19 +50,24 @@ export const isValidDomainOrUrl = (input: string): boolean => {
 }
 
 export const profileSchema = z.object({
-  name: z.string().min(2).max(50),
-  bio: z.string().max(160).optional(),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required")
+    .max(20, "Name cannot exceed 20 characters"),
+  bio: z
+    .string()
+    .trim()
+    .max(160, "Bio cannot exceed 160 characters")
+    .optional(),
   external_link: z
     .string()
     .trim()
+    .max(120, "Link cannot exceed 120 characters")
     .optional()
-    .refine(
-      (val) => {
-        if (!val) return true
-        return isValidDomainOrUrl(val)
-      },
-      { message: "Invalid URL format" },
-    )
+    .refine((val) => !val || isValidDomainOrUrl(val), {
+      message: "Invalid URL format",
+    })
     .transform((val) => (val ? normalizeUrl(val) : val)),
 })
 
@@ -139,102 +138,101 @@ export default function ProfileSettings() {
     }
   }
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile Settings</CardTitle>
-        <CardDescription>Manage your profile information</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="avatar">Avatar</Label>
-              <div className="flex items-center space-x-4">
-                <AvatarComponent
-                  user={{ avatar: avatar as string }}
-                  size="size-10"
-                  classname="size-20 cursor-auto"
-                />
-                <CldUploadWidget
-                  uploadPreset={
-                    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-                  }
-                  options={{
-                    cropping: true,
-                    croppingAspectRatio: 1, // 1:1 aspect ratio
-                    folder: "profile_pics", // Optional: specify folder in Cloudinary
-                    maxFileSize: 1_000_000, // Limit to 1MB, if needed
-                    resourceType: "image",
-                    clientAllowedFormats: ACCEPTED_IMAGE_TYPES,
-                  }}
-                  onSuccess={handleUpload}
-                >
-                  {({ open }) => (
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => open()}
-                    >
-                      Upload
-                    </Button>
-                  )}
-                </CldUploadWidget>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => setAvatar("")}
-                  disabled={!avatar}
-                >
-                  Remove
-                </Button>
-              </div>
+    <SettingsContentCard
+      title="Your Profile"
+      description="Manage your profile information."
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="avatar">Avatar</Label>
+            <div className="flex items-center space-x-4">
+              <AvatarComponent
+                user={{ avatar: avatar as string }}
+                size="size-10"
+                classname="size-20 cursor-auto"
+              />
+              <CldUploadWidget
+                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                options={{
+                  cropping: true,
+                  croppingAspectRatio: 1, // 1:1 aspect ratio
+                  folder: "profile_pics", // Optional: specify folder in Cloudinary
+                  maxFileSize: 1_000_000, // Limit to 1MB, if needed
+                  resourceType: "image",
+                  clientAllowedFormats: ACCEPTED_IMAGE_TYPES,
+                }}
+                onSuccess={handleUpload}
+              >
+                {({ open }) => (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => open()}
+                  >
+                    Upload
+                  </Button>
+                )}
+              </CldUploadWidget>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setAvatar("")}
+                disabled={!avatar}
+              >
+                Remove
+              </Button>
             </div>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your full name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="bio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bio</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Tell us about yourself" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="external_link"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Link</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter an link" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          </div>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter your full name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bio"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Bio</FormLabel>
+                <FormControl>
+                  <Textarea
+                    className="min-h-[80px]"
+                    placeholder="Tell us about yourself"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="external_link"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Link</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter an link" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <Button type="submit" disabled={loading || !form.formState.isDirty}>
-              {loading ? "Saving..." : "Save Profile"}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+          <Button type="submit" disabled={loading || !form.formState.isDirty}>
+            {loading ? "Saving..." : "Save Profile"}
+          </Button>
+        </form>
+      </Form>
+    </SettingsContentCard>
   )
 }

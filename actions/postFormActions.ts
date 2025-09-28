@@ -97,7 +97,7 @@ export async function updatePostForm(
     await post.save()
 
     revalidatePath("/home")
-    return { success: true, updatedPost: post }
+    return ps({ success: true, updatedPost: post })
   } catch (error) {
     console.error("Error saving post:", error)
     return { success: false }

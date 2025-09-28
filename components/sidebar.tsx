@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import {
   Bell,
   Search,
@@ -16,7 +16,7 @@ import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Badge } from "./ui/badge"
-import { defaultValues, postMedia, promptory_types } from "@/lib/constants"
+import { defaultValues, postMedia } from "@/lib/constants"
 import { ScrollArea } from "./ui/scroll-area"
 import React from "react"
 import { Input } from "./ui/input"
@@ -45,39 +45,12 @@ import { SetAction } from "@/types/generics.type"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useUser } from "@/hooks/use-user"
 import { usePosts } from "@/hooks/use-posts"
+import { FullPageLoadingIndicator } from "./home"
+import { truncateString } from "@/utils/ps"
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const pathname = usePathname()
-
-  const [notificationCount, setNotificationCount] = useState(0)
-  const intervalIdRef = useRef<NodeJS.Timeout | null>(null)
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const count = await getNotificationCount()
-        setNotificationCount(count)
-      } catch (error) {
-        console.error("Failed to get notification count")
-      }
-    }
-
-    fetchNotifications()
-
-    if (pathname === "/notifications" && notificationCount > 0) {
-      intervalIdRef.current = setInterval(() => {
-        setNotificationCount(0)
-      }, 4000)
-    }
-
-    return () => {
-      if (intervalIdRef.current) {
-        clearInterval(intervalIdRef.current)
-        intervalIdRef.current = null
-      }
-    }
-  }, [pathname, notificationCount])
 
   const noSidebar =
     status === "unauthenticated" ||
@@ -97,17 +70,21 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
           <nav className="relative bg-background sm:h-dvh sm:w-16 md:w-60">
             <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
               <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
-                <NavLinks notificationCount={notificationCount} />
+                <NavLinks />
               </div>
               <UserProfileLink />
             </div>
             <div className="fixed bottom-0 left-0 z-50 flex h-[var(--navbar-height)] w-full items-center justify-around border-t bg-background sm:hidden">
-              <NavLinks notificationCount={notificationCount} />
+              <NavLinks />
               <UserProfileLink />
             </div>
           </nav>
         </aside>
-        <div className="max-w-xl flex-1">{children}</div>
+        <div className="max-w-xl flex-1">
+          <Suspense fallback={<FullPageLoadingIndicator />}>
+            {children}
+          </Suspense>
+        </div>
         <section className="sticky top-0 h-dvh border-l">
           <SidePanel />
         </section>
@@ -147,13 +124,28 @@ export const navItems: NavItems[] = [
   },
   {
     name: "Settings",
-    url: "/settings/profile",
+    url: "/settings",
     icon: Settings,
   },
 ]
 
-export function NavLinks({ notificationCount }: { notificationCount: number }) {
+export function NavLinks() {
   const pathname = usePathname()
+
+  const [notificationCount, setNotificationCount] = useState(0)
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const count = await getNotificationCount()
+        setNotificationCount(count)
+      } catch (error) {
+        console.error("Failed to get notification count")
+      }
+    }
+
+    fetchNotifications()
+  }, [])
 
   return (
     <>
@@ -221,8 +213,10 @@ export function UserProfileLink() {
           </AvatarFallback>
         </Avatar>
         {/* <AvatarComponent user={user} classname="max-sm:size-8" /> */}
-        <span className="flex flex-col items-start max-md:hidden">
-          <span className="font-semibold">{user?.name}</span>
+        <span className="flex flex-col items-start gap-1 max-md:hidden">
+          <span className="font-semibold leading-4">
+            {truncateString(user?.name as string)}
+          </span>
           <span className="leading-4 text-muted-foreground">
             &#64;{user?.username}
           </span>
@@ -282,23 +276,9 @@ export function ComposePostButton({
 
 export function SidePanel() {
   const [inputValue, setInputValue] = useState("")
-  const [promptoryType, setPromptoryType] = useState("every")
-  const [trendingTags, setTrendingTags] = useState<
-    { tag: string; count: number }[]
-  >([])
 
   const router = useRouter()
   const pathname = usePathname()
-
-  useEffect(() => {
-    const fetchTags = async () => {
-      const tags = await getTrendingTags()
-      setTrendingTags(tags)
-    }
-    fetchTags()
-  }, [])
-
-  // if (pathname.startsWith("/compose") || pathname.endsWith("/edit")) return null
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -322,7 +302,7 @@ export function SidePanel() {
       )}
       {pathname === "/home" && (
         <div className="my-2 flex w-full flex-col gap-2">
-          <Select value={promptoryType} onValueChange={setPromptoryType}>
+          {/* <Select value={promptoryType} onValueChange={setPromptoryType}>
             <SelectTrigger className="rounded-lg">
               <SelectValue placeholder="Promptory Types" />
             </SelectTrigger>
@@ -336,36 +316,81 @@ export function SidePanel() {
                 ))}
               </ScrollArea>
             </SelectContent>
-          </Select>
+          </Select> */}
           <FeedTypeComponent />
         </div>
       )}
       {pathname === "/home" && (
-        <div className="flex-center flex-col">
-          <ScrollArea className="h-[17rem] w-full rounded-lg border shadow">
-            <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
-              <TrendingUp />
-              <span>Trending</span>
-            </h2>
-            {trendingTags.map((tag, index) => (
-              <Link
-                key={index}
-                href={`/search?q=${tag.tag}&category=tags`}
-                className="flex-between w-full gap-2 px-4 py-1 hover:bg-accent hover:text-accent-foreground"
-              >
-                <span className="flex-start gap-2">
-                  <span className="font-mono text-xl">#</span>
-                  <span>{tag.tag}</span>
-                </span>
-
-                <span className="text-sm text-muted-foreground">
-                  {tag.count}
-                </span>
-              </Link>
-            ))}
-          </ScrollArea>
-        </div>
+        <Suspense fallback={<TrendingTagsSkeleton />}>
+          <TrendingTags />
+        </Suspense>
       )}
+    </div>
+  )
+}
+
+export function TrendingTags() {
+  const [trendingTags, setTrendingTags] = useState<
+    { tag: string; count: number }[]
+  >([])
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      const tags = await getTrendingTags()
+      setTrendingTags(tags)
+    }
+    fetchTags()
+  }, [])
+
+  return (
+    <div className="flex-center flex-col">
+      <ScrollArea className="h-[17rem] w-full rounded-lg border shadow">
+        <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
+          <TrendingUp />
+          <span>Trending</span>
+        </h2>
+        {trendingTags.map((tag, index) => (
+          <Link
+            key={index}
+            href={`/search?q=${tag.tag}&category=tags`}
+            className="flex-between w-full gap-2 px-4 py-1 hover:bg-accent hover:text-accent-foreground"
+          >
+            <span className="flex-start gap-2">
+              <span className="font-mono text-lg">$</span>
+              <span>{tag.tag}</span>
+            </span>
+
+            <span className="text-sm text-muted-foreground">{tag.count}</span>
+          </Link>
+        ))}
+      </ScrollArea>
+    </div>
+  )
+}
+
+export function TrendingTagsSkeleton() {
+  return (
+    <div className="flex-center flex-col">
+      <ScrollArea className="h-[17rem] w-full rounded-lg border shadow">
+        <h2 className="flex-start sticky top-0 w-full gap-2 bg-background px-4 py-2 text-lg font-medium">
+          <TrendingUp />
+          <span>Trending</span>
+        </h2>
+
+        {/* Skeleton Items */}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="flex-between w-full animate-pulse gap-2 px-4 py-2"
+          >
+            <div className="flex-start gap-2">
+              <div className="h-5 w-5 rounded bg-muted" />
+              <div className="h-5 w-24 rounded bg-muted" />
+            </div>
+            <div className="h-4 w-10 rounded bg-muted" />
+          </div>
+        ))}
+      </ScrollArea>
     </div>
   )
 }

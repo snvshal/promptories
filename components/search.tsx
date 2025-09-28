@@ -1,14 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
-import { CheckCircle, Filter, Loader2, SearchIcon } from "lucide-react"
-import { NavigateBackHeader } from "./home"
+import { CheckCircle, Filter, SearchIcon } from "lucide-react"
+import { LoadingIndicator, NavigateBackHeader } from "./home"
 import { search } from "@/actions/searchQuery"
 import { TPost, TUser } from "@/types/schema.type"
 import { PostsComponent } from "./home"
@@ -104,7 +104,7 @@ export default function SearchComponent() {
                   }}
                   className="flex-1"
                 />
-                <Button type="submit" disabled={searchLoading}>
+                <Button type="submit" disabled={searchLoading || !searchQuery}>
                   <SearchIcon className="h-4 w-4" />
                   <span className="ml-2 max-sm:hidden">
                     {searchLoading ? "Searching..." : "Search"}
@@ -144,28 +144,27 @@ export default function SearchComponent() {
             </div>
             <TabsContent value="posts" className="m-0">
               {searchLoading ? (
-                <div className="flex-center mt-20 size-full">
-                  <Loader2 className="animate-spin" />
-                </div>
+                <LoadingIndicator />
               ) : (
-                <PostsComponent posts={results.posts} />
+                <Suspense fallback={<LoadingIndicator />}>
+                  <PostsComponent posts={results.posts} />
+                </Suspense>
               )}
             </TabsContent>
             <TabsContent value="users" className="m-0">
               {searchLoading ? (
-                <div className="flex-center mt-20 size-full">
-                  <Loader2 className="animate-spin" />
-                </div>
+                <LoadingIndicator />
               ) : (
                 <MatchedUsers matchedUsers={results.users} />
               )}
             </TabsContent>
           </Tabs>
         ) : (
-          <div className="flex-center w-full border-t p-4 max-md:pt-10">
+          <div className="flex-center h-40 w-full border-t p-4">
             <p>Searched results will appear here</p>
           </div>
         )}
+        <div className="h-40 w-full" />
       </main>
     </div>
   )
@@ -174,7 +173,7 @@ export default function SearchComponent() {
 function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
   if (!matchedUsers?.length) {
     return (
-      <div className="flex-center w-full p-4 max-md:pt-10">
+      <div className="flex-center h-40 w-full p-4">
         <p>No users matched</p>
       </div>
     )
@@ -288,7 +287,7 @@ function SearchFilterDialog({
                 <SelectItem value="prompt">Prompt</SelectItem>
                 <SelectItem value="response">Response</SelectItem>
                 <SelectItem value="tags">Tags</SelectItem>
-                <SelectItem value="user">User</SelectItem>
+                {/* <SelectItem value="user">User</SelectItem> */}
               </SelectContent>
             </Select>
           </div>

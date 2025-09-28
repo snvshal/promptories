@@ -3,6 +3,8 @@ import { connectToDatabase } from "./db"
 import { User } from "@/models/user.model"
 import { TUser } from "@/types/schema.type"
 import { ContextUser } from "@/hooks/use-user"
+import { ps } from "./ps"
+import { MUser } from "@/components/settings/privacy-and-safety"
 
 export const currentUser = async (): Promise<TUser | null> => {
   try {
@@ -39,7 +41,7 @@ export const getContextUser = async (): Promise<ContextUser | null> => {
       following: user.following.map((f) => f.toString()),
     }
 
-    return contextUser
+    return ps(contextUser)
   } catch (error) {
     console.error("getContextUser failed:", error)
     return null
@@ -61,12 +63,10 @@ export const getUserByUsername = async (
       {
         path: "likes",
         populate: { path: "user" },
-        options: { sort: { createdAt: -1 } },
       },
       {
         path: "saved",
         populate: { path: "user" },
-        options: { sort: { createdAt: -1 } },
       },
     ])
     // .populate("blocked")
@@ -76,6 +76,46 @@ export const getUserByUsername = async (
 
     return user as TUser
   } catch (error) {
+    return null
+  }
+}
+
+export const getMutedAndBlockedUsers = async (): Promise<{
+  muted: MUser[]
+  blocked: MUser[]
+} | null> => {
+  try {
+    await connectToDatabase()
+
+    const authUser = await currentUser()
+    if (!authUser) return null
+
+    const dbUser: TUser = await User.findById(authUser.id)
+      .populate("muted")
+      .populate("blocked")
+
+    if (!dbUser) return null
+
+    return {
+      muted: dbUser.muted
+        .filter((u): u is TUser => typeof u !== "string" && "_id" in u)
+        .map((u: TUser) => ({
+          id: u._id?.toString() as string,
+          name: u.name,
+          username: u.username,
+          avatar: u.avatar,
+        })),
+      blocked: dbUser.blocked
+        .filter((u): u is TUser => typeof u !== "string" && "_id" in u)
+        .map((u: TUser) => ({
+          id: u._id?.toString() as string,
+          name: u.name,
+          username: u.username,
+          avatar: u.avatar,
+        })),
+    }
+  } catch (error) {
+    console.error("Error fetching muted/blocked users:", error)
     return null
   }
 }

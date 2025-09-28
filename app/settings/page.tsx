@@ -1,5 +1,12 @@
-import { redirect } from "next/navigation"
+import {
+  SettingsContentCard,
+  SettingsList,
+} from "@/components/settings/settings-list"
 
-export default async function SettingsPage() {
-  return redirect("/settings/profile")
+export default function SettingsPage() {
+  return (
+    <SettingsContentCard title="Settings" className="p-0">
+      <SettingsList />
+    </SettingsContentCard>
+  )
 }

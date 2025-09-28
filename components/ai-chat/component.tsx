@@ -32,6 +32,7 @@ export default function AIChatsComponent({ aiChats }: { aiChats: AIChatPT[] }) {
         {aiChats.map((aiChat, index) => (
           <AIChatComponent key={index} aiChat={aiChat} />
         ))}
+        <div className="h-20 w-full" />
       </main>
     </div>
   )

@@ -1,3 +1,4 @@
+import { NavigateBackHeader } from "@/components/home"
 import SinglePostPage from "@/components/post/content"
 import { TPost, TUser } from "@/types/schema.type"
 import { getPostById } from "@/utils/get-posts"
@@ -30,9 +31,10 @@ export default async function PromptoriesPage({
 
   if (!post) {
     return (
-      <main className="main-content flex size-full">
-        <div className="flex-center mt-40 w-full">
-          <p>Post not found!</p>
+      <main className="main-content">
+        <NavigateBackHeader page="Promptory" />
+        <div className="flex-center mt-40">
+          <p className="text-xl font-semibold">Promptory not found!</p>
         </div>
       </main>
     )

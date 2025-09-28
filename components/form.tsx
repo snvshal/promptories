@@ -19,7 +19,7 @@ import { promptory_types } from "@/lib/constants"
 import { savePostForm, updatePostForm } from "@/actions/postFormActions"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
-import { postPathname } from "@/utils/ps"
+import { formatPromptType, postPathname } from "@/utils/ps"
 import { PostFormProps } from "@/types/props.type"
 import { ToastAction } from "./ui/toast"
 import { TPost } from "@/types/schema.type"
@@ -243,6 +243,7 @@ export default function PostForm({
               <ToastAction
                 onClick={() => postRoute(post)}
                 altText="View your created post"
+                className="underline"
               >
                 View
               </ToastAction>
@@ -288,6 +289,7 @@ export default function PostForm({
               <ToastAction
                 onClick={() => postRoute(post)}
                 altText="View your updated post"
+                className="underline"
               >
                 View
               </ToastAction>
@@ -341,18 +343,14 @@ export default function PostForm({
                   >
                     <SelectTrigger
                       id="promptory_type"
-                      className="capitalize text-muted-foreground"
+                      className="text-muted-foreground"
                     >
                       <SelectValue placeholder="Select a promptory type" />
                     </SelectTrigger>
                     <SelectContent className="max-h-60">
                       {promptory_types.map((type) => (
-                        <SelectItem
-                          key={type}
-                          value={type}
-                          className="capitalize"
-                        >
-                          {type}
+                        <SelectItem key={type} value={type}>
+                          {formatPromptType(type)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -375,6 +373,7 @@ export default function PostForm({
                   <Textarea
                     id="prompt"
                     placeholder="Enter prompt text"
+                    className="min-h-[100px] text-sm"
                     value={field.value}
                     onChange={(e) => {
                       field.onChange(e)
@@ -458,7 +457,7 @@ export default function PostForm({
                         <Textarea
                           id="response"
                           placeholder="Enter response in Markdown"
-                          className="min-h-[200px] text-sm"
+                          className="min-h-[100px] text-sm"
                           value={value || ""}
                           onChange={(e) => {
                             onChange(e.target.value)
@@ -581,10 +580,10 @@ export default function PostForm({
                   />
                 </div> */}
 
-                <div>
+                <div className="z-20">
                   <LabelWithToolTip
                     htmlFor="model_url"
-                    label="Platform"
+                    label="Website URL"
                     content="Enter the full URL of the website where you did this."
                   />
                   <Controller
@@ -608,8 +607,8 @@ export default function PostForm({
                 <div>
                   <LabelWithToolTip
                     htmlFor="chat_link"
-                    label="Public Chat Link"
-                    content="Enter public chat link of this promptory"
+                    label="Public Chat URL"
+                    content="Enter public chat URL of this promptory"
                   />
                   <Controller
                     name="chat_link"
@@ -617,7 +616,7 @@ export default function PostForm({
                     render={({ field }) => (
                       <Input
                         id="chat_link"
-                        placeholder="Enter public chat link"
+                        placeholder="Enter public chat URL"
                         {...field}
                       />
                     )}

@@ -27,7 +27,7 @@ export const getPosts = async (
         .sort({ createdAt: -1 })
         .skip(offset)
         .limit(limit)
-      return posts
+      return ps(posts)
     }
 
     // Get user's blocked and muted user IDs
@@ -52,7 +52,7 @@ export const getPosts = async (
       ) || []
 
     // Fetch posts with enhanced data for scoring
-    const posts = await Post.aggregate([
+    const posts: TPost[] = await Post.aggregate([
       // Exclude blocked and muted users
       {
         $match: {
@@ -202,7 +202,7 @@ export const getPosts = async (
       },
     ])
 
-    return posts
+    return ps(posts)
   } catch (error) {
     console.error("Error fetching personalized posts:", error)
 
@@ -212,15 +212,15 @@ export const getPosts = async (
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
-    return fallbackPosts
+    return ps(fallbackPosts)
   }
 }
 
 // Enhanced following posts with similar personalization
-export async function getFollowingPosts(
+export const getFollowingPosts = async (
   limit: number = 10,
   offset: number = 0,
-) {
+): Promise<TPost[]> => {
   try {
     await connectToDatabase()
     const user = await currentUser()
@@ -247,7 +247,7 @@ export async function getFollowingPosts(
         .skip(offset)
         .limit(limit)
         .populate("user")
-      return userPosts as TPost[]
+      return ps(userPosts as TPost[])
     }
 
     // Filter following list to exclude blocked/muted users
@@ -302,16 +302,16 @@ export async function getFollowingPosts(
       },
     ])
 
-    return posts as TPost[]
+    return ps(posts as TPost[])
   } catch (error) {
     console.error("Error fetching posts from following:", error)
     return [] as TPost[]
   }
 }
 
-export async function fetchFeedPosts(
+export const fetchFeedPosts = async (
   limit: number = 10,
-): Promise<FeedPostsType> {
+): Promise<FeedPostsType> => {
   const cookieStore = await cookies()
   const feedType = cookieStore.get("feed_type")
   const forYou = await getPosts(limit)

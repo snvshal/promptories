@@ -1,5 +1,6 @@
 import PostForm from "@/components/form"
 import { defaultValues, postMedia } from "@/lib/constants"
+import { ps } from "@/utils/ps"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -24,9 +25,9 @@ export const metadata: Metadata = {
 export default function CreatePromptory() {
   return (
     <PostForm
-      defaultFormValues={defaultValues}
+      defaultFormValues={ps(defaultValues)}
       operationType="POST"
-      media={postMedia}
+      media={ps(postMedia)}
     />
   )
 }

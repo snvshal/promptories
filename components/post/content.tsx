@@ -41,7 +41,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
 
   return (
     <div className="w-full">
-      <NavigateBackHeader page="Post" />
+      <NavigateBackHeader page="Promptory" />
       <main className="main-content">
         <PostType post={post} type="post" setPostReplies={setPostReplies} />
         <PostReplies
@@ -54,7 +54,7 @@ export default function SinglePostPage({ post }: { post: TPost }) {
         <Button
           size="icon"
           name="Reply Promptory"
-          className="compose-button hover:bg-blue-600"
+          className="compose-button hover:bg-orange-700"
           aria-label="Reply Promptory"
         >
           <MessageCircle className="h-6 w-6 text-white" />
@@ -174,7 +174,9 @@ export type PostContentProps = { type: "post" | "posts"; post: TPost }
 export function PostHeader({ type, post }: PostContentProps) {
   return (
     <CardHeader onClick={(e) => e.stopPropagation()} className="p-0">
-      <div className={`${type === "post" && "mb-4"} flex-between relative`}>
+      <div
+        className={`${type === "post" ? "mb-4" : "h-5"} flex-between relative`}
+      >
         <div className="flex-start flex-1">
           {type === "post" && (
             <div className="mr-2">
@@ -205,7 +207,7 @@ export function PostPromptSheet({ post }: { post: TPost }) {
     <Sheet>
       <ToolTipComponent content="Prompt">
         <SheetTrigger asChild>
-          <PostIconButton>
+          <PostIconButton className="hover:bg-orange-500/10 hover:text-orange-500">
             <SquareParkingIcon className="h-4 w-4" />
           </PostIconButton>
         </SheetTrigger>
@@ -252,9 +254,11 @@ export function PostAuthorName({
       // <ProfileHoverCard profileUser={pu(post)}>
       <Link
         href={cl(pu(post).username)}
-        className="flex cursor-pointer flex-col gap-0"
+        className="flex cursor-pointer flex-col gap-1"
       >
-        <p className="font-semibold hover:underline">{pu(post).name}</p>
+        <p className="font-semibold leading-4 hover:underline">
+          {pu(post).name}
+        </p>
         <p className="leading-4 text-muted-foreground">
           &#64;{pu(post).username}
         </p>

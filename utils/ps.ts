@@ -56,3 +56,15 @@ export const isValidUrl = (url: string): boolean => {
     return false
   }
 }
+
+export const formatPromptType = (type: string) => {
+  return type
+    .split("-to-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-to-")
+}
+
+export const truncateString = (text: string, maxLength = 12) => {
+  if (!text) return ""
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
+}
