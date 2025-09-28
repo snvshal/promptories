@@ -15,7 +15,8 @@ export default async function PromptoryMediaPage({
   const { promptory_id, prompt_response } = params
   const post = await getPostById(promptory_id)
 
-  if (!post) return <div className="flex-center h-screen">Photo not found</div>
+  if (!post)
+    return <div className="flex-center h-screen">Promptory not found!</div>
 
   const mediaUrl = post[prompt_response]?.media?.url
   const mediaType = post[prompt_response]?.media?.type

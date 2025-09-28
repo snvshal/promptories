@@ -28,7 +28,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.7rem;
     --navbar-height: 4rem;
   }
   .dark {
@@ -126,11 +126,15 @@ html {
 }
 
 .compose-button {
-  @apply fixed bottom-20 right-10 h-12 w-12 rounded-full bg-blue-500 p-2 hover:bg-blue-600 sm:bottom-10 sm:hidden;
+  @apply fixed bottom-20 right-10 h-12 w-12 rounded-full bg-orange-600 p-2 hover:bg-orange-700 sm:bottom-10 sm:hidden;
 }
 
 .nav-button {
   @apply h-10 w-10 gap-4 rounded-lg py-2 sm:px-2 md:flex md:w-full md:items-center md:justify-start md:px-3;
+}
+
+.option-button {
+  @apply w-full justify-start gap-3 px-3 max-sm:h-12 max-sm:text-lg;
 }
 
 /* nprogress custom styling */

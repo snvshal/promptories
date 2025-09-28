@@ -12,7 +12,7 @@ import {
 } from "@/actions/postActions"
 import { TPost, TReplies } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
-import { handlePostShare, ib, il, objId, st } from "@/utils/ps"
+import { handlePostShare, ib, il, st } from "@/utils/ps"
 import { SetAction } from "@/types/generics.type"
 import { ScrollArea } from "../ui/scroll-area"
 import {
@@ -37,8 +37,11 @@ export function PostFooter({
   const [open, setOpen] = useState(false)
 
   return (
-    <CardFooter onClick={(e) => e.stopPropagation()} className="h-8 p-0 pt-3">
-      <div className="grid w-4/5 grid-cols-4">
+    <CardFooter
+      onClick={(e) => e.stopPropagation()}
+      className="relative h-8 p-0 pt-3"
+    >
+      <div className="absolute -left-2 grid w-4/5 grid-cols-4">
         <PostReplyDialog post={post} setPostReplies={setPostReplies} />
         <LikeButton post={post} />
         <PostViews post={post} />
@@ -116,15 +119,12 @@ export function PostTagsDialog({
 }
 
 export function LikeButton({ post }: { post: TPost }) {
-  // const { data: session } = useSession()
-  // const user = session?.user
-
   const { user } = useUser()
 
   const initialLikes = post.likes.length
 
   const [likes, setLikes] = useState(initialLikes)
-  const [hasLiked, setHasLiked] = useState<boolean>(false)
+  const [hasLiked, setHasLiked] = useState(false)
 
   const processedLikes = useMemo(() => st(post.likes), [post.likes])
 
@@ -132,15 +132,14 @@ export function LikeButton({ post }: { post: TPost }) {
     if (user?.id) setHasLiked(processedLikes.includes(user.id))
   }, [user?.id, processedLikes])
 
-  const handleLikeClick = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleLikeClick = async () => {
     try {
-      // Optimistically update state
-      setHasLiked(!hasLiked)
-      setLikes(hasLiked ? Math.abs(likes - 1) : likes + 1)
-
       // Server action to handle like/unlike
-      await handleLikePost(post._id as string)
+      const { success } = await handleLikePost(post._id as string)
+      if (!success) return
+      // Optimistically update state
+      setHasLiked((prev) => !prev)
+      setLikes((prev) => (hasLiked ? Math.abs(prev - 1) : prev + 1))
     } catch (error) {
       console.error("Failed to save post like")
     }
@@ -148,33 +147,30 @@ export function LikeButton({ post }: { post: TPost }) {
 
   return (
     <div className="flex items-center justify-start">
-      <form onSubmit={handleLikeClick}>
-        <PostIconButton className="hover:bg-red-500/10 hover:text-red-500">
-          <Heart
-            style={{ color: il(hasLiked) }}
-            fill={il(hasLiked)}
-            className="size-4"
-          />
+      <PostIconButton
+        onClick={handleLikeClick}
+        className="hover:bg-red-500/10 hover:text-red-500"
+      >
+        <Heart
+          style={{ color: il(hasLiked) }}
+          fill={il(hasLiked)}
+          className="size-4"
+        />
 
-          <span className="sr-only">Like Post</span>
-        </PostIconButton>
-      </form>
+        <span className="sr-only">Like Post</span>
+      </PostIconButton>
       <span className="text-xs text-muted-foreground">{likes || null}</span>
     </div>
   )
 }
 
 export function BookmarkButton({ post }: { post: TPost }) {
-  // const { data: session } = useSession()
-  // const user = session?.user
-
   const { user } = useUser()
 
   const initialBookmarks = post.bookmarks.length
-  const hasBookmarkedInitial = post.bookmarks.includes(objId(user?.id))
 
   const [bookmarks, setBookmarks] = useState(initialBookmarks)
-  const [hasBookmarked, setHasBookmarked] = useState(hasBookmarkedInitial)
+  const [hasBookmarked, setHasBookmarked] = useState(false)
 
   const processedBookmarks = useMemo(() => st(post.bookmarks), [post.bookmarks])
 
@@ -182,15 +178,15 @@ export function BookmarkButton({ post }: { post: TPost }) {
     if (user?.id) setHasBookmarked(processedBookmarks.includes(user.id))
   }, [user?.id, processedBookmarks])
 
-  const handleBookmarkClick = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleBookmarkClick = async () => {
     try {
-      // Optimistically update state
-      setHasBookmarked(!hasBookmarked)
-      setBookmarks(hasBookmarked ? Math.abs(bookmarks - 1) : bookmarks + 1)
-
       // Server action to handle bookmark/unbookmark
-      await handleBookmarkPost(post._id as string)
+      const { success } = await handleBookmarkPost(post._id as string)
+      if (!success) return
+
+      // Optimistically update state
+      setHasBookmarked((prev) => !prev)
+      setBookmarks((prev) => (hasBookmarked ? Math.abs(prev - 1) : prev + 1))
     } catch (error) {
       console.error("Failed to save post bookmark")
     }
@@ -198,25 +194,20 @@ export function BookmarkButton({ post }: { post: TPost }) {
 
   return (
     <div className="flex items-center justify-start">
-      <form onSubmit={handleBookmarkClick}>
-        <PostIconButton>
-          <Bookmark
-            style={{ color: ib(hasBookmarked) }}
-            fill={ib(hasBookmarked)}
-            className="size-4"
-          />
-          <span className="sr-only">Bookmark Post</span>
-        </PostIconButton>
-      </form>
+      <PostIconButton onClick={handleBookmarkClick}>
+        <Bookmark
+          style={{ color: ib(hasBookmarked) }}
+          fill={ib(hasBookmarked)}
+          className="size-4"
+        />
+        <span className="sr-only">Bookmark Post</span>
+      </PostIconButton>
       <span className="text-xs text-muted-foreground">{bookmarks || null}</span>
     </div>
   )
 }
 
 export function PostViews({ post }: { post: TPost }) {
-  // const { data: session } = useSession()
-  // const user = session?.user
-
   const { user } = useUser()
 
   const postRef = useRef<HTMLButtonElement>(null)

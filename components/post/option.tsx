@@ -1,14 +1,21 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Trash,
   Ellipsis,
-  User,
   SquareArrowOutUpRight,
   MessageSquareShare,
   Edit,
+  FileTextIcon,
+  UserPlusIcon,
+  UserMinusIcon,
+  Volume2Icon,
+  VolumeOffIcon,
+  BanIcon,
+  Circle,
+  FlagIcon,
 } from "lucide-react"
 import Link from "next/link"
 import {
@@ -17,11 +24,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { handleDeletePost } from "@/actions/postActions"
-import { cl, postPathname, pu } from "@/utils/ps"
-import { useSession } from "next-auth/react"
+import { postPathname, pu } from "@/utils/ps"
 import { toast } from "@/hooks/use-toast"
 import { PostContentProps } from "./content"
 import {
@@ -46,96 +53,41 @@ import {
 } from "@/components/ui/sheet"
 import { ToolTipComponent } from "../ui/tooltip"
 import { PostIconButton } from "./footer"
+import { usePosts } from "@/hooks/use-posts"
+import { useUser } from "@/hooks/use-user"
+import { SetAction } from "@/types/generics.type"
 
 export function PostOptions({ post, type }: PostContentProps) {
-  const { data: session } = useSession()
-  const user = session?.user
   const router = useRouter()
+  const { user } = useUser()
+  const { removePost } = usePosts()
   const [isAlertOpen, setIsAlertOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isAlertModelLink, setIsAlertModelLink] = useState(false)
+  const [isAlertChatLink, setIsAlertChatLink] = useState(false)
+
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [isPending, startTransition] = useTransition()
-  const isLoading = isDeleting || isPending
+  const [isLoading, setIsLoading] = useState(false)
+
+  const authorized = pu(post).email === user?.email
+  const postUserId = pu(post)._id?.toString() as string
 
   const handleDeletePostClick = async () => {
     try {
-      setIsDeleting(true)
+      setIsLoading(true)
       const postId = post._id?.toString()
-
       if (!postId) throw new Error("Invalid post ID")
 
-      startTransition(async () => {
-        // First delete from database
-        await handleDeletePost(postId)
+      const { success } = await handleDeletePost(postId)
+      if (!success) throw new Error("Failed to delete post")
 
-        // Handle DOM update and navigation
-        if (type === "post") {
-          router.back()
-        } else {
-          const postElement = document.querySelector(
-            `[data-key="${postId}"].mid-width-card-content`,
-          )
+      removePost(postId)
 
-          if (postElement instanceof HTMLElement) {
-            // Set initial styles for smooth animation
-            postElement.style.cssText = `
-              transition: 
-                opacity 0.4s ease-out,
-                transform 0.4s ease-out,
-                height 0.4s ease-out 0.2s,
-                margin 0.4s ease-out 0.2s,
-                padding 0.4s ease-out 0.2s;
-              transform-origin: top;
-              overflow: hidden;
-            `
+      if (type === "post") router.back()
 
-            // Start the animation sequence
-            requestAnimationFrame(() => {
-              postElement.style.opacity = "0"
-              postElement.style.transform = "translateY(-8px) scale(0.98)"
-
-              // Add event listener for the first phase completion
-              postElement.addEventListener(
-                "transitionend",
-                (e) => {
-                  // Only proceed if opacity transition ended
-                  if (e.propertyName === "opacity") {
-                    const height = postElement.offsetHeight
-                    postElement.style.height = `${height}px`
-
-                    // Force browser reflow
-                    postElement.offsetHeight
-
-                    // Collapse the element
-                    requestAnimationFrame(() => {
-                      postElement.style.height = "0"
-                      postElement.style.margin = "0"
-                      postElement.style.padding = "0"
-
-                      // Remove element after all transitions complete
-                      postElement.addEventListener(
-                        "transitionend",
-                        (e) => {
-                          if (e.propertyName === "height") {
-                            postElement.remove()
-                          }
-                        },
-                        { once: true },
-                      )
-                    })
-                  }
-                },
-                { once: true },
-              )
-            })
-          }
-
-          toast({
-            description: "Post deleted successfully",
-            variant: "default",
-          })
-        }
+      toast({
+        variant: "default",
+        description: "Post deleted successfully",
       })
     } catch (error) {
       toast({
@@ -145,101 +97,126 @@ export function PostOptions({ post, type }: PostContentProps) {
         variant: "destructive",
       })
     } finally {
-      setIsDeleting(false)
       setIsAlertOpen(false)
       setIsSheetOpen(false)
       setIsMenuOpen(false)
+      setIsLoading(false)
     }
   }
 
-  const authorized = pu(post).email === user?.email
-
   const PostOptionItems = () => (
     <div className="flex flex-col">
-      <Link href={cl(pu(post).username)} prefetch={false} className="sm:hidden">
-        <Button
-          variant="ghost"
-          className="w-full justify-start max-sm:h-12 max-sm:text-lg"
-        >
-          <User className="mr-2 size-5 sm:size-4" />
-          <span>&#64;{pu(post).username}</span>
-        </Button>
-      </Link>
+      {type === "posts" && (
+        <DropdownMenuItem className="p-0">
+          <Link href={postPathname(post)} className="w-full">
+            <Button variant="ghost" className="option-button">
+              <FileTextIcon className="size-5 sm:size-4" />
+              <span>View Promptory</span>
+            </Button>
+          </Link>
+        </DropdownMenuItem>
+      )}
+      {authorized && (
+        <DropdownMenuItem className="p-0">
+          <Link href={postPathname(post, "edit")} className="w-full">
+            <Button variant="ghost" className="option-button">
+              <Edit className="size-5 sm:size-4" />
+              <span>Edit</span>
+            </Button>
+          </Link>
+        </DropdownMenuItem>
+      )}
       {post.model_url && (
-        <Link href={post.model_url} target="_blank" prefetch={false}>
-          <Button
-            variant="ghost"
-            className="w-full justify-start max-sm:h-12 max-sm:text-lg"
-          >
-            <SquareArrowOutUpRight className="mr-2 size-5 sm:size-4" />
+        <AlertDialogComponent
+          title="Navigate to model"
+          description={`You are about to visit "${post.model_url}". Do you want to continue?`}
+          isAlertOpen={isAlertModelLink}
+          setIsAlertOpen={setIsAlertModelLink}
+          action={
+            <AlertDialogAction asChild>
+              <a
+                href={post.model_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Continue
+              </a>
+            </AlertDialogAction>
+          }
+        >
+          <Button variant="ghost" className="option-button">
+            <SquareArrowOutUpRight className="size-5 sm:size-4" />
             <span>Test it</span>
           </Button>
-        </Link>
+        </AlertDialogComponent>
       )}
       {post.chat_link && (
-        <Link href={post.chat_link} target="_blank" prefetch={false}>
-          <Button
-            variant="ghost"
-            className="w-full justify-start max-sm:h-12 max-sm:text-lg"
-          >
-            <MessageSquareShare className="mr-2 size-5 sm:size-4" />
+        <AlertDialogComponent
+          title="Open chat"
+          description={`You are about to visit "${post.chat_link}". Do you want to continue?`}
+          isAlertOpen={isAlertChatLink}
+          setIsAlertOpen={setIsAlertChatLink}
+          action={
+            <AlertDialogAction asChild>
+              <a
+                href={post.chat_link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Continue
+              </a>
+            </AlertDialogAction>
+          }
+        >
+          <Button variant="ghost" className="option-button">
+            <MessageSquareShare className="size-5 sm:size-4" />
             <span>View chat</span>
           </Button>
-        </Link>
+        </AlertDialogComponent>
+      )}
+      {!authorized && (
+        <>
+          <UserOptions userId={postUserId} username={pu(post).username} />
+          <DropdownMenuItem className="p-0">
+            <Button variant="ghost" className="option-button">
+              <FlagIcon className="size-5 sm:size-4" />
+              <span>Report post</span>
+            </Button>
+          </DropdownMenuItem>
+        </>
       )}
       {authorized && (
-        <Link href={postPathname(post, "edit")} prefetch={false}>
+        <AlertDialogComponent
+          isAlertOpen={isAlertOpen}
+          setIsAlertOpen={setIsAlertOpen}
+          title="Confirm Deletion"
+          description="This action will permanently delete the promptory. Are you sure
+                you want to proceed? This cannot be undone."
+          action={
+            <AlertDialogAction
+              onClick={handleDeletePostClick}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 disabled:opacity-50"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <span>Deleting...</span>
+                </div>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          }
+        >
           <Button
             variant="ghost"
-            className="w-full justify-start max-sm:h-12 max-sm:text-lg"
+            className="option-button text-red-500 hover:text-red-500"
           >
-            <Edit className="mr-2 size-5 sm:size-4" />
-            <span>Edit</span>
+            <Trash className="size-5 sm:size-4" />
+            <span>Delete</span>
           </Button>
-        </Link>
-      )}
-      {authorized && (
-        <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-500 hover:text-red-500 max-sm:h-12 max-sm:text-lg"
-              onClick={(event) => {
-                event.preventDefault()
-                setIsAlertOpen(true)
-              }}
-            >
-              <Trash className="mr-2 size-5 sm:size-4" />
-              <span>Delete</span>
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action will permanently delete the promptory. Are you sure
-                you want to proceed? This cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeletePostClick}
-                disabled={isLoading}
-                className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    <span>Deleting...</span>
-                  </div>
-                ) : (
-                  "Delete"
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        </AlertDialogComponent>
       )}
     </div>
   )
@@ -273,12 +250,172 @@ export function PostOptions({ post, type }: PostContentProps) {
             </PostIconButton>
           </DropdownMenuTrigger>
         </ToolTipComponent>
-        <DropdownMenuContent className="absolute -left-36 -top-8 w-40 shadow-2xl shadow-slate-900">
-          <DropdownMenuLabel>Post Options</DropdownMenuLabel>
+        <DropdownMenuContent className="absolute -left-48 -top-8 min-w-52 shadow-2xl shadow-slate-900">
+          <DropdownMenuLabel className="px-3">Post Options</DropdownMenuLabel>
           <DropdownMenuSeparator className="h-[.1mm]" />
           <PostOptionItems />
         </DropdownMenuContent>
       </DropdownMenu>
+    </>
+  )
+}
+
+export function AlertDialogComponent({
+  children,
+  title,
+  description,
+  action,
+  isAlertOpen,
+  setIsAlertOpen,
+}: {
+  children: React.ReactNode
+  title: string
+  description: string
+  action: React.ReactNode
+  isAlertOpen: boolean
+  setIsAlertOpen: SetAction<boolean>
+}) {
+  return (
+    <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          {action}
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+export function UserOptions({
+  userId,
+  username,
+}: {
+  userId: string
+  username: string
+}) {
+  const { posts, removePost } = usePosts()
+  const {
+    user,
+    setUserFollowing,
+    setUserMuted,
+    setUserBlocked,
+    isUserMuted,
+    isUserBlocked,
+    isUserFollowed,
+  } = useUser()
+
+  const authorized = userId === user?.id
+
+  const handleAddFollower = async () => {
+    const { success, status } = await setUserFollowing(userId)
+    if (!success) return
+
+    toast({
+      variant: "default",
+      description: `You ${status === "Follow" ? "unfollowed" : "followed"} @${username}`,
+    })
+  }
+
+  const removePostFromState = (userId: string) => {
+    const userPosts = [
+      ...posts.forYou.filter((post) => pu(post)._id?.toString() === userId),
+      ...posts.following.filter((post) => pu(post)._id?.toString() === userId),
+    ].map((post) => post._id!.toString())
+
+    removePost(userPosts)
+  }
+
+  const handleMuteClick = async () => {
+    const { success, status } = await setUserMuted(userId)
+    if (!success) return
+
+    removePostFromState(userId)
+
+    toast({
+      variant: "default",
+      description: `You ${status} @${username}`,
+    })
+  }
+  const handleBlockClick = async () => {
+    const { success, status } = await setUserBlocked(userId)
+    if (!success) return
+
+    removePostFromState(userId)
+
+    toast({
+      variant: "default",
+      description: `You ${status} @${username}`,
+    })
+  }
+  return (
+    <>
+      {!authorized && (
+        <>
+          <DropdownMenuItem className="p-0">
+            <Button
+              variant="ghost"
+              onClick={handleAddFollower}
+              className="option-button"
+            >
+              {isUserFollowed(userId) ? (
+                <>
+                  <UserMinusIcon className="size-5 sm:size-4" />
+                  <span>Unfollow &#64;{username}</span>
+                </>
+              ) : (
+                <>
+                  <UserPlusIcon className="size-5 sm:size-4" />
+                  <span>Follow &#64;{username}</span>
+                </>
+              )}
+            </Button>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0">
+            <Button
+              variant="ghost"
+              onClick={handleMuteClick}
+              className="option-button"
+            >
+              {isUserMuted(userId) ? (
+                <>
+                  <Volume2Icon className="size-5 sm:size-4" />
+                  <span>Unmute &#64;{username}</span>
+                </>
+              ) : (
+                <>
+                  <VolumeOffIcon className="size-5 sm:size-4" />
+                  <span>Mute &#64;{username}</span>
+                </>
+              )}
+            </Button>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0">
+            <Button
+              variant="ghost"
+              onClick={handleBlockClick}
+              className="option-button"
+            >
+              {isUserBlocked(userId) ? (
+                <>
+                  <Circle className="size-5 sm:size-4" />
+                  <span>Unblock &#64;{username}</span>
+                </>
+              ) : (
+                <>
+                  <BanIcon className="size-5 sm:size-4" />
+                  <span>Block &#64;{username}</span>
+                </>
+              )}
+            </Button>
+          </DropdownMenuItem>
+        </>
+      )}
     </>
   )
 }

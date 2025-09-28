@@ -14,10 +14,10 @@ import { Notification } from "@/models/notification.model"
 export async function isUsernameUnique(
   username: string,
 ): Promise<{ status: boolean; message: string }> {
-  if (username.length <= 2) {
+  if (username.length < 3 || username.length > 12) {
     return {
       status: false,
-      message: "Username must be more than two characters.",
+      message: "Username must be 3-12 characters long.",
     }
   }
 
@@ -72,7 +72,14 @@ export async function updateUserData(
 
     const { name, external_link, avatar, bio } = updatedData
 
-    if (user.name !== name) user.name = name
+    if (
+      user.name !== name &&
+      name.trim().length >= 1 &&
+      name.trim().length <= 20
+    ) {
+      user.name = name.trim()
+    }
+
     if (
       user.external_link !== external_link &&
       isValidUrl(external_link as string)
@@ -217,8 +224,7 @@ export async function deleteAccount() {
 
     revalidatePath("/")
     return { success: true, message: "Account deleted successfully." }
-  } catch (error: any) {
-    console.error("Error deleting account:", error.message)
-    return { success: false, message: error.message }
+  } catch (error) {
+    return { success: false, message: "Failed to delete your account." }
   }
 }

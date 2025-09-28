@@ -4,15 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DynamicHeader, PostsComponent } from "../home"
+import { DynamicHeader, LoadingIndicator, PostsComponent } from "../home"
 import { TPost, TUser } from "@/types/schema.type"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { Link2Icon, User } from "lucide-react"
+import { Ellipsis, FlagIcon, Link2Icon, User } from "lucide-react"
 import { NavigateBackHeader } from "../home"
-import { addFollower } from "@/actions/addFollower"
-import React, { useEffect, useState } from "react"
+import React, { Suspense, useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
-import { cl } from "@/utils/ps"
+import { cl, pu, truncateString } from "@/utils/ps"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
 import {
@@ -20,11 +19,20 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
 import { AvatarComponent } from "../post/content"
 import { ArrowBack } from "../ui/svg-icons"
 import { useUser } from "@/hooks/use-user"
-import { Types } from "mongoose"
 import { tabs } from "@/lib/constants"
+import { toast } from "@/hooks/use-toast"
+import { usePosts } from "@/hooks/use-posts"
+import { UserOptions } from "../post/option"
+import { ToolTipComponent } from "../ui/tooltip"
 
 export type Tab = "posts" | "likes" | "saved"
 
@@ -36,7 +44,12 @@ export default function UserProfileComponent({
   const router = useRouter()
   const { data: session } = useSession()
 
+  const { posts, removePost } = usePosts()
+  const { isUserBlocked, setUserBlocked } = useUser()
+  const [isLoading, setIsLoading] = useState(false)
+
   const isAdmin = profileUser?.email === session?.user?.email
+  const profileUserId = profileUser._id?.toString() as string
 
   const searchParams = useSearchParams()
   const query = searchParams.get("tab")
@@ -52,6 +65,29 @@ export default function UserProfileComponent({
   const toggleTab = (stdTab: string) => {
     setTab(stdTab as Tab)
     router.push(`?tab=${stdTab}`, { scroll: false })
+  }
+
+  const handleUnblockClick = async () => {
+    setIsLoading(true)
+    const { success, status } = await setUserBlocked(profileUserId)
+    if (!success) return
+
+    const userPosts = [
+      ...posts.forYou.filter(
+        (post) => pu(post)._id?.toString() === profileUserId,
+      ),
+      ...posts.following.filter(
+        (post) => pu(post)._id?.toString() === profileUserId,
+      ),
+    ].map((post) => post._id!.toString())
+
+    removePost(userPosts)
+
+    toast({
+      description: `You ${status} @${profileUser.username}`,
+      variant: "default",
+    })
+    setIsLoading(false)
   }
   return (
     <div className="w-full">
@@ -73,41 +109,60 @@ export default function UserProfileComponent({
       </DynamicHeader>
 
       <main className="main-content">
-        <ProfileUserContent profileUser={profileUser as TUser} />
+        <ProfileUserContent
+          isLoading={isLoading}
+          profileUser={profileUser as TUser}
+          handleUnblockClick={handleUnblockClick}
+        />
 
-        <Tabs defaultValue={tab} onValueChange={toggleTab} className="w-full">
-          <TabsList
-            className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} mt-4 h-12 rounded-none border-b bg-background p-0`}
-          >
-            <TabsTriggerButton tab={tab} tabValue="posts">
-              Posts
-            </TabsTriggerButton>
+        {isUserBlocked(profileUserId) ? (
+          <BlockedUserWarning
+            isLoading={isLoading}
+            username={profileUser.username}
+            onViewPosts={handleUnblockClick}
+          />
+        ) : (
+          <Tabs defaultValue={tab} onValueChange={toggleTab} className="w-full">
+            <TabsList
+              className={`grid w-full ${isAdmin ? "grid-cols-3" : "grid-cols-1"} mt-4 h-12 rounded-none border-b bg-background p-0`}
+            >
+              <TabsTriggerButton tab={tab} tabValue="posts">
+                Posts
+              </TabsTriggerButton>
+              {isAdmin && (
+                <>
+                  <TabsTriggerButton tab={tab} tabValue="likes">
+                    Likes
+                  </TabsTriggerButton>
+                  <TabsTriggerButton tab={tab} tabValue="saved">
+                    Saved
+                  </TabsTriggerButton>
+                </>
+              )}
+            </TabsList>
+
+            <TabsContent value="posts" className="m-0">
+              <Suspense fallback={<LoadingIndicator />}>
+                <PostsComponent posts={profileUser?.posts as TPost[]} />
+              </Suspense>
+            </TabsContent>
             {isAdmin && (
               <>
-                <TabsTriggerButton tab={tab} tabValue="likes">
-                  Likes
-                </TabsTriggerButton>
-                <TabsTriggerButton tab={tab} tabValue="saved">
-                  Saved
-                </TabsTriggerButton>
+                <TabsContent value="likes" className="m-0">
+                  <Suspense fallback={<LoadingIndicator />}>
+                    <PostsComponent posts={profileUser?.likes as TPost[]} />
+                  </Suspense>
+                </TabsContent>
+                <TabsContent value="saved" className="m-0">
+                  <Suspense fallback={<LoadingIndicator />}>
+                    <PostsComponent posts={profileUser?.saved as TPost[]} />
+                  </Suspense>
+                </TabsContent>
               </>
             )}
-          </TabsList>
-
-          <TabsContent value="posts" className="m-0">
-            <PostsComponent posts={profileUser?.posts as TPost[]} />
-          </TabsContent>
-          {isAdmin && (
-            <>
-              <TabsContent value="likes" className="m-0">
-                <PostsComponent posts={profileUser?.likes as TPost[]} />
-              </TabsContent>
-              <TabsContent value="saved" className="m-0">
-                <PostsComponent posts={profileUser?.saved as TPost[]} />
-              </TabsContent>
-            </>
-          )}
-        </Tabs>
+          </Tabs>
+        )}
+        <div className="h-40 w-full" />
       </main>
     </div>
   )
@@ -136,19 +191,40 @@ export function TabsTriggerButton({
   )
 }
 
-export function ProfileUserContent({ profileUser }: { profileUser: TUser }) {
+export function ProfileUserContent({
+  isLoading,
+  profileUser,
+  handleUnblockClick,
+}: {
+  isLoading: boolean
+  profileUser: TUser
+  handleUnblockClick: () => void
+}) {
   const [followersCount, setFollowersCount] = useState(
     profileUser.followers.length ?? 0,
   )
+
+  const { isUserBlocked } = useUser()
+  const profileUserId = profileUser._id?.toString() as string
 
   return (
     <Card className="mb-0 w-full rounded-none border-0 shadow-none">
       <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
         <div className="flex w-full justify-end space-x-4">
-          <ProfileOptionButton
-            profileUser={profileUser}
-            setFollowersCount={setFollowersCount}
-          />
+          {isUserBlocked(profileUserId) ? (
+            <Button
+              variant="destructive"
+              onClick={handleUnblockClick}
+              disabled={isLoading}
+            >
+              Unblock
+            </Button>
+          ) : (
+            <ProfileOptionButton
+              profileUser={profileUser}
+              setFollowersCount={setFollowersCount}
+            />
+          )}
         </div>
         <div className="sm:flex-start flex max-sm:flex-col">
           <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 sm:size-40 md:mr-4">
@@ -162,24 +238,32 @@ export function ProfileUserContent({ profileUser }: { profileUser: TUser }) {
             <p className="text-muted-foreground">
               &#64;{profileUser?.username}
             </p>
-            <p className="mt-2">{profileUser?.bio}</p>
-            <div className="mt-4">
-              {profileUser.external_link && (
-                <Link
-                  target="_blank"
-                  prefetch={false}
-                  href={profileUser.external_link as string}
-                  className="flex items-center gap-2"
-                >
-                  <Link2Icon className="h-5 w-5 -rotate-45 text-muted-foreground" />
-                  <span className="text-blue-500 hover:underline">
-                    {profileUser.external_link
-                      ?.replace(/^https?:\/\//, "")
-                      .replace(/^www\./, "")}
-                  </span>
-                </Link>
-              )}
-            </div>
+            {isUserBlocked(profileUserId) || (
+              <>
+                <p className="mt-2">{profileUser?.bio}</p>
+                <div className="mt-4">
+                  {profileUser.external_link && (
+                    <Link
+                      target="_blank"
+                      prefetch={false}
+                      href={profileUser.external_link as string}
+                      className="flex items-center gap-2"
+                    >
+                      <Link2Icon className="h-5 w-5 -rotate-45 text-muted-foreground" />
+                      <span className="flex-1 text-blue-500 hover:underline">
+                        {truncateString(
+                          profileUser.external_link
+                            ?.replace(/^https?:\/\//, "")
+                            .replace(/^www\./, ""),
+                          32,
+                        )}
+                      </span>
+                    </Link>
+                  )}
+                </div>
+              </>
+            )}
+
             <div className="mt-4 flex gap-4">
               <div className="flex gap-1">
                 <p className="font-semibold">{profileUser?.following.length}</p>
@@ -252,10 +336,16 @@ export function ProfileOptionButton({
     )
   } else {
     return (
-      <FollowButton
-        profileUser={profileUser}
-        setFollowersCount={setFollowersCount}
-      />
+      <div className="flex items-center gap-4">
+        <ProfileUserOptions
+          userId={profileUser._id?.toString() as string}
+          username={profileUser.username}
+        />
+        <FollowButton
+          profileUser={profileUser}
+          setFollowersCount={setFollowersCount}
+        />
+      </div>
     )
   }
 }
@@ -267,46 +357,30 @@ export function FollowButton({
   profileUser: TUser
   setFollowersCount?: SetAction<number>
 }) {
-  const { user, setUser } = useUser()
+  const { user, setUserFollowing, isUserFollowed } = useUser()
   const [hover, setHover] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  const profileUserId = profileUser._id?.toString() as string
   const isAdmin = profileUser.email === user?.email
   const [follow, setFollow] = useState<"Follow" | "Following">("Follow")
 
   useEffect(() => {
-    const isFollowing = user?.following.includes(
-      (profileUser._id as Types.ObjectId).toString(),
-    )
-      ? "Following"
-      : "Follow"
+    const isFollowing = isUserFollowed(profileUserId) ? "Following" : "Follow"
     setFollow(isFollowing)
-  }, [profileUser.followers, user?.following, user?.id, profileUser._id])
+  }, [isUserFollowed, profileUserId])
 
   const handleAddFollower = async () => {
     try {
       setLoading(true)
-      const { success, status } = await addFollower(profileUser._id as string)
+      const { success, status } = await setUserFollowing(profileUserId)
       if (success && status) {
         setFollow(status)
-        setUser((prev) =>
-          prev
-            ? {
-                ...prev,
-                following:
-                  status === "Following"
-                    ? [...prev.following, profileUser._id?.toString() as string]
-                    : prev.following.filter(
-                        (id) => id !== profileUser._id?.toString(),
-                      ),
-              }
-            : prev,
+
+        setFollowersCount?.((prev: number) =>
+          Math.abs(status === "Following" ? prev + 1 : prev - 1),
         )
       }
-
-      setFollowersCount?.((prev: number) =>
-        Math.abs(status === "Following" ? prev + 1 : prev - 1),
-      )
     } catch (error) {
       console.error("Error updating follower state:", error)
     } finally {
@@ -397,5 +471,64 @@ export function ProfileHoverCard({
         </div>
       </HoverCardContent>
     </HoverCard>
+  )
+}
+
+export function BlockedUserWarning({
+  username,
+  isLoading,
+  onViewPosts,
+}: {
+  username: string
+  isLoading: boolean
+  onViewPosts?: () => void
+}) {
+  return (
+    <div className="flex min-h-screen items-center justify-center border-t p-4">
+      <div className="w-full max-w-md space-y-6 text-center">
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold">@{username} is blocked</h1>
+
+          <p className="text-base leading-relaxed">
+            Are you sure you want to view these posts? Viewing posts won&#39;t
+            unblock @{username}.
+          </p>
+        </div>
+
+        <Button onClick={onViewPosts} disabled={isLoading}>
+          View posts
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+export function ProfileUserOptions({
+  userId,
+  username,
+}: {
+  userId: string
+  username: string
+}) {
+  return (
+    <DropdownMenu>
+      <ToolTipComponent content="More">
+        <DropdownMenuTrigger asChild>
+          <Button size="icon" variant="outline">
+            <Ellipsis className="h-4 w-4" />
+            <span className="sr-only">User options</span>
+          </Button>
+        </DropdownMenuTrigger>
+      </ToolTipComponent>
+      <DropdownMenuContent className="shadow-2xl shadow-slate-900">
+        <UserOptions userId={userId} username={username} />
+        <DropdownMenuItem className="p-0">
+          <Button variant="ghost" className="option-button">
+            <FlagIcon className="size-5 sm:size-4" />
+            <span>Report @{username}</span>
+          </Button>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

@@ -35,7 +35,6 @@ export async function handleLikePost(
     await post.save({ validateModifiedOnly: true })
     await user.save()
 
-    revalidatePath("/home")
     return { success: true }
   } catch (error) {
     console.error("Error toggling like:", error)
@@ -70,7 +69,6 @@ export async function handleBookmarkPost(
     await post.save()
     await user.save()
 
-    revalidatePath("/home")
     return { success: true }
   } catch (error) {
     console.error("Error adding bookmarks:", error)

@@ -6,6 +6,7 @@ import {
   getFollowingPosts,
   getPosts,
 } from "@/actions/getFeedPosts"
+import { Types } from "mongoose"
 
 export type FeedPostsType = {
   feedType: "for_you" | "following"
@@ -32,6 +33,7 @@ type PostsContextType = {
       following: boolean
     }>
   >
+  removePost: (postId: string | string[]) => void
 }
 
 const PostsContext = createContext<PostsContextType | null>(null)
@@ -126,6 +128,22 @@ export function PostsProvider({
     }
   }
 
+  const removePost = (postId: string | string[]) => {
+    setPosts((prev) => {
+      const ids = Array.isArray(postId) ? postId : [postId]
+
+      return {
+        ...prev,
+        forYou: prev.forYou.filter(
+          (p) => !ids.includes((p._id as Types.ObjectId).toString()),
+        ),
+        following: prev.following.filter(
+          (p) => !ids.includes((p._id as Types.ObjectId).toString()),
+        ),
+      }
+    })
+  }
+
   return (
     <PostsContext.Provider
       value={{
@@ -139,6 +157,7 @@ export function PostsProvider({
         loadMorePosts,
         hasMore,
         setHasMore,
+        removePost,
       }}
     >
       {children}

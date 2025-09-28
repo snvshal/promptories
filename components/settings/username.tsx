@@ -5,14 +5,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -27,12 +19,13 @@ import { isUsernameUnique, updateUsername } from "@/actions/profileActions"
 import { useSession } from "next-auth/react"
 import { useState } from "react"
 import { ContextUser, useUser } from "@/hooks/use-user"
+import { SettingsContentCard } from "./settings-list"
 
 const usernameSchema = z.object({
   username: z
     .string()
-    .min(3)
-    .max(20)
+    .min(3, "Username must be at least 3 characters.")
+    .max(12, "Username must be at most 12 characters.")
     .superRefine(async (username, ctx) => {
       const result = await isUsernameUnique(username)
       if (!result.status) {
@@ -88,46 +81,43 @@ export default function UsernameSettings() {
     }
   }
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Change Username</CardTitle>
-        <CardDescription>Update your unique username</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...usernameForm}>
-          <form
-            onSubmit={usernameForm.handleSubmit(onUsernameSubmit)}
-            className="space-y-4"
+    <SettingsContentCard
+      title="Change Username"
+      description="Update your unique username."
+    >
+      <Form {...usernameForm}>
+        <form
+          onSubmit={usernameForm.handleSubmit(onUsernameSubmit)}
+          className="space-y-4"
+        >
+          <FormField
+            control={usernameForm.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>New Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter your new username" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Choose a unique username. It must be 3-12 characters long.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            type="submit"
+            disabled={
+              user?.username === usernameForm.getValues("username") ||
+              usernameForm.watch("username") === "" ||
+              loading
+            }
           >
-            <FormField
-              control={usernameForm.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>New Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your new username" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Choose a unique username. It must be 3-20 characters long.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              disabled={
-                user?.username === usernameForm.getValues("username") ||
-                usernameForm.watch("username") === "" ||
-                loading
-              }
-            >
-              {loading ? "Changing..." : "Change Username"}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+            {loading ? "Changing..." : "Change Username"}
+          </Button>
+        </form>
+      </Form>
+    </SettingsContentCard>
   )
 }

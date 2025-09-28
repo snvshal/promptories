@@ -185,7 +185,6 @@ export function PostRepliesContent({
                 <Link
                   href={cl(pu(reply).username)}
                   className="flex-start gap-1"
-                  prefetch={false}
                 >
                   <p className="font-semibold hover:underline max-sm:hidden">
                     {pu(reply).name}

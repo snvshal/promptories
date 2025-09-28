@@ -12,7 +12,9 @@ import { ps } from "@/utils/ps"
 import ProgressBar from "@/components/progress-bar"
 import { fetchFeedPosts } from "@/actions/getFeedPosts"
 import { PostsProvider } from "@/hooks/use-posts"
-import { UserProvider } from "@/hooks/use-user"
+import { ContextUser, UserProvider } from "@/hooks/use-user"
+import { Suspense } from "react"
+import { FullPageLoadingIndicator } from "@/components/home"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -88,7 +90,7 @@ export default async function RootLayout({
 }>) {
   const session: Session | null = await getServerSession()
 
-  const contextUser = await getContextUser()
+  const contextUser = (await getContextUser()) as ContextUser
   const posts = await fetchFeedPosts()
 
   return (
@@ -104,11 +106,13 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <UserProvider initialUser={JSON.parse(JSON.stringify(contextUser))}>
-              <PostsProvider initialPosts={ps(posts)}>
-                <Sidebar>{children}</Sidebar>
-              </PostsProvider>
-            </UserProvider>
+            <Suspense fallback={<FullPageLoadingIndicator />}>
+              <UserProvider initialUser={ps(contextUser)}>
+                <PostsProvider initialPosts={ps(posts)}>
+                  <Sidebar>{children}</Sidebar>
+                </PostsProvider>
+              </UserProvider>
+            </Suspense>
           </ThemeProvider>
 
           <Toaster />

@@ -47,6 +47,7 @@ export default function Notifications({
             </Tabs>
           </CardContent>
         </Card>
+        <div className="h-20 w-full" />
       </main>
     </div>
   )

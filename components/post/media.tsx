@@ -24,7 +24,7 @@ export function PromptoryMedia({
   const router = useRouter()
   return (
     <div className="flex h-dvh w-full flex-col">
-      <header className="flex-between z-20 border-b bg-background px-4 py-2">
+      <header className="flex-between z-20 border-b bg-background px-4 py-3">
         <div className="flex-start gap-2">
           <AvatarComponent user={pu(post)} />
           <Link
