@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DynamicHeader, LoadingIndicator, PostsComponent } from "../home"
+import { DynamicHeader, PostsComponent } from "../home"
 import { TPost, TUser } from "@/types/schema.type"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Ellipsis, FlagIcon, Link2Icon, User } from "lucide-react"
 import { NavigateBackHeader } from "../home"
-import React, { Suspense, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { cl, pu, truncateString } from "@/utils/ps"
 import Link from "next/link"
@@ -40,6 +40,7 @@ import { toast } from "@/hooks/use-toast"
 import { usePosts } from "@/hooks/use-posts"
 import { UserOptions } from "../post/option"
 import { ToolTipComponent } from "../ui/tooltip"
+import { useWindowWidth } from "@/hooks/use-window-width"
 
 export type Tab = "posts" | "likes" | "saved"
 
@@ -98,7 +99,6 @@ export default function UserProfileComponent({
   }
   return (
     <div className="w-full">
-      {/* <NavigateBackHeader page={profileUser.name} /> */}
       <DynamicHeader>
         <div className="flex-between w-full px-4 py-2">
           <div className="flex max-w-4xl items-center justify-start">
@@ -149,21 +149,15 @@ export default function UserProfileComponent({
             </TabsList>
 
             <TabsContent value="posts" className="m-0">
-              <Suspense fallback={<LoadingIndicator />}>
-                <PostsComponent posts={profileUser?.posts as TPost[]} />
-              </Suspense>
+              <PostsComponent posts={profileUser?.posts as TPost[]} />
             </TabsContent>
             {isAdmin && (
               <>
                 <TabsContent value="likes" className="m-0">
-                  <Suspense fallback={<LoadingIndicator />}>
-                    <PostsComponent posts={profileUser?.likes as TPost[]} />
-                  </Suspense>
+                  <PostsComponent posts={profileUser?.likes as TPost[]} />
                 </TabsContent>
                 <TabsContent value="saved" className="m-0">
-                  <Suspense fallback={<LoadingIndicator />}>
-                    <PostsComponent posts={profileUser?.saved as TPost[]} />
-                  </Suspense>
+                  <PostsComponent posts={profileUser?.saved as TPost[]} />
                 </TabsContent>
               </>
             )}
@@ -517,37 +511,13 @@ export function ProfileUserOptions({
   userId: string
   username: string
 }) {
+  const width = useWindowWidth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
 
-  return (
-    <>
-      {/* Mobile View */}
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetTrigger asChild>
-          <Button size="icon" variant="outline" className="sm:hidden">
-            <Ellipsis className="h-4 w-4" />
-            <span className="sr-only">User options</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-3xl px-0 sm:hidden">
-          <SheetHeader>
-            <SheetTitle></SheetTitle>
-            <SheetDescription></SheetDescription>
-          </SheetHeader>
-          <UserOptions
-            userId={userId}
-            username={username}
-            setIsMenuOpen={setIsSheetOpen}
-          />
-          <Button variant="ghost" className="option-button">
-            <FlagIcon className="size-5 sm:size-4" />
-            <span>Report @{username}</span>
-          </Button>
-        </SheetContent>
-      </Sheet>
+  const isDesktop = width >= 640
 
-      {/* Desktop View */}
+  if (isDesktop) {
+    return (
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <ToolTipComponent content="More">
           <DropdownMenuTrigger asChild>
@@ -566,16 +536,42 @@ export function ProfileUserOptions({
           <Button
             variant="ghost"
             className="option-button"
-            onClick={() => {
-              setIsMenuOpen(false)
-              setIsSheetOpen(false)
-            }}
+            onClick={() => setIsMenuOpen(false)}
           >
             <FlagIcon className="size-5 sm:size-4" />
             <span>Report @{username}</span>
           </Button>
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    )
+  }
+  return (
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <SheetTrigger asChild>
+        <Button size="icon" variant="outline" className="sm:hidden">
+          <Ellipsis className="h-4 w-4" />
+          <span className="sr-only">User options</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="rounded-t-3xl px-0 sm:hidden">
+        <SheetHeader>
+          <SheetTitle></SheetTitle>
+          <SheetDescription></SheetDescription>
+        </SheetHeader>
+        <UserOptions
+          userId={userId}
+          username={username}
+          setIsMenuOpen={setIsMenuOpen}
+        />
+        <Button
+          variant="ghost"
+          className="option-button"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <FlagIcon className="size-5 sm:size-4" />
+          <span>Report @{username}</span>
+        </Button>
+      </SheetContent>
+    </Sheet>
   )
 }

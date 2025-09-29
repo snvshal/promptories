@@ -139,13 +139,13 @@ html {
 
 /* nprogress custom styling */
 #nprogress .bar {
-  background: #3b82f6; /* Tailwind blue-500 */
+  background: #f6793b !important; /* Tailwind blue-500 */
   height: 3px;
 }
 #nprogress .peg {
   box-shadow:
-    0 0 10px #3b82f6,
-    0 0 5px #3b82f6;
+    0 0 10px #f6793b,
+    0 0 5px #f6793b !important;
 }
 
 .ptr-element {

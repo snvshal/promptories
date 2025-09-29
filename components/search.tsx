@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -146,9 +146,7 @@ export default function SearchComponent() {
               {searchLoading ? (
                 <LoadingIndicator />
               ) : (
-                <Suspense fallback={<LoadingIndicator />}>
-                  <PostsComponent posts={results.posts} />
-                </Suspense>
+                <PostsComponent posts={results.posts} />
               )}
             </TabsContent>
             <TabsContent value="users" className="m-0">
@@ -174,7 +172,7 @@ function MatchedUsers({ matchedUsers }: { matchedUsers: TUser[] }) {
   if (!matchedUsers?.length) {
     return (
       <div className="flex-center h-40 w-full p-4">
-        <p>No users matched</p>
+        <p className="mb-4 text-lg text-gray-500">No users matched</p>
       </div>
     )
   }

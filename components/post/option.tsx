@@ -55,17 +55,18 @@ import { PostIconButton } from "./footer"
 import { usePosts } from "@/hooks/use-posts"
 import { useUser } from "@/hooks/use-user"
 import { SetAction } from "@/types/generics.type"
+import { useWindowWidth } from "@/hooks/use-window-width"
 
 export function PostOptions({ post, type }: PostContentProps) {
   const router = useRouter()
   const { user } = useUser()
+  const width = useWindowWidth()
   const { removePost } = usePosts()
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [isAlertModelLink, setIsAlertModelLink] = useState(false)
   const [isAlertChatLink, setIsAlertChatLink] = useState(false)
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const authorized = pu(post).email === user?.email
@@ -97,7 +98,6 @@ export function PostOptions({ post, type }: PostContentProps) {
       })
     } finally {
       setIsAlertOpen(false)
-      setIsSheetOpen(false)
       setIsMenuOpen(false)
       setIsLoading(false)
     }
@@ -182,17 +182,13 @@ export function PostOptions({ post, type }: PostContentProps) {
             <UserOptions
               userId={postUserId}
               username={pu(post).username}
-              setIsMenuOpen={setIsSheetOpen}
+              setIsMenuOpen={setIsMenuOpen}
             />
           </div>
-
           <Button
             variant="ghost"
             className="option-button"
-            onClick={() => {
-              setIsMenuOpen(false)
-              setIsSheetOpen(false)
-            }}
+            onClick={() => setIsMenuOpen(false)}
           >
             <FlagIcon className="size-5 sm:size-4" />
             <span>Report post</span>
@@ -235,26 +231,10 @@ export function PostOptions({ post, type }: PostContentProps) {
     </div>
   )
 
-  return (
-    <>
-      {/* Mobile View */}
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetTrigger asChild>
-          <PostIconButton className="sm:hidden">
-            <Ellipsis className="h-4 w-4" />
-            <span className="sr-only">Post options</span>
-          </PostIconButton>
-        </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-3xl px-0 sm:hidden">
-          <SheetHeader>
-            <SheetTitle className="mb-4 text-xl">Post Options</SheetTitle>
-            <SheetDescription></SheetDescription>
-          </SheetHeader>
-          <PostOptionItems />
-        </SheetContent>
-      </Sheet>
+  const isDesktop = width >= 640
 
-      {/* Desktop View */}
+  if (isDesktop) {
+    return (
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <ToolTipComponent content="More">
           <DropdownMenuTrigger asChild>
@@ -270,7 +250,25 @@ export function PostOptions({ post, type }: PostContentProps) {
           <PostOptionItems />
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    )
+  }
+
+  return (
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <SheetTrigger asChild>
+        <PostIconButton className="sm:hidden">
+          <Ellipsis className="h-4 w-4" />
+          <span className="sr-only">Post options</span>
+        </PostIconButton>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="rounded-t-3xl px-0 sm:hidden">
+        <SheetHeader>
+          <SheetTitle className="mb-4 text-xl">Post Options</SheetTitle>
+          <SheetDescription></SheetDescription>
+        </SheetHeader>
+        <PostOptionItems />
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -329,10 +327,9 @@ export function UserOptions({
   const authorized = userId === user?.id
 
   const handleAddFollower = async () => {
+    setIsMenuOpen(false)
     const { success, status } = await setUserFollowing(userId)
     if (!success) return
-
-    setIsMenuOpen(false)
 
     toast({
       variant: "default",
@@ -350,11 +347,11 @@ export function UserOptions({
   }
 
   const handleMuteClick = async () => {
+    setIsMenuOpen(false)
     const { success, status } = await setUserMuted(userId)
     if (!success) return
 
     removePostFromState(userId)
-    setIsMenuOpen(false)
 
     toast({
       variant: "default",
@@ -362,11 +359,11 @@ export function UserOptions({
     })
   }
   const handleBlockClick = async () => {
+    setIsMenuOpen(false)
     const { success, status } = await setUserBlocked(userId)
     if (!success) return
 
     removePostFromState(userId)
-    setIsMenuOpen(false)
 
     toast({
       variant: "default",

@@ -8,13 +8,9 @@ import { getServerSession } from "next-auth"
 import { Toaster } from "@/components/ui/toaster"
 import { Sidebar } from "@/components/sidebar"
 import { getContextUser } from "@/utils/get-user"
-import { ps } from "@/utils/ps"
 import ProgressBar from "@/components/progress-bar"
-import { fetchFeedPosts } from "@/actions/getFeedPosts"
 import { PostsProvider } from "@/hooks/use-posts"
-import { ContextUser, UserProvider } from "@/hooks/use-user"
-import { Suspense } from "react"
-import { FullPageLoadingIndicator } from "@/components/home"
+import { UserProvider } from "@/hooks/use-user"
 import FeedbackDialog from "@/components/feedback-dialog"
 
 const geistSans = localFont({
@@ -91,8 +87,7 @@ export default async function RootLayout({
 }>) {
   const session: Session | null = await getServerSession()
 
-  const contextUser = (await getContextUser()) as ContextUser
-  const posts = await fetchFeedPosts()
+  const contextUser = await getContextUser()
 
   return (
     <html lang="en">
@@ -107,13 +102,11 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Suspense fallback={<FullPageLoadingIndicator />}>
-              <UserProvider initialUser={ps(contextUser)}>
-                <PostsProvider initialPosts={ps(posts)}>
-                  <Sidebar>{children}</Sidebar>
-                </PostsProvider>
-              </UserProvider>
-            </Suspense>
+            <UserProvider initialUser={contextUser}>
+              <PostsProvider>
+                <Sidebar>{children}</Sidebar>
+              </PostsProvider>
+            </UserProvider>
           </ThemeProvider>
 
           <Toaster />

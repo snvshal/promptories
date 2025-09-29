@@ -77,7 +77,9 @@ export default function ProfileSettings() {
   const { user, setUser } = useUser()
   const { data: session, update } = useSession()
   const [loading, setLoading] = useState(false)
-  const [avatar, setAvatar] = useState<string | null>(user?.avatar ?? null)
+  const [avatar, setAvatar] = useState<string>(
+    user?.avatar ?? "/avatar-placeholder.png",
+  )
 
   const handleUpload = (result: CloudinaryUploadWidgetResults) => {
     const info = result?.info as {
@@ -85,8 +87,26 @@ export default function ProfileSettings() {
       resource_type: string
       format: string
       bytes: number
+      coordinates?: {
+        custom?: number[][]
+      }
     }
-    setAvatar(info.secure_url)
+
+    // Check if crop coordinates exist
+    const cropData = info.coordinates?.custom?.[0]
+
+    if (cropData && cropData.length === 4) {
+      const [x, y, width, height] = cropData
+
+      // Build the cropped image URL
+      const urlParts = info.secure_url.split("/upload/")
+      const croppedUrl = `${urlParts[0]}/upload/c_crop,x_${Math.round(x)},y_${Math.round(y)},w_${Math.round(width)},h_${Math.round(height)}/${urlParts[1]}`
+
+      setAvatar(croppedUrl)
+    } else {
+      // Fallback to original if no crop data
+      setAvatar(info.secure_url)
+    }
   }
 
   const form = useForm<ProfileFormValues>({
@@ -156,9 +176,13 @@ export default function ProfileSettings() {
                 uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
                 options={{
                   cropping: true,
-                  croppingAspectRatio: 1, // 1:1 aspect ratio
-                  folder: "profile_pics", // Optional: specify folder in Cloudinary
-                  maxFileSize: 1_000_000, // Limit to 1MB, if needed
+                  croppingAspectRatio: 1,
+                  croppingCoordinatesMode: "custom",
+                  croppingShowDimensions: true,
+                  multiple: false,
+                  showSkipCropButton: false,
+                  folder: "profile_pics",
+                  maxFileSize: 1_000_000,
                   resourceType: "image",
                   clientAllowedFormats: ACCEPTED_IMAGE_TYPES,
                 }}
@@ -177,8 +201,8 @@ export default function ProfileSettings() {
               <Button
                 type="button"
                 variant="destructive"
-                onClick={() => setAvatar("")}
-                disabled={!avatar}
+                onClick={() => setAvatar("/avatar-placeholder.png")}
+                disabled={avatar === "/avatar-placeholder.png"}
               >
                 Remove
               </Button>
@@ -228,7 +252,12 @@ export default function ProfileSettings() {
             )}
           />
 
-          <Button type="submit" disabled={loading || !form.formState.isDirty}>
+          <Button
+            type="submit"
+            disabled={
+              loading || (!form.formState.isDirty && avatar === user?.avatar)
+            }
+          >
             {loading ? "Saving..." : "Save Profile"}
           </Button>
         </form>
