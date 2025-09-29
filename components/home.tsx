@@ -1,6 +1,6 @@
 "use client"
 
-import React, { Suspense, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Feather } from "lucide-react"
 import { TPost } from "@/types/schema.type"
@@ -14,14 +14,7 @@ import { RefreshCw, Loader2 } from "lucide-react"
 import { usePosts } from "@/hooks/use-posts"
 
 export function HomePageComponent() {
-  const {
-    posts,
-    isLoading,
-    isRefreshing,
-    refreshPosts,
-    loadMorePosts,
-    hasMore,
-  } = usePosts()
+  const { posts, isLoading, refreshPosts, loadMorePosts, hasMore } = usePosts()
 
   const [feedPosts, setFeedPosts] = useState(posts.forYou)
 
@@ -35,33 +28,33 @@ export function HomePageComponent() {
     posts.feedType === "following" ? "following" : "forYou"
   const hasMorePosts = hasMore[currentFeedType]
 
-  // const handleRefresh = async () => {
-  //   try {
-  //     await refreshPosts()
-  //   } catch (error) {
-  //     console.error("Refresh failed:", error)
-  //   }
-  // }
-
-  if (isRefreshing && feedPosts.length === 0) {
-    return <FullPageLoadingIndicator />
+  const handleRefresh = async () => {
+    try {
+      await refreshPosts()
+    } catch (error) {
+      console.error("Refresh failed:", error)
+    }
   }
+
+  if (!feedPosts.length) return <FullPageLoadingIndicator />
 
   return (
     <div className="relative w-full">
       <DynamicHeader>
         <div className="mx-auto flex h-16 items-center justify-between px-4 py-3">
           <div className="flex flex-1 items-center">
-            <Image
-              src="/rmbg-icon.png"
-              height={100}
-              width={100}
-              className="h-10 w-10 rounded-lg"
-              alt="Promptories Icon"
-            />
-            <h1 className="mx-2 bg-gradient-to-r from-orange-300 via-orange-500 to-orange-400 bg-clip-text text-2xl font-bold text-transparent">
-              Promptories
-            </h1>
+            <button onClick={handleRefresh} className="flex-center">
+              <Image
+                src="/rmbg-icon.png"
+                height={100}
+                width={100}
+                className="h-10 w-10 rounded-lg"
+                alt="Promptories Icon"
+              />
+              <h1 className="mx-2 bg-gradient-to-r from-orange-300 via-orange-500 to-orange-400 bg-clip-text text-2xl font-bold text-transparent">
+                Promptories
+              </h1>
+            </button>
           </div>
           <div className="flex items-center gap-3">
             <FeedTypeComponent trigger="button" />
@@ -70,10 +63,8 @@ export function HomePageComponent() {
       </DynamicHeader>
 
       <main className="main-content">
-        {feedPosts ? (
-          <Suspense fallback={<LoadingIndicator />}>
-            <PostsComponent posts={feedPosts} />
-          </Suspense>
+        {feedPosts.length ? (
+          <PostsComponent posts={feedPosts} />
         ) : (
           <LoadingIndicator />
         )}
@@ -211,7 +202,13 @@ export function LoadingIndicator() {
 export function FullPageLoadingIndicator() {
   return (
     <div className="flex-center h-dvh">
-      <Loader2 className="h-6 w-6 animate-spin p-8" />
+      <Image
+        src="/rmbg-icon.png"
+        height={50}
+        width={50}
+        alt="icon image"
+        className="animate-pulse"
+      />
     </div>
   )
 }

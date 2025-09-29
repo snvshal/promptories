@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Bell,
   Search,
@@ -45,7 +45,6 @@ import { SetAction } from "@/types/generics.type"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useUser } from "@/hooks/use-user"
 import { usePosts } from "@/hooks/use-posts"
-import { FullPageLoadingIndicator } from "./home"
 import { truncateString } from "@/utils/ps"
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
@@ -80,11 +79,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
             </div>
           </nav>
         </aside>
-        <div className="max-w-xl flex-1">
-          <Suspense fallback={<FullPageLoadingIndicator />}>
-            {children}
-          </Suspense>
-        </div>
+        <div className="max-w-xl flex-1">{children}</div>
         <section className="sticky top-0 h-dvh border-l">
           <SidePanel />
         </section>
@@ -320,11 +315,7 @@ export function SidePanel() {
           <FeedTypeComponent />
         </div>
       )}
-      {pathname === "/home" && (
-        <Suspense fallback={<TrendingTagsSkeleton />}>
-          <TrendingTags />
-        </Suspense>
-      )}
+      {pathname === "/home" && <TrendingTags />}
     </div>
   )
 }
@@ -341,6 +332,8 @@ export function TrendingTags() {
     }
     fetchTags()
   }, [])
+
+  if (!trendingTags.length) return <TrendingTagsSkeleton />
 
   return (
     <div className="flex-center flex-col">

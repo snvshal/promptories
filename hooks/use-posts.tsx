@@ -1,5 +1,5 @@
 "use client"
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import { TPost } from "@/types/schema.type"
 import {
   fetchFeedPosts,
@@ -38,20 +38,27 @@ type PostsContextType = {
 
 const PostsContext = createContext<PostsContextType | null>(null)
 
-export function PostsProvider({
-  children,
-  initialPosts,
-}: {
-  children: React.ReactNode
-  initialPosts: FeedPostsType
-}) {
-  const [posts, setPosts] = useState<FeedPostsType>(initialPosts)
+export function PostsProvider({ children }: { children: React.ReactNode }) {
+  const [posts, setPosts] = useState<FeedPostsType>({
+    feedType: "for_you",
+    forYou: [],
+    following: [],
+  })
   const [isLoading, setIsLoading] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(true)
   const [hasMore, setHasMore] = useState({
     forYou: true,
     following: true,
   })
+
+  useEffect(() => {
+    const getPosts = async () => {
+      const initialPosts = await fetchFeedPosts()
+      setPosts(initialPosts)
+    }
+    getPosts()
+    setIsRefreshing(false)
+  }, [])
 
   const refreshPosts = async () => {
     if (isRefreshing || isLoading) {
