@@ -63,38 +63,38 @@ export const metadata: Metadata = {
   },
   category: "AI Prompts Library",
   applicationName: "Promptories",
-  // openGraph: {
-  //   title: "Promptories — A Prompt Library for AI Enthusiasts",
-  //   description:
-  //     "Save, discover, and share powerful AI prompts and responses. Learn how to prompt smarter with Promptories.",
-  //   url: new URL(process.env.METADATA_BASE_URL as string),
-  //   siteName: "Promptories",
-  //   images: [
-  //     {
-  //       url: "/promptories.png",
-  //       width: 1600,
-  //       height: 900,
-  //       alt: "Promptories OpenGraph Image",
-  //     },
-  //   ],
-  //   type: "website",
-  // },
-  // twitter: {
-  //   title: "Promptories — A Prompt Library for AI Enthusiasts",
-  //   description:
-  //     "Unlock the full potential of AI with curated prompts and responses. Discover, learn, and share your best prompts.",
-  //   images: [
-  //     {
-  //       url: "/promptories.png",
-  //       width: 1600,
-  //       height: 900,
-  //       alt: "Promptories Twitter Image",
-  //     },
-  //   ],
-  //   card: "summary_large_image",
-  //   site: "@snvshal",
-  //   creator: "@snvshal",
-  // },
+  openGraph: {
+    title: "Promptories — A Prompt Library for AI Enthusiasts",
+    description:
+      "Save, discover, and share powerful AI prompts and responses. Learn how to prompt smarter with Promptories.",
+    url: new URL(process.env.METADATA_BASE_URL as string),
+    siteName: "Promptories",
+    images: [
+      {
+        url: `${process.env.METADATA_BASE_URL}/opengraph-image`,
+        width: 1600,
+        height: 900,
+        alt: "Promptories OpenGraph Image",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    title: "Promptories — A Prompt Library for AI Enthusiasts",
+    description:
+      "Unlock the full potential of AI with curated prompts and responses. Discover, learn, and share your best prompts.",
+    images: [
+      {
+        url: `${process.env.METADATA_BASE_URL}/opengraph-image`,
+        width: 1600,
+        height: 900,
+        alt: "Promptories Twitter Image",
+      },
+    ],
+    card: "summary_large_image",
+    site: "@snvshal",
+    creator: "@snvshal",
+  },
 }
 
 export default async function RootLayout({
