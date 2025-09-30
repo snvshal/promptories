@@ -26,8 +26,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default:
-      "Promptories — Your Ultimate Prompt Library for AI Learning and Discovery",
+    default: "Promptories — A Prompt Library for AI Enthusiasts",
     template: "%s — Promptories",
   },
   description:
@@ -58,13 +57,44 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.METADATA_BASE_URL as string),
   creator: "Promptories",
   publisher: "Promptories",
-  applicationName: "Promptories",
-  category: "AI Prompts Library",
-  twitter: {
-    card: "summary_large_image",
-    site: "@snvshal",
-    creator: "@snvshal",
+  robots: {
+    index: true,
+    follow: true,
   },
+  category: "AI Prompts Library",
+  applicationName: "Promptories",
+  // openGraph: {
+  //   title: "Promptories — A Prompt Library for AI Enthusiasts",
+  //   description:
+  //     "Save, discover, and share powerful AI prompts and responses. Learn how to prompt smarter with Promptories.",
+  //   url: new URL(process.env.METADATA_BASE_URL as string),
+  //   siteName: "Promptories",
+  //   images: [
+  //     {
+  //       url: "/promptories.png",
+  //       width: 1600,
+  //       height: 900,
+  //       alt: "Promptories OpenGraph Image",
+  //     },
+  //   ],
+  //   type: "website",
+  // },
+  // twitter: {
+  //   title: "Promptories — A Prompt Library for AI Enthusiasts",
+  //   description:
+  //     "Unlock the full potential of AI with curated prompts and responses. Discover, learn, and share your best prompts.",
+  //   images: [
+  //     {
+  //       url: "/promptories.png",
+  //       width: 1600,
+  //       height: 900,
+  //       alt: "Promptories Twitter Image",
+  //     },
+  //   ],
+  //   card: "summary_large_image",
+  //   site: "@snvshal",
+  //   creator: "@snvshal",
+  // },
 }
 
 export default async function RootLayout({
