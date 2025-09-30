@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { MoreHorizontal, Trash, Flag } from "lucide-react"
+import { MoreHorizontal, Trash, Flag, User } from "lucide-react"
 import { TimeAgo } from "../time-ago"
 import { AvatarComponent } from "../post/content"
 import { NavigateBackHeader } from "../home"
@@ -112,7 +112,7 @@ export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
               <DropdownMenuItem>
                 <Button
                   variant="ghost"
-                  className="flex-start h-auto w-full p-0"
+                  className="flex-start h-auto w-full p-0 hover:bg-inherit"
                   onClick={async () => await deleteAIChat(_id as string)}
                 >
                   <Trash className="mr-2 h-4 w-4 text-red-500 hover:text-red-500" />
@@ -122,15 +122,28 @@ export function AIChatComponent({ aiChat }: { aiChat: AIChatPT }) {
                 </Button>
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem>
-                <Button
-                  variant="ghost"
-                  className="flex-start h-auto w-full p-0"
-                >
-                  <Flag className="mr-2 h-4 w-4" />
-                  <span>Report chatlink</span>
-                </Button>
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem>
+                  <Link href={cl(user.username)} className="w-full">
+                    <Button
+                      variant="ghost"
+                      className="flex-start h-auto w-full p-0 hover:bg-inherit"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Button>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Button
+                    variant="ghost"
+                    className="flex-start h-auto w-full p-0 hover:bg-inherit"
+                  >
+                    <Flag className="mr-2 h-4 w-4" />
+                    <span>Report chat</span>
+                  </Button>
+                </DropdownMenuItem>
+              </>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

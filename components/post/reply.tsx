@@ -17,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
 import { cl, il, pu, st } from "@/utils/ps"
 import { Types } from "mongoose"
 import { SetAction } from "@/types/generics.type"
@@ -247,8 +246,6 @@ export function PostReplyOptions({
 }) {
   const { isAuthorized } = useUser()
 
-  const router = useRouter()
-
   const handleDeleteReplyClick = async () => {
     try {
       const updatedReplies = await deleteReply(postId, reply._id as string)
@@ -277,17 +274,27 @@ export function PostReplyOptions({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32">
         {authorized ? (
-          <DropdownMenuItem onClick={handleDeleteReplyClick}>
-            <Trash className="mr-2 h-4 w-4 text-red-500" />
-            <span className="text-red-500">Delete</span>
+          <DropdownMenuItem>
+            <Button
+              variant="ghost"
+              className="flex-start h-auto w-full p-0 hover:bg-inherit"
+              onClick={handleDeleteReplyClick}
+            >
+              <Trash className="mr-2 h-4 w-4 text-red-500" />
+              <span className="text-red-500">Delete</span>
+            </Button>
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem
-            onClick={() => router.push(cl(pu(reply).username))}
-            className="cursor-pointer"
-          >
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+          <DropdownMenuItem>
+            <Link href={cl(pu(reply).username)} className="w-full">
+              <Button
+                variant="ghost"
+                className="flex-start h-auto w-full p-0 hover:bg-inherit"
+              >
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </Button>
+            </Link>
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
