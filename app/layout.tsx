@@ -39,50 +39,31 @@ export const metadata: Metadata = {
     "prompt sharing",
     "AI learning",
     "prompt examples",
-    "Next.js",
-    "Tailwind CSS",
-    "shadcn-ui",
     "social features",
-    "Vercel",
     "AI discovery",
     "effective prompting",
+    "Gemini prompts",
+    "ChatGPT prompts",
+    "Claude prompts",
+    "LLaMA prompts",
+    "GPT-4 prompts",
+    "AI prompt ideas",
+    "AI writing prompts",
+    "AI chatbot prompts",
+    "prompt marketplace",
+    "creative prompts",
+    "educational AI prompts",
+    "productivity prompts",
   ],
   metadataBase: new URL(process.env.METADATA_BASE_URL as string),
-  openGraph: {
-    title: "Promptories — A Prompt Library for AI Enthusiasts",
-    description:
-      "Save, discover, and share powerful AI prompts and responses. Learn how to prompt smarter with Promptories.",
-    url: new URL(process.env.METADATA_BASE_URL as string),
-    siteName: "Promptories",
-    images: [
-      {
-        url: new URL(
-          "/opengraph-image",
-          process.env.METADATA_BASE_URL,
-        ).toString(),
-        width: 1200,
-        height: 630,
-        alt: "Promptories OpenGraph Image",
-      },
-    ],
-    type: "website",
-  },
+  creator: "Promptories",
+  publisher: "Promptories",
+  applicationName: "Promptories",
+  category: "AI Prompts Library",
   twitter: {
-    title: "Promptories — Master the Art of AI Prompting",
-    description:
-      "Unlock the full potential of AI with curated prompts and responses. Discover, learn, and share your best prompts.",
-    images: [
-      {
-        url: new URL(
-          "/opengraph-image",
-          process.env.METADATA_BASE_URL,
-        ).toString(),
-        width: 1200,
-        height: 630,
-        alt: "Promptories Twitter Image",
-      },
-    ],
     card: "summary_large_image",
+    site: "@snvshal",
+    creator: "@snvshal",
   },
 }
 
