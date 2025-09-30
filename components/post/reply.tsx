@@ -17,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
 import { cl, il, pu, st } from "@/utils/ps"
 import { Types } from "mongoose"
 import { SetAction } from "@/types/generics.type"
@@ -246,8 +245,6 @@ export function PostReplyOptions({
   setPostReplies: SetAction<TReplies[]>
 }) {
   const { isAuthorized } = useUser()
-
-  const router = useRouter()
 
   const handleDeleteReplyClick = async () => {
     try {
