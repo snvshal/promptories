@@ -46,10 +46,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useUser } from "@/hooks/use-user"
 import { usePosts } from "@/hooks/use-posts"
 import { truncateString } from "@/utils/ps"
+import { cn } from "@/lib/utils"
+import { useIsMobileDevice } from "@/hooks/use-window"
 
 export function Sidebar({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const pathname = usePathname()
+  const isMobile = useIsMobileDevice()
 
   const noSidebar =
     status === "unauthenticated" ||
@@ -65,7 +68,12 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
         id="scrollable-element"
         className="flex flex-1 justify-center overflow-y-scroll"
       >
-        <aside className="sticky top-0 z-50 h-dvh border-r">
+        <aside
+          className={cn(
+            isMobile ? "border-0" : "border-r",
+            "sticky top-0 z-50 h-dvh",
+          )}
+        >
           <nav className="relative bg-background sm:h-dvh sm:w-16 md:w-60">
             <div className="flex h-full flex-col justify-between py-4 max-sm:hidden">
               <div className="flex h-full w-full flex-col items-center justify-start gap-2 sm:px-2 md:px-5">
@@ -80,7 +88,12 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
           </nav>
         </aside>
         <div className="max-w-xl flex-1">{children}</div>
-        <section className="sticky top-0 h-dvh border-l">
+        <section
+          className={cn(
+            isMobile ? "border-0" : "border-l",
+            "sticky top-0 h-dvh",
+          )}
+        >
           <SidePanel />
         </section>
       </div>

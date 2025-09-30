@@ -10,7 +10,6 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Ellipsis, FlagIcon, Link2Icon, User } from "lucide-react"
 import { NavigateBackHeader } from "../home"
 import React, { useEffect, useState } from "react"
-import { useSession } from "next-auth/react"
 import { cl, pu, truncateString } from "@/utils/ps"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
@@ -40,7 +39,7 @@ import { toast } from "@/hooks/use-toast"
 import { usePosts } from "@/hooks/use-posts"
 import { UserOptions } from "../post/option"
 import { ToolTipComponent } from "../ui/tooltip"
-import { useWindowWidth } from "@/hooks/use-window-width"
+import { useWindowWidth } from "@/hooks/use-window"
 
 export type Tab = "posts" | "likes" | "saved"
 
@@ -50,13 +49,12 @@ export default function UserProfileComponent({
   profileUser: TUser
 }) {
   const router = useRouter()
-  const { data: session } = useSession()
 
   const { posts, removePost } = usePosts()
-  const { isUserBlocked, setUserBlocked } = useUser()
+  const { isAuthorized, isUserBlocked, setUserBlocked } = useUser()
   const [isLoading, setIsLoading] = useState(false)
 
-  const isAdmin = profileUser?.email === session?.user?.email
+  const isAdmin = isAuthorized(profileUser?.email)
   const profileUserId = profileUser._id?.toString() as string
 
   const searchParams = useSearchParams()
@@ -292,7 +290,10 @@ export function UserNotFound() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
               <Avatar className="mb-4 size-32">
-                <AvatarImage src={""} alt={"user not found!"} />
+                <AvatarImage
+                  src={"/avatar-placeholder.png"}
+                  alt={"user not found!"}
+                />
                 <AvatarFallback>
                   <User className="size-16 text-muted-foreground" />
                 </AvatarFallback>
@@ -324,10 +325,9 @@ export function ProfileOptionButton({
   profileUser: TUser
   setFollowersCount: SetAction<number>
 }) {
-  const { data: session } = useSession()
-  const user = session?.user
+  const { isAuthorized } = useUser()
 
-  const isAdmin = profileUser.email === user?.email
+  const isAdmin = isAuthorized(profileUser?.email)
 
   if (isAdmin) {
     return (
@@ -358,12 +358,12 @@ export function FollowButton({
   profileUser: TUser
   setFollowersCount?: SetAction<number>
 }) {
-  const { user, setUserFollowing, isUserFollowed } = useUser()
+  const { isAuthorized, setUserFollowing, isUserFollowed } = useUser()
   const [hover, setHover] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const profileUserId = profileUser._id?.toString() as string
-  const isAdmin = profileUser.email === user?.email
+  const isAdmin = isAuthorized(profileUser?.email)
   const [follow, setFollow] = useState<"Follow" | "Following">("Follow")
 
   useEffect(() => {

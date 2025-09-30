@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { cl, il, pu, st } from "@/utils/ps"
-import { useSession } from "next-auth/react"
 import { Types } from "mongoose"
 import { SetAction } from "@/types/generics.type"
 import { toast } from "@/hooks/use-toast"
@@ -246,7 +245,7 @@ export function PostReplyOptions({
   reply: TReplies
   setPostReplies: SetAction<TReplies[]>
 }) {
-  const { data: session } = useSession()
+  const { isAuthorized } = useUser()
 
   const router = useRouter()
 
@@ -266,7 +265,7 @@ export function PostReplyOptions({
     }
   }
 
-  const authorized = pu(reply).email === session?.user.email
+  const authorized = isAuthorized(pu(reply).email)
 
   return (
     <DropdownMenu>
