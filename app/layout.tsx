@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     siteName: "Promptories",
     images: [
       {
-        url: `${process.env.METADATA_BASE_URL}/opengraph-image`,
+        url: `${process.env.METADATA_BASE_URL}/opengraph-image.png`,
         width: 1600,
         height: 900,
         alt: "Promptories OpenGraph Image",
@@ -85,7 +85,7 @@ export const metadata: Metadata = {
       "Unlock the full potential of AI with curated prompts and responses. Discover, learn, and share your best prompts.",
     images: [
       {
-        url: `${process.env.METADATA_BASE_URL}/opengraph-image`,
+        url: `${process.env.METADATA_BASE_URL}/opengraph-image.png`,
         width: 1600,
         height: 900,
         alt: "Promptories Twitter Image",
