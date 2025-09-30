@@ -15,3 +15,16 @@ export function useWindowWidth() {
 
   return width
 }
+
+export function useIsMobileDevice() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userAgent = navigator.userAgent
+      setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(userAgent))
+    }
+  }, [])
+
+  return isMobile
+}

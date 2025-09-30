@@ -22,7 +22,7 @@ export async function generateMetadata({
       siteName: "Promptories",
       images: [
         {
-          url: userProfile?.avatar || "/user-fallback-image.webp",
+          url: userProfile?.avatar || "/avatar-placeholder.png",
           width: 800,
           height: 800,
           alt: `Profile image of @${username}`,
@@ -35,7 +35,7 @@ export async function generateMetadata({
       description: `Discover @${username}'s posts, prompts, and AI learnings on Promptories.`,
       images: [
         {
-          url: userProfile?.avatar || "/user-fallback-image.webp",
+          url: userProfile?.avatar || "/avatar-placeholder.png",
           width: 800,
           height: 800,
           alt: `Twitter profile image of @${username}`,

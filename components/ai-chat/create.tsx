@@ -28,6 +28,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 import { ScrollArea } from "../ui/scroll-area"
 import { saveAIChat } from "@/actions/aiChatActions"
+import { useIsMobileDevice } from "@/hooks/use-window"
+import { cn } from "@/lib/utils"
 
 const aiChatFormSchema = z.object({
   title: z
@@ -72,6 +74,7 @@ export type AIChatFormValue = z.infer<typeof aiChatFormSchema>
 export default function AIChatDialogForm() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const isMobile = useIsMobileDevice()
 
   const form = useForm<AIChatFormValue>({
     resolver: zodResolver(aiChatFormSchema),
@@ -109,7 +112,12 @@ export default function AIChatDialogForm() {
         <Button>Create</Button>
       </DialogTrigger>
       <DialogContent className="p-2">
-        <ScrollArea className="rounded-md p-2 pr-4 sm:h-[calc(100vh-5rem)]">
+        <ScrollArea
+          className={cn(
+            "rounded-md p-2 pr-4",
+            !isMobile && "h-[calc(100dvh-8rem)]",
+          )}
+        >
           <DialogHeader className="px-2">
             <DialogTitle>Create AI Chat Entry</DialogTitle>
             <DialogDescription>

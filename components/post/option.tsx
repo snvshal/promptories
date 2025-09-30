@@ -55,11 +55,11 @@ import { PostIconButton } from "./footer"
 import { usePosts } from "@/hooks/use-posts"
 import { useUser } from "@/hooks/use-user"
 import { SetAction } from "@/types/generics.type"
-import { useWindowWidth } from "@/hooks/use-window-width"
+import { useWindowWidth } from "@/hooks/use-window"
 
 export function PostOptions({ post, type }: PostContentProps) {
   const router = useRouter()
-  const { user } = useUser()
+  const { isAuthorized } = useUser()
   const width = useWindowWidth()
   const { removePost } = usePosts()
   const [isAlertOpen, setIsAlertOpen] = useState(false)
@@ -69,7 +69,7 @@ export function PostOptions({ post, type }: PostContentProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const authorized = pu(post).email === user?.email
+  const authorized = isAuthorized(pu(post).email)
   const postUserId = pu(post)._id?.toString() as string
 
   const handleDeletePostClick = async () => {
@@ -280,7 +280,7 @@ export function AlertDialogComponent({
   isAlertOpen,
   setIsAlertOpen,
 }: {
-  children: React.ReactNode
+  children: React.ReactElement
   title: string
   description: string
   action: React.ReactNode

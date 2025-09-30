@@ -36,6 +36,7 @@ type UserContextType = {
   isUserMuted: (userId: string) => boolean
   isUserBlocked: (userId: string) => boolean
   isUserFollowed: (userId: string) => boolean
+  isAuthorized: (email: string) => boolean
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
@@ -144,6 +145,10 @@ export function UserProvider({
   }
 
   // Helper functions to check user status
+  const isAuthorized = (email: string): boolean => {
+    return user?.email === email
+  }
+
   const isUserMuted = (userId: string): boolean => {
     return user?.muted.includes(userId) ?? false
   }
@@ -167,6 +172,7 @@ export function UserProvider({
         isUserMuted,
         isUserBlocked,
         isUserFollowed,
+        isAuthorized,
       }}
     >
       {children}
