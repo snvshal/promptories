@@ -410,6 +410,7 @@ export default function PostForm({
                   options={{
                     maxFiles: 1,
                     resourceType: "auto",
+                    folder: "prompt_media",
                     clientAllowedFormats: [
                       ...ACCEPTED_IMAGE_TYPES,
                       ...ACCEPTED_VIDEO_TYPES,
@@ -510,6 +511,7 @@ export default function PostForm({
                   options={{
                     maxFiles: 1,
                     resourceType: "auto",
+                    folder: "response_media",
                     clientAllowedFormats: [
                       ...ACCEPTED_IMAGE_TYPES,
                       ...ACCEPTED_VIDEO_TYPES,
