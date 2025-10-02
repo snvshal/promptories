@@ -35,6 +35,8 @@ export async function handleLikePost(
     await post.save({ validateModifiedOnly: true })
     await user.save()
 
+    revalidatePath(`/${user.username}?tab=likes`)
+
     return { success: true }
   } catch (error) {
     console.error("Error toggling like:", error)
@@ -69,6 +71,8 @@ export async function handleBookmarkPost(
     await post.save()
     await user.save()
 
+    revalidatePath(`/${user.username}?tab=saved`)
+
     return { success: true }
   } catch (error) {
     console.error("Error adding bookmarks:", error)
@@ -98,7 +102,9 @@ export async function handleDeletePost(
     )
     await user.save()
 
-    // revalidatePath("/home")
+    revalidatePath("/home")
+    revalidatePath(`/${user.username}`)
+
     return { success: true }
   } catch (error) {
     console.error("Error deleting post:", error)

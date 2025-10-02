@@ -69,10 +69,9 @@ export const getUserByUsername = async (
         populate: { path: "user" },
       },
     ])
-    // .populate("blocked")
-    // .populate("muted")
-    // .populate("followers")
-    // .populate("following");
+
+    user.likes = user.likes.reverse()
+    user.saved = user.saved.reverse()
 
     return user as TUser
   } catch (error) {

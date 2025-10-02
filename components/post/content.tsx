@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -212,12 +213,13 @@ export function PostPromptSheet({ post }: { post: TPost }) {
           </PostIconButton>
         </SheetTrigger>
       </ToolTipComponent>
-      <SheetContent className="overflow-y-auto max-sm:w-full">
-        <SheetHeader className="flex-row items-center justify-between space-y-0 pr-2">
+      <SheetContent className="p-0 max-sm:w-full">
+        <SheetHeader className="flex-row items-center justify-between space-y-0 p-6 pb-0">
           <SheetTitle>Prompt</SheetTitle>
+          <SheetDescription></SheetDescription>
           <CopyButton text={post.prompt.text as string} />
         </SheetHeader>
-        <div className="mt-2">
+        <div className="mt-2 max-h-[calc(100dvh-4.5rem)] overflow-y-auto p-6 pt-0">
           <div className="prose prose-sm mb-2 max-w-none dark:prose-invert">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {post.prompt.text as string}
