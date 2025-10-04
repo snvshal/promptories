@@ -658,7 +658,15 @@ export default function PostForm({
           </Accordion>
 
           <div className="flex w-full gap-2">
-            <Button type="submit" disabled={isSubmitting || !isDirty}>
+            <Button
+              type="submit"
+              disabled={
+                isSubmitting ||
+                (!isDirty &&
+                  promptMediaUrl === media.prompt.url &&
+                  responseMediaUrl === media.response.url)
+              }
+            >
               {operationType === "POST"
                 ? isSubmitting
                   ? "Submitting..."
