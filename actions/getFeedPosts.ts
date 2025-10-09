@@ -4,12 +4,12 @@ import { FeedPostsType } from "@/hooks/use-posts"
 import { Post } from "@/models/post.model"
 import { TPost } from "@/types/schema.type"
 import { connectToDatabase } from "@/utils/db"
-// import { getPosts } from "@/utils/get-posts"
 import { currentUser } from "@/utils/get-user"
 import { ps } from "@/utils/ps"
 import { cookies } from "next/headers"
 
 import { Types } from "mongoose"
+import { redis } from "@/utils/redis"
 
 // Enhanced personalized feed algorithm
 export const getPosts = async (
@@ -28,6 +28,14 @@ export const getPosts = async (
         .skip(offset)
         .limit(limit)
       return ps(posts)
+    }
+
+    const cacheKey = `posts:${user?._id}`
+
+    // Try to get data from cache first
+    const cachedData = await redis.get(cacheKey)
+    if (cachedData) {
+      return cachedData as TPost[]
     }
 
     // Get user's blocked and muted user IDs
@@ -202,6 +210,9 @@ export const getPosts = async (
       },
     ])
 
+    // Cache the data for 1 hour (3600 seconds)
+    await redis.setex(cacheKey, 3600, JSON.stringify(posts))
+
     return ps(posts)
   } catch (error) {
     console.error("Error fetching personalized posts:", error)
@@ -227,6 +238,14 @@ export const getFollowingPosts = async (
     if (!user) {
       console.error("No current user found.")
       return [] as TPost[]
+    }
+
+    const cacheKey = `posts:following:${user._id}`
+
+    // Try to get data from cache first
+    const cachedData = await redis.get(cacheKey)
+    if (cachedData) {
+      return cachedData as TPost[]
     }
 
     // Get blocked and muted users
@@ -302,7 +321,11 @@ export const getFollowingPosts = async (
       },
     ])
 
-    return ps(posts as TPost[])
+    const stringifyPosts = JSON.stringify(posts)
+    // Cache the data for 1 hour (3600 seconds)
+    await redis.setex(cacheKey, 3600, stringifyPosts)
+
+    return JSON.parse(stringifyPosts)
   } catch (error) {
     console.error("Error fetching posts from following:", error)
     return [] as TPost[]
@@ -312,14 +335,32 @@ export const getFollowingPosts = async (
 export const fetchFeedPosts = async (
   limit: number = 10,
 ): Promise<FeedPostsType> => {
+  const user = await currentUser()
+  const userId = user?._id || "anonymous"
+
+  // More specific cache key
+  const cacheKey = `feed:${userId}:${limit}`
+
+  // Try to get data from cache first
+  const cachedData = await redis.get(cacheKey)
+  if (cachedData) {
+    return cachedData as FeedPostsType
+  }
+
   const cookieStore = await cookies()
   const feedType = cookieStore.get("feed_type")
   const forYou = await getPosts(limit)
   const following = await getFollowingPosts(limit)
 
-  return ps({
+  const feedPosts = {
     feedType: (feedType?.value as "for_you" | "following") || "for_you",
     forYou: forYou || [],
     following: following || [],
-  })
+  }
+
+  const stringifyPosts = JSON.stringify(feedPosts)
+  // Cache the data for 1 hour (3600 seconds)
+  await redis.setex(cacheKey, 3600, stringifyPosts)
+
+  return JSON.parse(stringifyPosts)
 }

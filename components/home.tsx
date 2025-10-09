@@ -50,6 +50,7 @@ export function HomePageComponent() {
                 width={100}
                 className="h-10 w-10 rounded-lg"
                 alt="Promptories Icon"
+                priority
               />
               <h1 className="mx-2 bg-gradient-to-r from-orange-300 via-orange-500 to-orange-400 bg-clip-text text-2xl font-bold text-transparent">
                 Promptories
@@ -208,6 +209,7 @@ export function FullPageLoadingIndicator() {
         width={50}
         alt="icon image"
         className="animate-pulse"
+        priority
       />
     </div>
   )

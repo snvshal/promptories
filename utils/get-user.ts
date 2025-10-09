@@ -3,8 +3,10 @@ import { connectToDatabase } from "./db"
 import { User } from "@/models/user.model"
 import { TUser } from "@/types/schema.type"
 import { ContextUser } from "@/hooks/use-user"
-import { ps } from "./ps"
 import { MUser } from "@/components/settings/privacy-and-safety"
+import { Redis } from "@upstash/redis"
+
+const redis = Redis.fromEnv()
 
 export const currentUser = async (): Promise<TUser | null> => {
   try {
@@ -24,6 +26,14 @@ export const getContextUser = async (): Promise<ContextUser | null> => {
     const user = await currentUser()
     if (!user) return null
 
+    const cacheKey = `user:context:${user?.email}`
+
+    // Try to get data from cache first
+    const cachedData = await redis.get(cacheKey)
+    if (cachedData) {
+      return cachedData as ContextUser
+    }
+
     const contextUser: ContextUser = {
       id: user.id.toString(),
       username: user.username,
@@ -41,7 +51,12 @@ export const getContextUser = async (): Promise<ContextUser | null> => {
       following: user.following.map((f) => f.toString()),
     }
 
-    return ps(contextUser)
+    const processedUser = JSON.stringify(contextUser)
+
+    // Cache the data for 1 hour (3600 seconds)
+    await redis.setex(cacheKey, 3600, processedUser)
+
+    return JSON.parse(processedUser)
   } catch (error) {
     console.error("getContextUser failed:", error)
     return null
@@ -53,6 +68,14 @@ export const getUserByUsername = async (
 ): Promise<TUser | null> => {
   try {
     await connectToDatabase()
+
+    const cacheKey = `user:profile:${username}`
+
+    // Try to get data from cache first
+    const cachedData = await redis.get(cacheKey)
+    if (typeof cachedData === "string" && cachedData) {
+      return JSON.parse(cachedData) as TUser
+    }
 
     const user = await User.findOne({ username }).populate([
       {
@@ -72,6 +95,9 @@ export const getUserByUsername = async (
 
     user.likes = user.likes.reverse()
     user.saved = user.saved.reverse()
+
+    // Cache the data for 1 hour (3600 seconds)
+    await redis.setex(cacheKey, 3600, JSON.stringify(user))
 
     return user as TUser
   } catch (error) {

@@ -154,8 +154,7 @@ export function PostContentType({
           </ReactMarkdown>
         </div>
         {content.split(" ").length > 50 && (
-          <Button
-            variant="link"
+          <button
             onClick={(e) => {
               e.stopPropagation()
               setShowMore(true)
@@ -163,7 +162,7 @@ export function PostContentType({
             className="text-blue-500 hover:underline"
           >
             Show more
-          </Button>
+          </button>
         )}
       </>
     )
