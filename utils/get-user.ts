@@ -6,9 +6,7 @@ import { User } from "@/models/user.model"
 import { TUser } from "@/types/schema.type"
 import { ContextUser } from "@/hooks/use-user"
 import { MUser } from "@/components/settings/privacy-and-safety"
-import { Redis } from "@upstash/redis"
-
-const redis = Redis.fromEnv()
+// import { redis } from "./redis"
 
 export const currentUser = async (): Promise<TUser | null> => {
   try {
@@ -28,13 +26,13 @@ export const getContextUser = async (): Promise<ContextUser | null> => {
     const user = await currentUser()
     if (!user) return null
 
-    const cacheKey = `user:context:${user?.email}`
+    // const cacheKey = `user:context:${user?.email}`
 
-    // Try to get data from cache first
-    const cachedData = await redis.get(cacheKey)
-    if (cachedData) {
-      return cachedData as ContextUser
-    }
+    // // Try to get data from cache first
+    // const cachedData = await redis.get(cacheKey)
+    // if (cachedData) {
+    //   return cachedData as ContextUser
+    // }
 
     const contextUser: ContextUser = {
       id: user.id.toString(),
@@ -56,7 +54,7 @@ export const getContextUser = async (): Promise<ContextUser | null> => {
     const processedUser = JSON.stringify(contextUser)
 
     // Cache the data for 1 hour (3600 seconds)
-    await redis.setex(cacheKey, 3600, processedUser)
+    // await redis.setex(cacheKey, 3600, processedUser)
 
     return JSON.parse(processedUser)
   } catch (error) {
@@ -71,13 +69,13 @@ export const getUserByUsername = async (
   try {
     await connectToDatabase()
 
-    const cacheKey = `user:profile:${username}`
+    // const cacheKey = `user:profile:${username}`
 
-    // Try to get data from cache first
-    const cachedData = await redis.get(cacheKey)
-    if (cachedData) {
-      return cachedData as TUser
-    }
+    // // Try to get data from cache first
+    // const cachedData = await redis.get(cacheKey)
+    // if (cachedData) {
+    //   return cachedData as TUser
+    // }
 
     const user: TUser | null = await User.findOne({ username }).populate([
       {
@@ -103,7 +101,7 @@ export const getUserByUsername = async (
     const processedUser = JSON.stringify(user)
 
     // Cache the data for 1 hour (3600 seconds)
-    await redis.setex(cacheKey, 3600, processedUser)
+    // await redis.setex(cacheKey, 3600, processedUser)
 
     return JSON.parse(processedUser)
   } catch (error) {
