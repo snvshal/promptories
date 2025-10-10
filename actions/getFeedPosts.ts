@@ -9,7 +9,7 @@ import { ps } from "@/utils/ps"
 import { cookies } from "next/headers"
 
 import { Types } from "mongoose"
-import { redis } from "@/utils/redis"
+// import { redis } from "@/utils/redis"
 
 // Enhanced personalized feed algorithm
 export const getPosts = async (
@@ -30,13 +30,13 @@ export const getPosts = async (
       return ps(posts)
     }
 
-    const cacheKey = `posts:${user?._id}`
+    // const cacheKey = `posts:${user?._id}`
 
-    // Try to get data from cache first
-    const cachedData = await redis.get(cacheKey)
-    if (cachedData) {
-      return cachedData as TPost[]
-    }
+    // // Try to get data from cache first
+    // const cachedData = await redis.get(cacheKey)
+    // if (cachedData) {
+    //   return cachedData as TPost[]
+    // }
 
     // Get user's blocked and muted user IDs
     const blockedUserIds =
@@ -211,7 +211,7 @@ export const getPosts = async (
     ])
 
     // Cache the data for 1 hour (3600 seconds)
-    await redis.setex(cacheKey, 3600, JSON.stringify(posts))
+    // await redis.setex(cacheKey, 3600, JSON.stringify(posts))
 
     return ps(posts)
   } catch (error) {
@@ -240,13 +240,13 @@ export const getFollowingPosts = async (
       return [] as TPost[]
     }
 
-    const cacheKey = `posts:following:${user._id}`
+    // const cacheKey = `posts:following:${user._id}`
 
-    // Try to get data from cache first
-    const cachedData = await redis.get(cacheKey)
-    if (cachedData) {
-      return cachedData as TPost[]
-    }
+    // // Try to get data from cache first
+    // const cachedData = await redis.get(cacheKey)
+    // if (cachedData) {
+    //   return cachedData as TPost[]
+    // }
 
     // Get blocked and muted users
     const blockedUserIds =
@@ -323,7 +323,7 @@ export const getFollowingPosts = async (
 
     const stringifyPosts = JSON.stringify(posts)
     // Cache the data for 1 hour (3600 seconds)
-    await redis.setex(cacheKey, 3600, stringifyPosts)
+    // await redis.setex(cacheKey, 3600, stringifyPosts)
 
     return JSON.parse(stringifyPosts)
   } catch (error) {
@@ -335,17 +335,17 @@ export const getFollowingPosts = async (
 export const fetchFeedPosts = async (
   limit: number = 10,
 ): Promise<FeedPostsType> => {
-  const user = await currentUser()
-  const userId = user?._id || "anonymous"
+  // const user = await currentUser()
+  // const userId = user?._id || "anonymous"
 
-  // More specific cache key
-  const cacheKey = `feed:${userId}:${limit}`
+  // // More specific cache key
+  // const cacheKey = `feed:${userId}:${limit}`
 
-  // Try to get data from cache first
-  const cachedData = await redis.get(cacheKey)
-  if (cachedData) {
-    return cachedData as FeedPostsType
-  }
+  // // Try to get data from cache first
+  // const cachedData = await redis.get(cacheKey)
+  // if (cachedData) {
+  //   return cachedData as FeedPostsType
+  // }
 
   const cookieStore = await cookies()
   const feedType = cookieStore.get("feed_type")
@@ -360,7 +360,7 @@ export const fetchFeedPosts = async (
 
   const stringifyPosts = JSON.stringify(feedPosts)
   // Cache the data for 1 hour (3600 seconds)
-  await redis.setex(cacheKey, 3600, stringifyPosts)
+  // await redis.setex(cacheKey, 3600, stringifyPosts)
 
   return JSON.parse(stringifyPosts)
 }
