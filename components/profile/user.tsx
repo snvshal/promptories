@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DynamicHeader, PostsComponent } from "../home"
+import {
+  DynamicHeader,
+  FullPageLoadingIndicator,
+  PostsComponent,
+} from "../home"
 import { TPost, TUser } from "@/types/schema.type"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Ellipsis, FlagIcon, Link2Icon, User } from "lucide-react"
@@ -40,22 +44,30 @@ import { usePosts } from "@/hooks/use-posts"
 import { UserOptions } from "../post/option"
 import { ToolTipComponent } from "../ui/tooltip"
 import { useWindowWidth } from "@/hooks/use-window"
+import { getUserByUsername } from "@/utils/get-user"
 
 export type Tab = "posts" | "likes" | "saved"
 
-export default function UserProfileComponent({
-  profileUser,
-}: {
-  profileUser: TUser
-}) {
-  const router = useRouter()
+export default function UserProfileComponent() {
+  const { username } = useParams()
+  const [profileUser, setProfileUser] = useState<TUser | null>(null)
+
+  useEffect(() => {
+    const fetchProfileUser = async () => {
+      const user = await getUserByUsername(username as string)
+      setProfileUser(user)
+    }
+    fetchProfileUser()
+  }, [username])
 
   const { posts, removePost } = usePosts()
   const { isAuthorized, isUserBlocked, setUserBlocked } = useUser()
   const [isLoading, setIsLoading] = useState(false)
 
-  const isAdmin = isAuthorized(profileUser?.email)
-  const profileUserId = profileUser._id?.toString() as string
+  const isAdmin = isAuthorized(profileUser?.email as string)
+  const profileUserId = profileUser?._id?.toString() as string
+
+  const router = useRouter()
 
   const searchParams = useSearchParams()
   const query = searchParams.get("tab")
@@ -90,11 +102,14 @@ export default function UserProfileComponent({
     removePost(userPosts)
 
     toast({
-      description: `You ${status} @${profileUser.username}`,
+      description: `You ${status} @${profileUser?.username}`,
       variant: "default",
     })
     setIsLoading(false)
   }
+
+  if (!profileUser) return <FullPageLoadingIndicator />
+
   return (
     <div className="w-full">
       <DynamicHeader>
@@ -123,7 +138,7 @@ export default function UserProfileComponent({
         {isUserBlocked(profileUserId) ? (
           <BlockedUserWarning
             isLoading={isLoading}
-            username={profileUser.username}
+            username={profileUser?.username}
             onViewPosts={handleUnblockClick}
           />
         ) : (

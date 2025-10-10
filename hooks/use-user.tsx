@@ -2,7 +2,8 @@
 
 import { addFollower } from "@/actions/addFollower"
 import { muteUser, blockUser } from "@/actions/userModeration"
-import { createContext, useContext, useState } from "react"
+import { getContextUser } from "@/utils/get-user"
+import { createContext, useContext, useEffect, useState } from "react"
 
 export type ContextUser = {
   readonly id: string
@@ -41,14 +42,16 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
-export function UserProvider({
-  children,
-  initialUser,
-}: {
-  children: React.ReactNode
-  initialUser: ContextUser | null
-}) {
-  const [user, setUser] = useState<ContextUser | null>(initialUser)
+export function UserProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<ContextUser | null>(null)
+
+  useEffect(() => {
+    const fetchContextUser = async () => {
+      const contextUser = await getContextUser()
+      setUser(contextUser)
+    }
+    fetchContextUser()
+  }, [])
 
   const setUserFollowing = async (
     userId: string,
@@ -64,7 +67,9 @@ export function UserProvider({
             following:
               status === "Following"
                 ? [...prev.following, userId]
-                : prev.following.filter((id) => id !== userId),
+                : status === "Follow"
+                  ? prev.following.filter((id) => id !== userId)
+                  : prev.following,
           }
         })
         return { success: true, status }
@@ -185,32 +190,3 @@ export function useUser() {
   if (!ctx) throw new Error("useUser must be used inside UserProvider")
   return ctx
 }
-
-// Optional: Enhanced hook with additional utilities
-// export function useUserModerationActions() {
-//   const { user, setUserMuted, setUserBlocked, isUserMuted, isUserBlocked } =
-//     useUser()
-
-//   const toggleMute = async (userId: string) => {
-//     const currentlyMuted = isUserMuted(userId)
-//     const success = await setUserMuted(userId)
-//     return { success, newStatus: success ? !currentlyMuted : currentlyMuted }
-//   }
-
-//   const toggleBlock = async (userId: string) => {
-//     const currentlyBlocked = isUserBlocked(userId)
-//     const success = await setUserBlocked(userId)
-//     return {
-//       success,
-//       newStatus: success ? !currentlyBlocked : currentlyBlocked,
-//     }
-//   }
-
-//   return {
-//     user,
-//     toggleMute,
-//     toggleBlock,
-//     isUserMuted,
-//     isUserBlocked,
-//   }
-// }

@@ -1,3 +1,5 @@
+"use server"
+
 import { getServerSession } from "next-auth"
 import { connectToDatabase } from "./db"
 import { User } from "@/models/user.model"
@@ -73,11 +75,11 @@ export const getUserByUsername = async (
 
     // Try to get data from cache first
     const cachedData = await redis.get(cacheKey)
-    if (typeof cachedData === "string" && cachedData) {
-      return JSON.parse(cachedData) as TUser
+    if (cachedData) {
+      return cachedData as TUser
     }
 
-    const user = await User.findOne({ username }).populate([
+    const user: TUser | null = await User.findOne({ username }).populate([
       {
         path: "posts",
         populate: { path: "user" },
@@ -93,13 +95,17 @@ export const getUserByUsername = async (
       },
     ])
 
+    if (!user) return null
+
     user.likes = user.likes.reverse()
     user.saved = user.saved.reverse()
 
-    // Cache the data for 1 hour (3600 seconds)
-    await redis.setex(cacheKey, 3600, JSON.stringify(user))
+    const processedUser = JSON.stringify(user)
 
-    return user as TUser
+    // Cache the data for 1 hour (3600 seconds)
+    await redis.setex(cacheKey, 3600, processedUser)
+
+    return JSON.parse(processedUser)
   } catch (error) {
     return null
   }

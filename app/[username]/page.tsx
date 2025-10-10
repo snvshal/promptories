@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import { getUserByUsername } from "@/utils/get-user"
 import UserProfileComponent, { UserNotFound } from "@/components/profile/user"
-import { ps } from "@/utils/ps"
 
 export async function generateMetadata({
   params,
@@ -12,7 +11,7 @@ export async function generateMetadata({
   const userProfile = await getUserByUsername(username)
 
   return {
-    title: `${userProfile?.name} (@${username})`,
+    title: userProfile ? `${userProfile?.name} (@${username})` : "Profile",
     description:
       userProfile?.bio || `View the profile of @${username} on Promptories.`,
     openGraph: {
@@ -57,5 +56,5 @@ export default async function UserProfilePage({
 
   if (!profileUser) return <UserNotFound />
 
-  return <UserProfileComponent profileUser={ps(profileUser)} />
+  return <UserProfileComponent />
 }

@@ -191,15 +191,14 @@ export function NavLinks() {
 
 export function UserProfileLink() {
   const { user } = useUser()
-
   const pathname = usePathname()
-  // const [open, setOpen] = useState(false)
 
   const isProfileRoute = pathname === `/${user?.username}`
+
+  if (!user) return null
+
   return (
     <div className="flex flex-col gap-2 sm:px-2 md:px-5">
-      {/* <ComposePostButton open={open} setOpen={setOpen} /> */}
-
       <Link
         href={"/compose/promptory"}
         className="flex-center w-full self-center rounded-full bg-foreground p-2 text-background max-md:size-10 max-sm:hidden md:h-11 md:w-[calc(100%-1rem)] md:self-start"
@@ -220,7 +219,6 @@ export function UserProfileLink() {
             <User className="size-5 text-muted-foreground" />
           </AvatarFallback>
         </Avatar>
-        {/* <AvatarComponent user={user} classname="max-sm:size-8" /> */}
         <span className="flex flex-col items-start gap-1 max-md:hidden">
           <span className="font-semibold leading-4">
             {truncateString(user?.name as string)}
