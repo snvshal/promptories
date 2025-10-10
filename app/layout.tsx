@@ -7,7 +7,6 @@ import { Session } from "next-auth"
 import { getServerSession } from "next-auth"
 import { Toaster } from "@/components/ui/toaster"
 import { Sidebar } from "@/components/sidebar"
-import { getContextUser } from "@/utils/get-user"
 import ProgressBar from "@/components/progress-bar"
 import { PostsProvider } from "@/hooks/use-posts"
 import { UserProvider } from "@/hooks/use-user"
@@ -104,8 +103,6 @@ export default async function RootLayout({
 }>) {
   const session: Session | null = await getServerSession()
 
-  const contextUser = await getContextUser()
-
   return (
     <html lang="en">
       <body
@@ -119,7 +116,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <UserProvider initialUser={contextUser}>
+            <UserProvider>
               <PostsProvider>
                 <Sidebar>{children}</Sidebar>
               </PostsProvider>
