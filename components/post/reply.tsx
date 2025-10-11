@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,9 +8,8 @@ import { MessageCircle, Send, Heart, Trash, Ellipsis, User } from "lucide-react"
 import Link from "next/link"
 import { TimeAgo } from "../time-ago"
 import { TPost, TReplies } from "@/types/schema.type"
-import { addReplyToPost } from "@/actions/replyActions"
 import { Separator } from "../ui/separator"
-import { deleteReply, handleLikeReply } from "@/actions/replyActions"
+import { addReplyToPost, deleteReply, handleLikeReply } from "@/actions/reply"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +33,7 @@ import { PostIconButton } from "./footer"
 import { AvatarComponent } from "./content"
 import { useUser } from "@/hooks/use-user"
 
-export function PostReplies({
+export const PostReplies = memo(function PostReplies({
   post,
   postReplies,
   setPostReplies,
@@ -117,7 +116,7 @@ export function PostReplies({
       </CardContent>
     </Card>
   )
-}
+})
 
 export function PostRepliesContent({
   post,

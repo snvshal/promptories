@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { memo, useState } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -36,7 +36,11 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { ToolTipComponent } from "../ui/tooltip"
 
-export default function SinglePostPage({ post }: { post: TPost }) {
+export const SinglePostPage = memo(function SinglePostPage({
+  post,
+}: {
+  post: TPost
+}) {
   const sortedReplies = getSortedReplies(post.replies)
   const [postReplies, setPostReplies] = useState(sortedReplies)
 
@@ -63,9 +67,9 @@ export default function SinglePostPage({ post }: { post: TPost }) {
       </PostReplyDialog>
     </div>
   )
-}
+})
 
-export function PostType({
+export const PostType = memo(function PostType({
   post,
   type,
   setPostReplies,
@@ -97,7 +101,7 @@ export function PostType({
       </div>
     </Card>
   )
-}
+})
 
 export function AvatarComponent({
   user,

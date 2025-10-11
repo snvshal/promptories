@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 import { ScrollArea } from "../ui/scroll-area"
-import { saveAIChat } from "@/actions/aiChatActions"
+import { saveAIChat } from "@/actions/ai-chats"
 import { useIsMobileDevice } from "@/hooks/use-window"
 import { cn } from "@/lib/utils"
 

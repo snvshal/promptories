@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
-import { handleDeletePost } from "@/actions/postActions"
+import { handleDeletePost } from "@/actions/post"
 import { postPathname, pu } from "@/utils/ps"
 import { toast } from "@/hooks/use-toast"
 import { PostContentProps } from "./content"

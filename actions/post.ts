@@ -3,7 +3,7 @@
 import { connectToDatabase } from "@/utils/db"
 import { Post } from "@/models/post.model"
 import { currentUser } from "@/utils/get-user"
-import { likeNotification } from "./notificationActions"
+import { likeNotification } from "./notification"
 import { revalidatePath } from "next/cache"
 import { Types } from "mongoose"
 

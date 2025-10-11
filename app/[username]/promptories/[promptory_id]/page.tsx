@@ -1,5 +1,5 @@
 import { NavigateBackHeader } from "@/components/home"
-import SinglePostPage from "@/components/post/content"
+import { SinglePostPage } from "@/components/post/content"
 import { TPost, TUser } from "@/types/schema.type"
 import { getPostById } from "@/utils/get-posts"
 import { ps } from "@/utils/ps"

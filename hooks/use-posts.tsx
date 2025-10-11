@@ -5,7 +5,7 @@ import {
   fetchFeedPosts,
   getFollowingPosts,
   getPosts,
-} from "@/actions/getFeedPosts"
+} from "@/actions/feed-posts"
 import { Types } from "mongoose"
 
 export type FeedPostsType = {

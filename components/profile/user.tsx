@@ -13,7 +13,7 @@ import { TPost, TUser } from "@/types/schema.type"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Ellipsis, FlagIcon, Link2Icon, User } from "lucide-react"
 import { NavigateBackHeader } from "../home"
-import React, { useEffect, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { cl, pu, truncateString } from "@/utils/ps"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
@@ -205,7 +205,7 @@ export function TabsTriggerButton({
   )
 }
 
-export function ProfileUserContent({
+export const ProfileUserContent = memo(function ProfileUserContent({
   isLoading,
   profileUser,
   handleUnblockClick,
@@ -293,7 +293,7 @@ export function ProfileUserContent({
       </CardContent>
     </Card>
   )
-}
+})
 
 export function UserNotFound() {
   const { username } = useParams()

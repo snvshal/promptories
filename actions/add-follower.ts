@@ -4,7 +4,7 @@ import { User } from "@/models/user.model"
 import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
 import { Types } from "mongoose"
-import { followNotification } from "./notificationActions"
+import { followNotification } from "./notification"
 import { TUser } from "@/types/schema.type"
 import { ps } from "@/utils/ps"
 

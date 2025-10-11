@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import Image from "next/image"
 import { AvatarComponent } from "./content"
 import { TPost } from "@/types/schema.type"
@@ -10,7 +11,7 @@ import { cl, pu } from "@/utils/ps"
 import { MediaType } from "../form"
 import Link from "next/link"
 
-export function PromptoryMedia({
+export const PromptoryMedia = memo(function PromptoryMedia({
   post,
   mediaUrl,
   mediaType,
@@ -83,4 +84,4 @@ export function PromptoryMedia({
       </div>
     </div>
   )
-}
+})

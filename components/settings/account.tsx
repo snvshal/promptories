@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { signOut } from "next-auth/react"
-import { deleteAccount } from "@/actions/profileActions"
+import { deleteAccount } from "@/actions/profile"
 import { SettingsContentCard } from "./settings-list"
 
 export default function AccountSettings() {
