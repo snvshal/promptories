@@ -228,7 +228,7 @@ const FeedbackDialog: React.FC = () => {
       </div> */}
 
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>We&#39;d love your feedback!</DialogTitle>
             <DialogDescription></DialogDescription>
