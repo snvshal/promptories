@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { memo, useState } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -36,7 +36,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { ToolTipComponent } from "../ui/tooltip"
 
-export default function SinglePostPage({ post }: { post: TPost }) {
+export const SinglePostPage = memo(({ post }: { post: TPost }) => {
   const sortedReplies = getSortedReplies(post.replies)
   const [postReplies, setPostReplies] = useState(sortedReplies)
 
@@ -63,41 +63,43 @@ export default function SinglePostPage({ post }: { post: TPost }) {
       </PostReplyDialog>
     </div>
   )
-}
+})
 
-export function PostType({
-  post,
-  type,
-  setPostReplies,
-}: {
-  type: "post" | "posts"
-  post: TPost
-  setPostReplies?: SetAction<TReplies[]>
-}) {
-  const router = useRouter()
-  const visitPost = () => router.push(postPathname(post))
+export const PostType = memo(
+  ({
+    post,
+    type,
+    setPostReplies,
+  }: {
+    type: "post" | "posts"
+    post: TPost
+    setPostReplies?: SetAction<TReplies[]>
+  }) => {
+    const router = useRouter()
+    const visitPost = () => router.push(postPathname(post))
 
-  return (
-    <Card
-      role={type === "posts" ? "button" : undefined}
-      onClick={type === "posts" ? visitPost : undefined}
-      className="mid-width-card-content flex px-4 py-3 shadow-none"
-      data-key={post._id?.toString() as string}
-    >
-      {type === "posts" && (
-        <div className="mr-2 flex items-start">
-          <AvatarComponent user={pu(post)} />
+    return (
+      <Card
+        role={type === "posts" ? "button" : undefined}
+        onClick={type === "posts" ? visitPost : undefined}
+        className="mid-width-card-content flex px-4 py-3 shadow-none"
+        data-key={post._id?.toString() as string}
+      >
+        {type === "posts" && (
+          <div className="mr-2 flex items-start">
+            <AvatarComponent user={pu(post)} />
+          </div>
+        )}
+        <div className="flex-1">
+          <PostHeader type={type} post={post} />
+          <PostContent type={type} post={post} />
+          {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
+          <PostFooter post={post} setPostReplies={setPostReplies} />
         </div>
-      )}
-      <div className="flex-1">
-        <PostHeader type={type} post={post} />
-        <PostContent type={type} post={post} />
-        {type === "post" && <PostTime createdAt={post.createdAt as Date} />}
-        <PostFooter post={post} setPostReplies={setPostReplies} />
-      </div>
-    </Card>
-  )
-}
+      </Card>
+    )
+  },
+)
 
 export function AvatarComponent({
   user,

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Feather } from "lucide-react"
 import { TPost } from "@/types/schema.type"
@@ -174,7 +174,7 @@ export function NavigateBackHeader({
   )
 }
 
-export function PostsComponent({ posts }: { posts: TPost[] }) {
+export const PostsComponent = memo(({ posts }: { posts: TPost[] }) => {
   if (!posts?.length) {
     return (
       <div className="flex-center h-40 w-full p-4">
@@ -190,7 +190,7 @@ export function PostsComponent({ posts }: { posts: TPost[] }) {
       ))}
     </>
   )
-}
+})
 
 export function LoadingIndicator() {
   return (

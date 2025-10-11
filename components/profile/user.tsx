@@ -13,7 +13,7 @@ import { TPost, TUser } from "@/types/schema.type"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Ellipsis, FlagIcon, Link2Icon, User } from "lucide-react"
 import { NavigateBackHeader } from "../home"
-import React, { useEffect, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { cl, pu, truncateString } from "@/utils/ps"
 import Link from "next/link"
 import { SetAction } from "@/types/generics.type"
@@ -205,95 +205,99 @@ export function TabsTriggerButton({
   )
 }
 
-export function ProfileUserContent({
-  isLoading,
-  profileUser,
-  handleUnblockClick,
-}: {
-  isLoading: boolean
-  profileUser: TUser
-  handleUnblockClick: () => void
-}) {
-  const [followersCount, setFollowersCount] = useState(
-    profileUser.followers.length ?? 0,
-  )
+export const ProfileUserContent = memo(
+  ({
+    isLoading,
+    profileUser,
+    handleUnblockClick,
+  }: {
+    isLoading: boolean
+    profileUser: TUser
+    handleUnblockClick: () => void
+  }) => {
+    const [followersCount, setFollowersCount] = useState(
+      profileUser.followers.length ?? 0,
+    )
 
-  const { isUserBlocked } = useUser()
-  const profileUserId = profileUser._id?.toString() as string
+    const { isUserBlocked } = useUser()
+    const profileUserId = profileUser._id?.toString() as string
 
-  return (
-    <Card className="mb-0 w-full rounded-none border-0 shadow-none">
-      <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
-        <div className="flex w-full justify-end space-x-4">
-          {isUserBlocked(profileUserId) ? (
-            <Button
-              variant="destructive"
-              onClick={handleUnblockClick}
-              disabled={isLoading}
-            >
-              Unblock
-            </Button>
-          ) : (
-            <ProfileOptionButton
-              profileUser={profileUser}
-              setFollowersCount={setFollowersCount}
-            />
-          )}
-        </div>
-        <div className="sm:flex-start flex max-sm:flex-col">
-          <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 sm:size-40 md:mr-4">
-            <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
-            <AvatarFallback>
-              <User className="size-16 text-muted-foreground md:size-20" />
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex grow flex-col items-start">
-            <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
-            <p className="text-muted-foreground">
-              &#64;{profileUser?.username}
-            </p>
-            {isUserBlocked(profileUserId) || (
-              <>
-                <p className="mt-2">{profileUser?.bio}</p>
-                <div className="mt-4">
-                  {profileUser.external_link && (
-                    <Link
-                      target="_blank"
-                      prefetch={false}
-                      href={profileUser.external_link as string}
-                      className="flex items-center gap-2"
-                    >
-                      <Link2Icon className="h-5 w-5 -rotate-45 text-muted-foreground" />
-                      <span className="flex-1 text-blue-500 hover:underline">
-                        {truncateString(
-                          profileUser.external_link
-                            ?.replace(/^https?:\/\//, "")
-                            .replace(/^www\./, ""),
-                          32,
-                        )}
-                      </span>
-                    </Link>
-                  )}
-                </div>
-              </>
+    return (
+      <Card className="mb-0 w-full rounded-none border-0 shadow-none">
+        <CardContent className="pt-6 max-md:px-4 max-sm:pb-4">
+          <div className="flex w-full justify-end space-x-4">
+            {isUserBlocked(profileUserId) ? (
+              <Button
+                variant="destructive"
+                onClick={handleUnblockClick}
+                disabled={isLoading}
+              >
+                Unblock
+              </Button>
+            ) : (
+              <ProfileOptionButton
+                profileUser={profileUser}
+                setFollowersCount={setFollowersCount}
+              />
             )}
+          </div>
+          <div className="sm:flex-start flex max-sm:flex-col">
+            <Avatar className="size-32 self-start max-sm:mb-4 sm:mr-3 sm:size-40 md:mr-4">
+              <AvatarImage src={profileUser?.avatar} alt={profileUser?.name} />
+              <AvatarFallback>
+                <User className="size-16 text-muted-foreground md:size-20" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex grow flex-col items-start">
+              <h2 className="text-2xl font-bold">{profileUser?.name}</h2>
+              <p className="text-muted-foreground">
+                &#64;{profileUser?.username}
+              </p>
+              {isUserBlocked(profileUserId) || (
+                <>
+                  <p className="mt-2">{profileUser?.bio}</p>
+                  <div className="mt-4">
+                    {profileUser.external_link && (
+                      <Link
+                        target="_blank"
+                        prefetch={false}
+                        href={profileUser.external_link as string}
+                        className="flex items-center gap-2"
+                      >
+                        <Link2Icon className="h-5 w-5 -rotate-45 text-muted-foreground" />
+                        <span className="flex-1 text-blue-500 hover:underline">
+                          {truncateString(
+                            profileUser.external_link
+                              ?.replace(/^https?:\/\//, "")
+                              .replace(/^www\./, ""),
+                            32,
+                          )}
+                        </span>
+                      </Link>
+                    )}
+                  </div>
+                </>
+              )}
 
-            <div className="mt-4 flex gap-4">
-              <div className="flex gap-1">
-                <p className="font-semibold">{profileUser?.following.length}</p>
-                <p className="text-muted-foreground">Following</p>
-              </div>
-              <div className="flex gap-1">
-                <p className="font-semibold">{followersCount}</p>
-                <p className="text-muted-foreground">Followers</p>
+              <div className="mt-4 flex gap-4">
+                <div className="flex gap-1">
+                  <p className="font-semibold">
+                    {profileUser?.following.length}
+                  </p>
+                  <p className="text-muted-foreground">Following</p>
+                </div>
+                <div className="flex gap-1">
+                  <p className="font-semibold">{followersCount}</p>
+                  <p className="text-muted-foreground">Followers</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
+        </CardContent>
+      </Card>
+    )
+  },
+)
 
 export function UserNotFound() {
   const { username } = useParams()
