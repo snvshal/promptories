@@ -9,7 +9,7 @@ import {
   handleLikePost,
   handleBookmarkPost,
   handlePostView,
-} from "@/actions/postActions"
+} from "@/actions/post"
 import { TPost, TReplies } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { handlePostShare, ib, il, st } from "@/utils/ps"

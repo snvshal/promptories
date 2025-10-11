@@ -6,7 +6,7 @@ import { connectToDatabase } from "@/utils/db"
 import { currentUser } from "@/utils/get-user"
 import { getSortedReplies, postPathname, ps } from "@/utils/ps"
 import { Types } from "mongoose"
-import { commentNotification } from "./notificationActions"
+import { commentNotification } from "./notification"
 import { revalidatePath } from "next/cache"
 
 export async function addReplyToPost(postId: string, replyText: string) {

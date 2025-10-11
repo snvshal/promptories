@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { toast } from "@/hooks/use-toast"
-import { isUsernameUnique, updateUsername } from "@/actions/profileActions"
+import { isUsernameUnique, updateUsername } from "@/actions/profile"
 import { useSession } from "next-auth/react"
 import { useState } from "react"
 import { ContextUser, useUser } from "@/hooks/use-user"

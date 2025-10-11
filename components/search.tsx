@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs"
 import { CheckCircle, Filter, SearchIcon } from "lucide-react"
 import { LoadingIndicator, NavigateBackHeader } from "./home"
-import { search } from "@/actions/searchQuery"
+import { search } from "@/actions/search"
 import { TPost, TUser } from "@/types/schema.type"
 import { PostsComponent } from "./home"
 import {

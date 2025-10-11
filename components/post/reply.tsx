@@ -8,9 +8,8 @@ import { MessageCircle, Send, Heart, Trash, Ellipsis, User } from "lucide-react"
 import Link from "next/link"
 import { TimeAgo } from "../time-ago"
 import { TPost, TReplies } from "@/types/schema.type"
-import { addReplyToPost } from "@/actions/replyActions"
 import { Separator } from "../ui/separator"
-import { deleteReply, handleLikeReply } from "@/actions/replyActions"
+import { addReplyToPost, deleteReply, handleLikeReply } from "@/actions/reply"
 import {
   DropdownMenu,
   DropdownMenuContent,

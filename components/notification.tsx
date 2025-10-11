@@ -7,7 +7,7 @@ import { Heart, MessageCircle, UserPlus, Bell } from "lucide-react"
 import { TNotification, TUser } from "@/types/schema.type"
 import { useRouter } from "next/navigation"
 import { TimeAgo } from "./time-ago"
-import { markAsReadNotification } from "@/actions/notificationActions"
+import { markAsReadNotification } from "@/actions/notification"
 import { NavigateBackHeader } from "./home"
 import { AvatarComponent } from "./post/content"
 

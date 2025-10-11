@@ -1,7 +1,7 @@
 "use client"
 
-import { addFollower } from "@/actions/addFollower"
-import { muteUser, blockUser } from "@/actions/userModeration"
+import { addFollower } from "@/actions/add-follower"
+import { muteUser, blockUser } from "@/actions/user-moderation"
 import { getContextUser } from "@/utils/get-user"
 import { createContext, useContext, useEffect, useState } from "react"
 

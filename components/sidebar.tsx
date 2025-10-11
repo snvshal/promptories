@@ -28,8 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select"
-import { getNotificationCount } from "@/actions/notificationActions"
-import { getTrendingTags } from "@/actions/getTrendingTags"
+import { getNotificationCount } from "@/actions/notification"
+import { getTrendingTags } from "@/actions/trending-tags"
 import Cookies from "js-cookie"
 
 import {

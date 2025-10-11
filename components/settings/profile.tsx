@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { updateUserData } from "@/actions/profileActions"
+import { updateUserData } from "@/actions/profile"
 import {
   Form,
   FormControl,
