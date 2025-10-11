@@ -33,95 +33,90 @@ import { PostIconButton } from "./footer"
 import { AvatarComponent } from "./content"
 import { useUser } from "@/hooks/use-user"
 
-export const PostReplies = memo(
-  ({
-    post,
-    postReplies,
-    setPostReplies,
-  }: {
-    post: TPost
-    postReplies: TReplies[]
-    setPostReplies: SetAction<TReplies[]>
-  }) => {
-    const [replyText, setReplyText] = useState("")
-    const [emptyReplyError, setEmptyReplyError] = useState("")
-    const [sendingReply, setSendingReply] = useState(false)
+export const PostReplies = memo(function PostReplies({
+  post,
+  postReplies,
+  setPostReplies,
+}: {
+  post: TPost
+  postReplies: TReplies[]
+  setPostReplies: SetAction<TReplies[]>
+}) {
+  const [replyText, setReplyText] = useState("")
+  const [emptyReplyError, setEmptyReplyError] = useState("")
+  const [sendingReply, setSendingReply] = useState(false)
 
-    const handleReplySubmit = async (e: React.FormEvent) => {
-      try {
-        e.preventDefault()
+  const handleReplySubmit = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault()
 
-        setSendingReply(true)
+      setSendingReply(true)
 
-        if (!replyText.trim()) {
-          setEmptyReplyError("Reply is required!")
-          return
-        }
-
-        const updatedReplies = await addReplyToPost(
-          post._id as string,
-          replyText,
-        )
-        setPostReplies(updatedReplies)
-        setReplyText("")
-
-        toast({
-          description: "Your reply has been sent.",
-        })
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "There was a problem sending your reply.",
-          variant: "destructive",
-        })
-      } finally {
-        setSendingReply(false)
+      if (!replyText.trim()) {
+        setEmptyReplyError("Reply is required!")
+        return
       }
+
+      const updatedReplies = await addReplyToPost(post._id as string, replyText)
+      setPostReplies(updatedReplies)
+      setReplyText("")
+
+      toast({
+        description: "Your reply has been sent.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was a problem sending your reply.",
+        variant: "destructive",
+      })
+    } finally {
+      setSendingReply(false)
     }
-    return (
-      <Card className="mb-0 min-h-screen w-full rounded-none border-0 shadow-none">
-        <CardHeader className="p-4">
-          <CardTitle className="text-lg font-semibold">Replies</CardTitle>
-        </CardHeader>
-        <CardContent className="px-4">
-          <form onSubmit={handleReplySubmit} className="w-full">
-            <div className="flex space-x-2">
-              <Input
-                type="text"
-                name="reply"
-                placeholder="Write a reply..."
-                value={replyText}
-                onChange={(e) => {
-                  setReplyText(e.target.value)
-                  setEmptyReplyError("")
-                  setSendingReply(false)
-                }}
-                className="flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-              <Button
-                size="icon"
-                type="submit"
-                disabled={sendingReply || !replyText.trim()}
-              >
-                <Send className="h-4 w-4" />
-                <span className="sr-only">Send reply</span>
-              </Button>
-            </div>
-          </form>
-          {emptyReplyError && (
-            <p className="mt-1 text-sm text-red-500">{emptyReplyError}</p>
-          )}
-          <Separator className="my-4" />
-          <PostRepliesContent
-            post={post}
-            replies={postReplies}
-            setPostReplies={setPostReplies}
-          />
-        </CardContent>
-      </Card>
-    )
-  },
-)
+  }
+  return (
+    <Card className="mb-0 min-h-screen w-full rounded-none border-0 shadow-none">
+      <CardHeader className="p-4">
+        <CardTitle className="text-lg font-semibold">Replies</CardTitle>
+      </CardHeader>
+      <CardContent className="px-4">
+        <form onSubmit={handleReplySubmit} className="w-full">
+          <div className="flex space-x-2">
+            <Input
+              type="text"
+              name="reply"
+              placeholder="Write a reply..."
+              value={replyText}
+              onChange={(e) => {
+                setReplyText(e.target.value)
+                setEmptyReplyError("")
+                setSendingReply(false)
+              }}
+              className="flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+            <Button
+              size="icon"
+              type="submit"
+              disabled={sendingReply || !replyText.trim()}
+            >
+              <Send className="h-4 w-4" />
+              <span className="sr-only">Send reply</span>
+            </Button>
+          </div>
+        </form>
+        {emptyReplyError && (
+          <p className="mt-1 text-sm text-red-500">{emptyReplyError}</p>
+        )}
+        <Separator className="my-4" />
+        <PostRepliesContent
+          post={post}
+          replies={postReplies}
+          setPostReplies={setPostReplies}
+        />
+      </CardContent>
+    </Card>
+  )
+})
 
 export function PostRepliesContent({
   post,

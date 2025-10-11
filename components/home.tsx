@@ -174,7 +174,11 @@ export function NavigateBackHeader({
   )
 }
 
-export const PostsComponent = memo(({ posts }: { posts: TPost[] }) => {
+export const PostsComponent = memo(function PostsComponent({
+  posts,
+}: {
+  posts: TPost[]
+}) {
   if (!posts?.length) {
     return (
       <div className="flex-center h-40 w-full p-4">
